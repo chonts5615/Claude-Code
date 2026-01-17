@@ -14,6 +14,66 @@ This system uses a multi-agent architecture orchestrated by LangGraph to convert
 - **Governance controls**: Configurable quality gates and thresholds
 - **Audit trail**: Complete before/after snapshots of all changes
 - **Multi-source benchmarking**: Validates against O*NET, SFIA, NICE frameworks
+- **🆕 Intelligent file analysis**: Automatically analyzes input files and confirms structure before processing
+- **🆕 Knowledge base management**: Upload and manage reference documents for enhanced benchmarking
+
+## New Features
+
+### Intelligent File Analysis
+
+The system now automatically analyzes your input files before processing:
+
+```bash
+# Analyze files to verify structure
+techcomp analyze-files data/input/jobs.xlsx data/input/tech_comps.xlsx
+
+# Run with automatic analysis (default)
+techcomp run --jobs-file data/input/jobs.xlsx ...
+
+# Skip analysis for trusted files
+techcomp run --skip-analysis --jobs-file data/input/jobs.xlsx ...
+```
+
+**What it does**:
+- Detects file type and structure
+- Identifies column purposes
+- Suggests column mappings
+- Provides confidence scores
+- Shows sample data
+- Confirms with user before proceeding
+
+See [File Analysis Guide](docs/file_analysis_guide.md) for details.
+
+### Knowledge Base Management
+
+Upload reference documents for enhanced competency benchmarking:
+
+```bash
+# Add documents to knowledge base
+techcomp kb add frameworks/sfia_v8.pdf \
+  --title "SFIA Framework v8" \
+  --category framework \
+  --tags "IT,skills"
+
+# List documents
+techcomp kb list
+
+# Search documents
+techcomp kb search "data analysis"
+
+# View statistics
+techcomp kb stats
+```
+
+**Supported documents**:
+- PDF files (frameworks, standards, research papers)
+- Word documents (.docx, .doc)
+- Excel/CSV files (competency libraries)
+- Text files
+
+The benchmark researcher (Step 6) automatically searches your knowledge base to validate competencies against your uploaded documents.
+
+See [Knowledge Base Guide](docs/knowledge_base_guide.md) for details.
 
 ## Quick Start
 
