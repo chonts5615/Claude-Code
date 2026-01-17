@@ -1,0 +1,41 @@
+# Competency writing standards
+
+naming_convention:
+  pattern: "Domain: Specific Skill/Knowledge"
+  examples:
+    - "Data Analysis: Statistical Modeling"
+    - "Software Development: API Design"
+    - "Quality Assurance: Test Automation"
+  max_length: 80
+
+definition:
+  min_words: 50
+  max_words: 150
+  requirements:
+    - Applied to work context (not generic)
+    - Includes tools/methods/technologies where relevant
+    - Describes observable application
+    - Avoids jargon without explanation
+
+behavioral_indicators:
+  min_count: 3
+  max_count: 7
+  characteristics:
+    - Observable behaviors
+    - Tied to technical execution
+    - Outcome-oriented
+    - Assessable (not aspirational)
+  format: "Verb + Object + Context/Standard"
+  examples:
+    - "Designs RESTful APIs following OpenAPI specification"
+    - "Writes SQL queries optimized for query performance (< 2s execution)"
+    - "Conducts code reviews using established security checklists"
+
+applied_scope:
+  tools_methods_tech:
+    min_count: 2
+    examples: ["Python", "TensorFlow", "AWS SageMaker"]
+  standards_frameworks:
+    examples: ["ISO 9001", "WCAG 2.1", "NIST Cybersecurity Framework"]
+  typical_outputs:
+    examples: ["Technical specifications", "Test plans", "Data models"]

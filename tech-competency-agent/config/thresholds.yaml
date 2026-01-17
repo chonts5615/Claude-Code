@@ -1,0 +1,24 @@
+# Quality gate thresholds
+
+# Step 1 - Job Extraction
+job_extraction:
+  min_responsibilities_per_job: 5
+  max_missing_summary_rate: 0.10
+
+# Step 2 - Competency Mapping
+competency_mapping:
+  max_unmapped_responsibility_rate: 0.05
+  min_candidates_per_responsibility: 1
+
+# Step 4/5 - Overlap Detection
+overlap:
+  material_threshold: 0.82  # >= this is material overlap
+  minor_threshold: 0.72     # between minor and material
+  distinctness_duplicate: 0.88  # within-job duplicate threshold
+
+# Step 7 - Ranking
+ranking:
+  top_n_competencies: 8
+  min_responsibility_coverage: 0.80
+  min_competencies_per_job: 6
+  max_competencies_per_job: 10

@@ -1,0 +1,61 @@
+workflow_name: JobToTechnicalCompetencyAgent
+version: 1.0
+
+# Orchestration settings
+orchestration:
+  max_retries_per_step: 2
+  enable_parallel_processing: false
+  checkpoint_enabled: true
+  checkpoint_directory: ./data/checkpoints
+
+# Agent-specific settings
+agents:
+  job_ingestion:
+    parser_type: openpyxl  # or xlrd, pandas
+    responsibility_detection_mode: newline_split  # or bullet_detect
+
+  competency_mapping:
+    similarity_model: sentence-transformers/all-MiniLM-L6-v2
+    lexical_weight: 0.3
+    semantic_weight: 0.4
+    llm_weight: 0.3
+    min_relevance_threshold: 0.6
+
+  normalizer:
+    target_definition_word_count: [50, 150]
+    min_indicators: 3
+    max_indicators: 7
+
+  overlap_auditor:
+    similarity_model: sentence-transformers/all-MiniLM-L6-v2
+    use_keyword_filtering: true
+
+  benchmark_researcher:
+    sources_priority:
+      - ONET
+      - SFIA
+      - NICE
+      - industry_specific
+    max_search_results_per_competency: 5
+
+  criticality_ranker:
+    factor_weights:
+      coverage: 0.25
+      impact_risk: 0.20
+      frequency: 0.15
+      complexity: 0.15
+      differentiation: 0.15
+      time_to_proficiency: 0.10
+
+# LLM provider settings (uses Anthropic by default)
+llm:
+  provider: anthropic
+  model: claude-sonnet-4-20250514
+  temperature: 0.3
+  max_tokens: 4000
+
+# Logging
+logging:
+  level: INFO
+  structured: true
+  output_file: ./data/output/workflow.log
