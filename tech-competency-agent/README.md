@@ -77,7 +77,22 @@ See [Knowledge Base Guide](docs/knowledge_base_guide.md) for details.
 
 ## Quick Start
 
-### 1. Installation
+### Automated Installation (Recommended)
+
+```bash
+# One-command installation
+./install.sh
+
+# This will:
+# - Check Python version (3.11+ required)
+# - Install all dependencies
+# - Set up environment
+# - Generate configuration files
+# - Create sample data
+# - Verify installation
+```
+
+### Manual Installation
 
 ```bash
 # Clone repository
@@ -89,6 +104,12 @@ poetry install
 
 # Or using pip
 pip install -e .
+
+# Verify installation
+python verify_setup.py
+
+# Generate sample data
+python data/input/create_sample_data.py
 ```
 
 ### 2. Configuration
@@ -110,7 +131,22 @@ cp .env.example .env
 echo "ANTHROPIC_API_KEY=your_key_here" >> .env
 ```
 
-### 4. Run workflow
+### 4. Test the system (Optional but Recommended)
+
+```bash
+# Run end-to-end tests
+python test_e2e.py
+
+# This tests:
+# - File parsing
+# - File analysis
+# - Similarity engine
+# - Knowledge base
+# - Schema validation
+# - Agent execution
+```
+
+### 5. Run workflow
 
 ```bash
 techcomp run \
@@ -121,11 +157,30 @@ techcomp run \
   --output-dir data/output
 ```
 
-### 5. Inspect results
+### 6. Inspect results
 
 ```bash
 techcomp inspect data/output/run_<timestamp>_final_state.json
 ```
+
+## Testing & Verification
+
+The system includes comprehensive testing tools:
+
+- **`verify_setup.py`** - Automated installation verification
+  ```bash
+  python verify_setup.py
+  ```
+
+- **`test_e2e.py`** - End-to-end system tests
+  ```bash
+  python test_e2e.py
+  ```
+
+- **`install.sh`** - Automated installation script
+  ```bash
+  ./install.sh
+  ```
 
 ## Project Structure
 
