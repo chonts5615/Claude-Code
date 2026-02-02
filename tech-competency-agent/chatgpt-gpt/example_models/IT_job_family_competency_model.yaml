@@ -1,0 +1,1460 @@
+# =============================================================================
+# INFORMATION TECHNOLOGY JOB FAMILY COMPETENCY MODEL
+# =============================================================================
+# A comprehensive competency model for the Information Technology job family.
+# This model serves as the foundation for generating role-specific technical
+# competencies when combined with individual Job Descriptions.
+#
+# Version: 1.0.0
+# Effective Date: 2024-01-01
+# Last Review: 2024-01-01
+# Next Review: 2025-01-01
+# =============================================================================
+
+job_family_competency_model:
+
+  # ---------------------------------------------------------------------------
+  # MODEL METADATA
+  # ---------------------------------------------------------------------------
+  metadata:
+    model_id: "JF_IT_2024_001"
+    model_name: "Information Technology Competency Framework"
+    job_family: "Information Technology"
+    version: "1.0.0"
+    effective_date: "2024-01-01"
+    review_date: "2025-01-01"
+    owner: "Talent Management - Technical Roles"
+    description: |
+      Comprehensive competency model for Information Technology professionals
+      covering software development, data management, infrastructure, security,
+      and technical methodologies. Applicable to roles from entry-level
+      developers through principal engineers and technical architects.
+
+  # ---------------------------------------------------------------------------
+  # JOB FAMILY DEFINITION
+  # ---------------------------------------------------------------------------
+  job_family_definition:
+    purpose: |
+      The Information Technology job family exists to design, develop, deploy,
+      and maintain the technology systems and applications that enable business
+      operations, drive digital transformation, and create competitive advantage.
+
+    scope: |
+      Includes all roles primarily focused on creating, managing, or maintaining
+      software systems, data platforms, infrastructure, and technology services.
+      Excludes purely project management roles (see Project Management family)
+      and business analysis roles without technical implementation responsibilities.
+
+    typical_roles:
+      - role_name: "Software Engineer"
+        level: "Entry to Principal"
+        focus_area: "Application development and software systems"
+      - role_name: "Data Engineer"
+        level: "Mid to Principal"
+        focus_area: "Data pipelines and platform architecture"
+      - role_name: "DevOps Engineer"
+        level: "Mid to Lead"
+        focus_area: "Infrastructure automation and deployment"
+      - role_name: "Security Engineer"
+        level: "Mid to Principal"
+        focus_area: "Application and infrastructure security"
+      - role_name: "Cloud Architect"
+        level: "Senior to Principal"
+        focus_area: "Cloud platform design and optimization"
+      - role_name: "Full Stack Developer"
+        level: "Entry to Senior"
+        focus_area: "End-to-end web application development"
+      - role_name: "Machine Learning Engineer"
+        level: "Mid to Principal"
+        focus_area: "ML model development and deployment"
+      - role_name: "Site Reliability Engineer"
+        level: "Mid to Principal"
+        focus_area: "System reliability and performance"
+
+    career_progression:
+      entry_to_mid:
+        typical_years: 2-3
+        key_transitions:
+          - "From guided to independent work"
+          - "From single task to multi-component ownership"
+          - "From following patterns to understanding trade-offs"
+      mid_to_senior:
+        typical_years: 3-4
+        key_transitions:
+          - "From component to system-level thinking"
+          - "From individual contributor to technical influence"
+          - "From execution to design leadership"
+      senior_to_lead:
+        typical_years: 2-4
+        key_transitions:
+          - "From technical excellence to multiplying others"
+          - "From project scope to program scope"
+          - "From technical decisions to architectural direction"
+
+    adjacent_families:
+      - family_name: "Data Science & Analytics"
+        relationship: "LATERAL"
+        common_competencies:
+          - "Data Management: Data Modeling"
+          - "Programming: Python Development"
+          - "Systems: API Development"
+      - family_name: "Product Management"
+        relationship: "LATERAL"
+        common_competencies:
+          - "Analysis: Requirements Engineering"
+          - "Quality: Testing Methodologies"
+      - family_name: "Information Security"
+        relationship: "LATERAL"
+        common_competencies:
+          - "Security: Application Security"
+          - "Security: Infrastructure Security"
+
+  # ---------------------------------------------------------------------------
+  # COMPETENCY ARCHITECTURE - CORE COMPETENCIES
+  # ---------------------------------------------------------------------------
+  competency_architecture:
+    core_competencies:
+
+      # ========================================
+      # CORE 1: Software Development
+      # ========================================
+      - competency_id: "IT_CORE_001"
+        name: "Software Development: Programming & Implementation"
+        category: "TECHNICAL"
+
+        definition:
+          text: |
+            The ability to write clean, efficient, and maintainable code that
+            solves business problems and meets technical requirements. This
+            encompasses proficiency in one or more programming languages,
+            understanding of data structures and algorithms, and application
+            of software design principles. Practitioners translate requirements
+            into working software, optimize code performance, and ensure code
+            quality through testing and peer review processes.
+          key_elements:
+            - "Writing syntactically correct and logically sound code"
+            - "Applying data structures and algorithms appropriately"
+            - "Following coding standards and best practices"
+            - "Debugging and troubleshooting code issues"
+            - "Optimizing code for performance and maintainability"
+
+        why_it_matters: |
+          Programming is the foundational capability that enables all software
+          delivery. High-quality code reduces maintenance costs, improves system
+          reliability, and accelerates feature delivery. Poor programming practices
+          result in technical debt that compounds over time, eventually slowing
+          innovation and increasing operational risk.
+
+        behavioral_indicators:
+          - indicator: "Writes clean, readable code following established style guides and patterns"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Implements efficient algorithms with appropriate time and space complexity"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Refactors existing code to improve structure without changing behavior"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Debugs complex issues using systematic troubleshooting approaches"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Writes comprehensive unit tests achieving target code coverage"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Conducts thorough code reviews providing constructive technical feedback"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Establishes coding standards and patterns for team adoption"
+            level_applicability: ["Lead", "Principal"]
+
+        proficiency_levels:
+          foundational:
+            description: "Writes working code with guidance, follows established patterns"
+            typical_behaviors:
+              - "Completes assigned coding tasks with mentor support"
+              - "Follows existing code patterns and style guides"
+              - "Writes basic unit tests for own code"
+              - "Uses debugging tools to identify simple issues"
+          working:
+            description: "Independently delivers quality code, handles moderate complexity"
+            typical_behaviors:
+              - "Delivers features independently with standard code quality"
+              - "Selects appropriate data structures for given problems"
+              - "Writes comprehensive tests for complex scenarios"
+              - "Debugs multi-component issues effectively"
+          advanced:
+            description: "Produces exemplary code, solves complex problems, guides others"
+            typical_behaviors:
+              - "Architects solutions for complex technical challenges"
+              - "Optimizes critical code paths for performance"
+              - "Mentors others through code reviews and pairing"
+              - "Identifies and addresses systemic code quality issues"
+          expert:
+            description: "Industry-level expertise, shapes team practices, tackles novel challenges"
+            typical_behaviors:
+              - "Designs language-level or framework-level solutions"
+              - "Solves problems with novel algorithmic approaches"
+              - "Defines coding standards adopted across organization"
+              - "Evaluates and introduces new programming paradigms"
+
+        applied_scope:
+          tools_technologies:
+            - "Python, Java, JavaScript, TypeScript, Go, C++"
+            - "Git, GitHub, GitLab"
+            - "IDEs: VS Code, IntelliJ, PyCharm"
+            - "Debugging tools: Chrome DevTools, pdb, gdb"
+          methodologies_frameworks:
+            - "Object-Oriented Programming"
+            - "Functional Programming"
+            - "Test-Driven Development (TDD)"
+            - "Clean Code principles"
+            - "SOLID principles"
+          standards_certifications:
+            - "Language-specific style guides (PEP 8, Google Style Guides)"
+            - "Code quality tools (SonarQube, ESLint, Pylint)"
+          typical_outputs:
+            - "Production-ready source code"
+            - "Unit tests and integration tests"
+            - "Code review feedback"
+            - "Technical documentation"
+
+        development_resources:
+          formal_training:
+            - "Programming language certifications"
+            - "Data structures and algorithms courses"
+            - "Clean Code workshop"
+          experiential_learning:
+            - "Feature development projects"
+            - "Bug fixing and maintenance work"
+            - "Open source contributions"
+          certifications:
+            - "AWS Developer Associate"
+            - "Oracle Certified Professional Java Developer"
+            - "Microsoft Certified: Azure Developer"
+
+        assessment_methods:
+          - "Coding assessments and take-home projects"
+          - "Code review quality evaluation"
+          - "Technical interview (live coding)"
+          - "Production code portfolio review"
+
+      # ========================================
+      # CORE 2: Systems Architecture
+      # ========================================
+      - competency_id: "IT_CORE_002"
+        name: "Systems Design: Architecture & Integration"
+        category: "TECHNICAL"
+
+        definition:
+          text: |
+            The ability to design software systems that are scalable, reliable,
+            maintainable, and aligned with business requirements. This includes
+            understanding of architectural patterns, system decomposition,
+            integration approaches, and non-functional requirements. Practitioners
+            create technical designs that balance competing concerns, communicate
+            architecture decisions effectively, and ensure systems integrate
+            properly with existing technology ecosystems.
+          key_elements:
+            - "Decomposing systems into appropriate components"
+            - "Selecting suitable architectural patterns"
+            - "Designing for scalability and reliability"
+            - "Planning system integrations and APIs"
+            - "Documenting architecture decisions"
+
+        why_it_matters: |
+          Sound architecture enables systems to evolve with changing requirements
+          while maintaining performance and reliability. Poor architectural decisions
+          create systemic issues that are expensive to remediate and can limit
+          business agility. Good architecture reduces complexity, enables team
+          autonomy, and supports long-term maintainability.
+
+        behavioral_indicators:
+          - indicator: "Creates system design documents with clear component diagrams"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Evaluates architectural trade-offs considering business constraints"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Designs APIs following REST or GraphQL conventions"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Applies appropriate design patterns to solve recurring problems"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Conducts architecture reviews identifying risks and improvements"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Defines integration standards for enterprise system connectivity"
+            level_applicability: ["Lead", "Principal"]
+
+        proficiency_levels:
+          foundational:
+            description: "Understands basic architecture concepts, contributes to designs"
+            typical_behaviors:
+              - "Reads and interprets existing architecture documentation"
+              - "Implements components within established architecture"
+              - "Identifies when to seek architectural guidance"
+          working:
+            description: "Designs component-level solutions, understands system context"
+            typical_behaviors:
+              - "Creates designs for moderate-complexity components"
+              - "Considers scalability in component design"
+              - "Integrates components with existing systems"
+          advanced:
+            description: "Designs complete systems, guides architectural decisions"
+            typical_behaviors:
+              - "Architects multi-component systems"
+              - "Leads technical design for complex features"
+              - "Evaluates and recommends technology choices"
+          expert:
+            description: "Defines enterprise architecture, shapes technical strategy"
+            typical_behaviors:
+              - "Sets architectural direction for organization"
+              - "Designs platform-level solutions"
+              - "Mentors architects across teams"
+
+        applied_scope:
+          tools_technologies:
+            - "Diagramming: Lucidchart, Draw.io, Miro"
+            - "Documentation: Confluence, Notion, Arc42"
+            - "API Design: Swagger, Postman, OpenAPI"
+          methodologies_frameworks:
+            - "Microservices architecture"
+            - "Event-driven architecture"
+            - "Domain-driven design"
+            - "TOGAF (enterprise)"
+          standards_certifications:
+            - "OpenAPI Specification"
+            - "12-Factor App methodology"
+            - "Cloud design patterns"
+          typical_outputs:
+            - "Architecture decision records (ADRs)"
+            - "System design documents"
+            - "API specifications"
+            - "Integration diagrams"
+
+        development_resources:
+          formal_training:
+            - "Software Architecture courses"
+            - "Cloud architecture certifications"
+            - "Domain-driven design workshops"
+          experiential_learning:
+            - "Leading system design initiatives"
+            - "Architecture review participation"
+            - "Technology evaluation projects"
+          certifications:
+            - "AWS Solutions Architect"
+            - "Google Cloud Professional Architect"
+            - "TOGAF certification"
+
+        assessment_methods:
+          - "System design interviews"
+          - "Architecture document review"
+          - "Design decision justification"
+          - "Past project architecture walkthrough"
+
+      # ========================================
+      # CORE 3: Data Management
+      # ========================================
+      - competency_id: "IT_CORE_003"
+        name: "Data Management: Storage & Processing"
+        category: "TECHNICAL"
+
+        definition:
+          text: |
+            The ability to design, implement, and optimize data storage and
+            processing solutions that meet business needs for reliability,
+            performance, and accessibility. This includes proficiency in
+            database systems (relational and non-relational), data modeling,
+            query optimization, and data integrity practices. Practitioners
+            ensure data is structured appropriately, queries perform efficiently,
+            and data quality standards are maintained.
+          key_elements:
+            - "Designing efficient data models and schemas"
+            - "Writing and optimizing database queries"
+            - "Selecting appropriate database technologies"
+            - "Ensuring data integrity and consistency"
+            - "Managing database performance"
+
+        why_it_matters: |
+          Data is a critical business asset, and proper data management ensures
+          it remains accurate, accessible, and performant. Poor data practices
+          lead to slow applications, incorrect business decisions, and compliance
+          risks. Strong data management enables analytics, supports operations,
+          and maintains customer trust.
+
+        behavioral_indicators:
+          - indicator: "Designs normalized database schemas for transactional systems"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Writes SQL queries optimized for performance (response time < 2s)"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Implements appropriate indexes based on query patterns"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Selects appropriate database technology for given requirements"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Designs data migration strategies minimizing downtime"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Implements data quality checks and monitoring"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+
+        proficiency_levels:
+          foundational:
+            description: "Writes basic queries, understands schema concepts"
+            typical_behaviors:
+              - "Writes SELECT queries with joins and filters"
+              - "Understands primary/foreign key relationships"
+              - "Follows existing data model patterns"
+          working:
+            description: "Designs schemas, optimizes queries, handles moderate complexity"
+            typical_behaviors:
+              - "Creates database schemas for new features"
+              - "Identifies and resolves slow queries"
+              - "Implements data validation rules"
+          advanced:
+            description: "Architects data solutions, handles complex optimization"
+            typical_behaviors:
+              - "Designs database architecture for scale"
+              - "Leads data migration projects"
+              - "Optimizes database performance at system level"
+          expert:
+            description: "Sets data strategy, handles enterprise-scale challenges"
+            typical_behaviors:
+              - "Defines data architecture standards"
+              - "Designs multi-region data strategies"
+              - "Evaluates and adopts new data technologies"
+
+        applied_scope:
+          tools_technologies:
+            - "PostgreSQL, MySQL, SQL Server, Oracle"
+            - "MongoDB, Cassandra, DynamoDB"
+            - "Redis, Elasticsearch"
+            - "Query analyzers and profilers"
+          methodologies_frameworks:
+            - "Database normalization (1NF-BCNF)"
+            - "Data modeling (ER diagrams)"
+            - "ACID/BASE principles"
+          standards_certifications:
+            - "SQL standards"
+            - "Data governance policies"
+          typical_outputs:
+            - "Database schemas and models"
+            - "Query optimization reports"
+            - "Data migration scripts"
+            - "Data quality metrics"
+
+        development_resources:
+          formal_training:
+            - "Database administration courses"
+            - "SQL optimization workshops"
+            - "NoSQL database training"
+          experiential_learning:
+            - "Database performance tuning projects"
+            - "Data migration initiatives"
+            - "Schema design for new applications"
+          certifications:
+            - "Oracle Database certification"
+            - "MongoDB Developer certification"
+            - "AWS Database Specialty"
+
+        assessment_methods:
+          - "SQL assessment"
+          - "Schema design exercise"
+          - "Query optimization challenge"
+          - "Data modeling review"
+
+      # ========================================
+      # CORE 4: Quality Assurance
+      # ========================================
+      - competency_id: "IT_CORE_004"
+        name: "Quality Assurance: Testing & Validation"
+        category: "METHODOLOGICAL"
+
+        definition:
+          text: |
+            The ability to ensure software quality through systematic testing,
+            validation, and quality practices. This includes designing test
+            strategies, writing automated tests, performing various testing
+            types (unit, integration, system, performance), and implementing
+            quality gates in development processes. Practitioners identify
+            defects early, validate requirements are met, and maintain
+            confidence in system behavior through comprehensive test coverage.
+          key_elements:
+            - "Designing comprehensive test strategies"
+            - "Writing automated tests at multiple levels"
+            - "Executing manual testing when appropriate"
+            - "Analyzing test results and coverage metrics"
+            - "Integrating testing into CI/CD pipelines"
+
+        why_it_matters: |
+          Quality assurance prevents defects from reaching production, protecting
+          customer experience and business reputation. Automated testing enables
+          rapid, confident deployments while manual testing catches subtle issues.
+          Strong QA practices reduce the cost of defects by catching them early
+          and enable sustainable development velocity.
+
+        behavioral_indicators:
+          - indicator: "Writes unit tests achieving >80% code coverage for new features"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Designs integration tests validating component interactions"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Creates end-to-end test scenarios covering critical user journeys"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Implements performance tests with defined acceptance criteria"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Configures quality gates in CI/CD pipelines"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Establishes testing standards and frameworks for team adoption"
+            level_applicability: ["Lead", "Principal"]
+
+        proficiency_levels:
+          foundational:
+            description: "Writes basic tests, follows testing guidelines"
+            typical_behaviors:
+              - "Writes unit tests for own code"
+              - "Executes test suites and reports results"
+              - "Follows test naming and organization conventions"
+          working:
+            description: "Creates comprehensive tests, identifies edge cases"
+            typical_behaviors:
+              - "Designs test cases covering edge cases"
+              - "Writes integration tests for component boundaries"
+              - "Maintains test suites for assigned areas"
+          advanced:
+            description: "Architects test strategies, mentors testing practices"
+            typical_behaviors:
+              - "Designs test architecture for complex systems"
+              - "Implements advanced testing patterns (mocking, fixtures)"
+              - "Guides team on testing best practices"
+          expert:
+            description: "Sets quality standards, innovates testing approaches"
+            typical_behaviors:
+              - "Defines organizational testing strategy"
+              - "Evaluates and adopts new testing tools"
+              - "Drives quality culture across teams"
+
+        applied_scope:
+          tools_technologies:
+            - "Jest, Pytest, JUnit, TestNG"
+            - "Selenium, Cypress, Playwright"
+            - "JMeter, Locust, k6"
+            - "SonarQube, Code Climate"
+          methodologies_frameworks:
+            - "Test-Driven Development (TDD)"
+            - "Behavior-Driven Development (BDD)"
+            - "Test Pyramid approach"
+          standards_certifications:
+            - "ISTQB testing standards"
+            - "Code coverage thresholds"
+          typical_outputs:
+            - "Automated test suites"
+            - "Test plans and strategies"
+            - "Quality metrics reports"
+            - "Defect documentation"
+
+        development_resources:
+          formal_training:
+            - "Test automation courses"
+            - "ISTQB certification preparation"
+            - "Performance testing workshops"
+          experiential_learning:
+            - "Test suite development projects"
+            - "Quality improvement initiatives"
+            - "CI/CD pipeline enhancement"
+          certifications:
+            - "ISTQB Foundation/Advanced"
+            - "AWS DevOps Professional"
+
+        assessment_methods:
+          - "Test code review"
+          - "Test strategy presentation"
+          - "Coverage and quality metrics review"
+          - "Testing approach interview"
+
+      # ========================================
+      # CORE 5: Security Fundamentals
+      # ========================================
+      - competency_id: "IT_CORE_005"
+        name: "Security: Application Security Fundamentals"
+        category: "TECHNICAL"
+
+        definition:
+          text: |
+            The ability to develop and maintain secure software by identifying
+            vulnerabilities, implementing security controls, and following
+            secure development practices. This includes understanding common
+            security threats (OWASP Top 10), implementing authentication and
+            authorization, handling sensitive data appropriately, and
+            participating in security reviews. Practitioners build security
+            into applications from design through deployment.
+          key_elements:
+            - "Identifying and mitigating security vulnerabilities"
+            - "Implementing authentication and authorization"
+            - "Handling sensitive data securely"
+            - "Following secure coding practices"
+            - "Participating in security reviews and audits"
+
+        why_it_matters: |
+          Security breaches cause significant financial and reputational damage.
+          Building security into applications from the start is far more effective
+          than remediation after deployment. All developers must understand
+          security fundamentals to protect systems and customer data from
+          increasingly sophisticated threats.
+
+        behavioral_indicators:
+          - indicator: "Implements input validation to prevent injection attacks"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Applies secure authentication patterns (OAuth, JWT)"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Handles sensitive data following encryption standards"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Conducts security-focused code reviews using OWASP checklist"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Remediates identified vulnerabilities within SLA timeframes"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Designs secure architecture patterns for team adoption"
+            level_applicability: ["Lead", "Principal"]
+
+        proficiency_levels:
+          foundational:
+            description: "Follows security guidelines, avoids common vulnerabilities"
+            typical_behaviors:
+              - "Implements input validation in own code"
+              - "Uses security libraries correctly"
+              - "Recognizes and reports security concerns"
+          working:
+            description: "Implements security features, handles moderate threats"
+            typical_behaviors:
+              - "Implements authentication/authorization features"
+              - "Identifies vulnerabilities in code reviews"
+              - "Follows secure data handling practices"
+          advanced:
+            description: "Designs security solutions, leads remediation efforts"
+            typical_behaviors:
+              - "Architects secure systems"
+              - "Leads vulnerability remediation projects"
+              - "Mentors team on security practices"
+          expert:
+            description: "Sets security standards, handles advanced threats"
+            typical_behaviors:
+              - "Defines security architecture standards"
+              - "Evaluates emerging security threats"
+              - "Drives security culture organization-wide"
+
+        applied_scope:
+          tools_technologies:
+            - "SAST tools: Snyk, SonarQube, Checkmarx"
+            - "DAST tools: OWASP ZAP, Burp Suite"
+            - "Secrets management: HashiCorp Vault, AWS Secrets Manager"
+          methodologies_frameworks:
+            - "OWASP Top 10"
+            - "Secure SDLC"
+            - "Zero Trust architecture"
+          standards_certifications:
+            - "OWASP guidelines"
+            - "PCI-DSS (if applicable)"
+            - "SOC 2 requirements"
+          typical_outputs:
+            - "Secure code implementations"
+            - "Security review findings"
+            - "Vulnerability remediation"
+            - "Security documentation"
+
+        development_resources:
+          formal_training:
+            - "OWASP security training"
+            - "Secure coding courses"
+            - "Application security workshops"
+          experiential_learning:
+            - "Security review participation"
+            - "Vulnerability remediation projects"
+            - "Penetration testing exercises"
+          certifications:
+            - "CSSLP"
+            - "AWS Security Specialty"
+            - "GIAC certifications"
+
+        assessment_methods:
+          - "Secure coding assessment"
+          - "Security review participation"
+          - "Vulnerability identification exercise"
+          - "Security design interview"
+
+      # ========================================
+      # CORE 6: Technical Problem Solving
+      # ========================================
+      - competency_id: "IT_CORE_006"
+        name: "Problem Solving: Technical Analysis & Debugging"
+        category: "METHODOLOGICAL"
+
+        definition:
+          text: |
+            The ability to systematically analyze technical problems, identify
+            root causes, and develop effective solutions. This includes
+            gathering and analyzing diagnostic information, forming and testing
+            hypotheses, using debugging tools effectively, and documenting
+            findings. Practitioners approach problems methodically, avoiding
+            trial-and-error in favor of structured investigation techniques
+            that lead to sustainable solutions.
+          key_elements:
+            - "Gathering and analyzing diagnostic data"
+            - "Forming and testing hypotheses systematically"
+            - "Using debugging and profiling tools"
+            - "Identifying root causes vs. symptoms"
+            - "Documenting problems and solutions"
+
+        why_it_matters: |
+          Technical problems are inevitable; how quickly and effectively they
+          are resolved determines system reliability and team productivity.
+          Strong problem solvers reduce downtime, prevent recurring issues,
+          and build organizational knowledge. This capability directly impacts
+          operational efficiency and customer satisfaction.
+
+        behavioral_indicators:
+          - indicator: "Gathers relevant logs and metrics before investigating issues"
+            level_applicability: ["Entry", "Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Uses systematic debugging approach (binary search, isolation)"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Identifies root cause rather than applying surface-level fixes"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Documents troubleshooting steps and solutions in runbooks"
+            level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+          - indicator: "Leads post-incident reviews identifying preventive measures"
+            level_applicability: ["Senior", "Lead", "Principal"]
+          - indicator: "Develops diagnostic tools and frameworks for team use"
+            level_applicability: ["Lead", "Principal"]
+
+        proficiency_levels:
+          foundational:
+            description: "Solves straightforward problems with guidance"
+            typical_behaviors:
+              - "Gathers basic diagnostic information"
+              - "Resolves known issues using documentation"
+              - "Escalates appropriately when stuck"
+          working:
+            description: "Independently solves moderate problems"
+            typical_behaviors:
+              - "Debugs multi-component issues"
+              - "Identifies patterns in problem occurrence"
+              - "Creates documentation for solved issues"
+          advanced:
+            description: "Solves complex problems, prevents future occurrences"
+            typical_behaviors:
+              - "Diagnoses system-level issues"
+              - "Implements systemic improvements"
+              - "Mentors others on problem-solving techniques"
+          expert:
+            description: "Handles novel challenges, improves organizational capability"
+            typical_behaviors:
+              - "Resolves unprecedented technical challenges"
+              - "Develops diagnostic frameworks"
+              - "Shapes incident response practices"
+
+        applied_scope:
+          tools_technologies:
+            - "Debuggers: Chrome DevTools, gdb, pdb"
+            - "Profilers: Flamegraphs, memory profilers"
+            - "Logging: ELK Stack, Splunk, CloudWatch"
+            - "APM: Datadog, New Relic, Dynatrace"
+          methodologies_frameworks:
+            - "Root cause analysis"
+            - "Five Whys technique"
+            - "Incident management processes"
+          standards_certifications:
+            - "ITIL incident management"
+          typical_outputs:
+            - "Root cause analysis reports"
+            - "Runbooks and troubleshooting guides"
+            - "Post-incident reviews"
+            - "Process improvements"
+
+        development_resources:
+          formal_training:
+            - "Root cause analysis training"
+            - "Debugging workshops"
+            - "Incident management courses"
+          experiential_learning:
+            - "On-call rotations"
+            - "Bug investigation projects"
+            - "Post-incident review participation"
+          certifications:
+            - "ITIL Foundation"
+
+        assessment_methods:
+          - "Debugging exercise"
+          - "Problem-solving scenario"
+          - "Post-incident review sample"
+          - "Technical interview (system design debugging)"
+
+    # ---------------------------------------------------------------------------
+    # COMPETENCY ARCHITECTURE - SPECIALIZED COMPETENCIES
+    # ---------------------------------------------------------------------------
+    specialized_competencies:
+
+      # ========================================
+      # SPECIALIZATION: Cloud & DevOps
+      # ========================================
+      - specialization_area: "Cloud & DevOps"
+        applicable_roles:
+          - "DevOps Engineer"
+          - "Cloud Engineer"
+          - "Site Reliability Engineer"
+          - "Platform Engineer"
+
+        competencies:
+
+          - competency_id: "IT_SPEC_CLOUD_001"
+            name: "Cloud Computing: Infrastructure Management"
+            category: "TECHNICAL"
+
+            definition:
+              text: |
+                The ability to design, deploy, and manage cloud infrastructure
+                using major cloud platforms (AWS, Azure, GCP). This includes
+                provisioning resources, implementing infrastructure as code,
+                optimizing costs, and ensuring reliability. Practitioners
+                leverage cloud-native services to build scalable, resilient
+                systems while managing cloud spend effectively.
+              key_elements:
+                - "Provisioning and configuring cloud resources"
+                - "Implementing infrastructure as code"
+                - "Optimizing cloud costs and performance"
+                - "Ensuring high availability and disaster recovery"
+                - "Managing cloud security and compliance"
+
+            why_it_matters: |
+              Cloud infrastructure underpins modern applications. Effective
+              cloud management enables scalability, reduces operational burden,
+              and can significantly reduce infrastructure costs when optimized.
+              Poor cloud practices lead to security risks and runaway costs.
+
+            behavioral_indicators:
+              - indicator: "Provisions cloud resources using infrastructure as code (Terraform/CloudFormation)"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Implements auto-scaling policies based on performance metrics"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Configures monitoring and alerting for cloud resources"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Optimizes cloud costs through right-sizing and reserved capacity"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Designs multi-region architectures for disaster recovery"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Establishes cloud governance and standards for organization"
+                level_applicability: ["Lead", "Principal"]
+
+            proficiency_levels:
+              foundational:
+                description: "Uses cloud console and basic CLI operations"
+                typical_behaviors:
+                  - "Creates basic cloud resources manually"
+                  - "Follows cloud security guidelines"
+                  - "Monitors resource usage"
+              working:
+                description: "Implements IaC, manages moderate cloud environments"
+                typical_behaviors:
+                  - "Writes Terraform/CloudFormation for common patterns"
+                  - "Implements standard security configurations"
+                  - "Troubleshoots cloud infrastructure issues"
+              advanced:
+                description: "Architects cloud solutions, optimizes at scale"
+                typical_behaviors:
+                  - "Designs complex cloud architectures"
+                  - "Implements cost optimization strategies"
+                  - "Leads cloud migration projects"
+              expert:
+                description: "Sets cloud strategy, handles enterprise-scale challenges"
+                typical_behaviors:
+                  - "Defines cloud architecture standards"
+                  - "Negotiates cloud provider agreements"
+                  - "Shapes cloud adoption strategy"
+
+            applied_scope:
+              tools_technologies:
+                - "AWS, Azure, GCP"
+                - "Terraform, CloudFormation, Pulumi"
+                - "Kubernetes, ECS, AKS"
+                - "Cloud monitoring tools"
+              methodologies_frameworks:
+                - "Well-Architected Framework"
+                - "Cloud-native patterns"
+                - "GitOps"
+              standards_certifications:
+                - "Cloud provider best practices"
+                - "CIS benchmarks"
+              typical_outputs:
+                - "Infrastructure code"
+                - "Cloud architecture diagrams"
+                - "Cost optimization reports"
+                - "Disaster recovery plans"
+
+            development_resources:
+              formal_training:
+                - "AWS/Azure/GCP courses"
+                - "Terraform certification"
+                - "Kubernetes training"
+              experiential_learning:
+                - "Cloud migration projects"
+                - "Cost optimization initiatives"
+                - "DR testing exercises"
+              certifications:
+                - "AWS Solutions Architect"
+                - "Azure Administrator"
+                - "Google Cloud Professional"
+                - "Terraform Associate"
+
+            assessment_methods:
+              - "Cloud architecture design"
+              - "IaC code review"
+              - "Cost optimization analysis"
+              - "Cloud troubleshooting scenario"
+
+          - competency_id: "IT_SPEC_CLOUD_002"
+            name: "DevOps: CI/CD Pipeline Engineering"
+            category: "METHODOLOGICAL"
+
+            definition:
+              text: |
+                The ability to design, implement, and maintain continuous
+                integration and continuous deployment pipelines that enable
+                rapid, reliable software delivery. This includes automating
+                build processes, implementing quality gates, managing deployment
+                strategies, and ensuring pipeline security. Practitioners
+                create pipelines that balance speed with safety, enabling
+                teams to ship with confidence.
+              key_elements:
+                - "Designing and implementing CI/CD pipelines"
+                - "Automating build, test, and deployment processes"
+                - "Implementing deployment strategies (blue-green, canary)"
+                - "Managing pipeline security and secrets"
+                - "Optimizing pipeline performance"
+
+            why_it_matters: |
+              CI/CD pipelines are the backbone of modern software delivery.
+              Effective pipelines enable rapid iteration, reduce deployment
+              risk, and free developers to focus on value creation. Poor
+              pipelines slow delivery, introduce risk, and frustrate teams.
+
+            behavioral_indicators:
+              - indicator: "Configures CI pipelines with automated testing and quality gates"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Implements CD pipelines with appropriate deployment strategies"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Manages secrets and credentials securely in pipelines"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Optimizes pipeline execution time while maintaining quality"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Establishes CI/CD standards and shared pipeline libraries"
+                level_applicability: ["Lead", "Principal"]
+
+            proficiency_levels:
+              foundational:
+                description: "Uses existing pipelines, makes minor modifications"
+                typical_behaviors:
+                  - "Triggers and monitors pipeline runs"
+                  - "Makes minor configuration changes"
+                  - "Troubleshoots basic pipeline failures"
+              working:
+                description: "Creates standard pipelines, implements quality gates"
+                typical_behaviors:
+                  - "Builds pipelines for typical applications"
+                  - "Integrates testing and security scanning"
+                  - "Implements standard deployment patterns"
+              advanced:
+                description: "Architects pipeline platforms, handles complex scenarios"
+                typical_behaviors:
+                  - "Designs pipeline architecture for organization"
+                  - "Creates shared pipeline libraries"
+                  - "Implements advanced deployment strategies"
+              expert:
+                description: "Sets delivery practices, innovates deployment approaches"
+                typical_behaviors:
+                  - "Defines delivery strategy for organization"
+                  - "Evaluates and adopts new delivery tools"
+                  - "Shapes industry practices through thought leadership"
+
+            applied_scope:
+              tools_technologies:
+                - "GitHub Actions, GitLab CI, Jenkins"
+                - "ArgoCD, Spinnaker, Flux"
+                - "Docker, Kubernetes"
+                - "Artifact repositories"
+              methodologies_frameworks:
+                - "GitOps"
+                - "Continuous Delivery practices"
+                - "DevOps principles"
+              standards_certifications:
+                - "DORA metrics"
+                - "DevOps best practices"
+              typical_outputs:
+                - "CI/CD pipeline configurations"
+                - "Deployment runbooks"
+                - "Pipeline documentation"
+                - "Delivery metrics dashboards"
+
+            development_resources:
+              formal_training:
+                - "CI/CD platform certifications"
+                - "DevOps courses"
+                - "Container orchestration training"
+              experiential_learning:
+                - "Pipeline improvement projects"
+                - "Deployment automation initiatives"
+                - "Release engineering work"
+              certifications:
+                - "GitHub Actions certification"
+                - "Jenkins certification"
+                - "Kubernetes certifications"
+
+            assessment_methods:
+              - "Pipeline design exercise"
+              - "CI/CD configuration review"
+              - "Delivery metrics analysis"
+              - "DevOps practice interview"
+
+      # ========================================
+      # SPECIALIZATION: Data Engineering
+      # ========================================
+      - specialization_area: "Data Engineering"
+        applicable_roles:
+          - "Data Engineer"
+          - "Analytics Engineer"
+          - "Data Platform Engineer"
+          - "ETL Developer"
+
+        competencies:
+
+          - competency_id: "IT_SPEC_DATA_001"
+            name: "Data Engineering: Pipeline Development"
+            category: "TECHNICAL"
+
+            definition:
+              text: |
+                The ability to design and implement data pipelines that extract,
+                transform, and load data reliably at scale. This includes
+                working with batch and streaming data, implementing data
+                quality checks, handling schema evolution, and optimizing
+                pipeline performance. Practitioners build data infrastructure
+                that enables analytics and machine learning while ensuring
+                data quality and timeliness.
+              key_elements:
+                - "Designing ETL/ELT pipelines"
+                - "Implementing batch and streaming processing"
+                - "Ensuring data quality and validation"
+                - "Managing schema evolution"
+                - "Optimizing pipeline performance"
+
+            why_it_matters: |
+              Data pipelines feed analytics, reporting, and ML systems. Reliable
+              pipelines enable data-driven decisions; unreliable ones lead to
+              incorrect insights and eroded trust. Good data engineering provides
+              the foundation for organizational data capabilities.
+
+            behavioral_indicators:
+              - indicator: "Designs ETL pipelines handling diverse data sources"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Implements data quality checks with automated alerting"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Builds streaming pipelines for real-time data processing"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Optimizes pipeline performance for large-scale data"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Establishes data engineering standards and patterns"
+                level_applicability: ["Lead", "Principal"]
+
+            proficiency_levels:
+              foundational:
+                description: "Implements basic pipelines with guidance"
+                typical_behaviors:
+                  - "Builds simple ETL jobs"
+                  - "Follows data modeling conventions"
+                  - "Monitors pipeline execution"
+              working:
+                description: "Develops production pipelines independently"
+                typical_behaviors:
+                  - "Designs pipelines for moderate complexity"
+                  - "Implements data quality validations"
+                  - "Troubleshoots pipeline failures"
+              advanced:
+                description: "Architects data platforms, handles scale challenges"
+                typical_behaviors:
+                  - "Designs data architecture for organization"
+                  - "Implements real-time streaming solutions"
+                  - "Optimizes large-scale data processing"
+              expert:
+                description: "Sets data strategy, handles enterprise-scale"
+                typical_behaviors:
+                  - "Defines data platform strategy"
+                  - "Evaluates emerging data technologies"
+                  - "Shapes data engineering practices"
+
+            applied_scope:
+              tools_technologies:
+                - "Apache Spark, Flink, Kafka"
+                - "Airflow, dbt, Dagster"
+                - "Snowflake, BigQuery, Redshift"
+                - "Data quality tools"
+              methodologies_frameworks:
+                - "Data modeling (Kimball, Data Vault)"
+                - "DataOps practices"
+                - "Data mesh principles"
+              standards_certifications:
+                - "Data governance standards"
+                - "Data quality frameworks"
+              typical_outputs:
+                - "Data pipelines"
+                - "Data models and schemas"
+                - "Data quality reports"
+                - "Pipeline documentation"
+
+            development_resources:
+              formal_training:
+                - "Spark/Flink courses"
+                - "Data warehousing training"
+                - "Streaming technologies courses"
+              experiential_learning:
+                - "Pipeline development projects"
+                - "Data platform improvements"
+                - "Scale optimization work"
+              certifications:
+                - "Databricks certifications"
+                - "Snowflake certifications"
+                - "Cloud data certifications"
+
+            assessment_methods:
+              - "Pipeline design exercise"
+              - "Data modeling assessment"
+              - "Performance optimization scenario"
+              - "Data engineering interview"
+
+      # ========================================
+      # SPECIALIZATION: Machine Learning
+      # ========================================
+      - specialization_area: "Machine Learning"
+        applicable_roles:
+          - "Machine Learning Engineer"
+          - "ML Platform Engineer"
+          - "AI Engineer"
+
+        competencies:
+
+          - competency_id: "IT_SPEC_ML_001"
+            name: "Machine Learning: Model Development & Deployment"
+            category: "TECHNICAL"
+
+            definition:
+              text: |
+                The ability to develop, train, deploy, and maintain machine
+                learning models in production environments. This includes
+                feature engineering, model training and validation, building
+                ML pipelines, and implementing model monitoring. Practitioners
+                bridge the gap between data science experimentation and
+                production ML systems that deliver business value reliably.
+              key_elements:
+                - "Implementing feature engineering pipelines"
+                - "Training and validating ML models"
+                - "Deploying models to production"
+                - "Monitoring model performance and drift"
+                - "Building MLOps infrastructure"
+
+            why_it_matters: |
+              ML capabilities drive competitive advantage in many industries.
+              However, most ML projects fail to reach production. Strong ML
+              engineering enables reliable, scalable ML systems that deliver
+              sustained business value rather than one-time experiments.
+
+            behavioral_indicators:
+              - indicator: "Implements feature pipelines with proper versioning"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Deploys models using containerization and orchestration"
+                level_applicability: ["Mid", "Senior", "Lead", "Principal"]
+              - indicator: "Implements model monitoring detecting performance degradation"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Builds automated retraining pipelines"
+                level_applicability: ["Senior", "Lead", "Principal"]
+              - indicator: "Establishes MLOps standards and platforms"
+                level_applicability: ["Lead", "Principal"]
+
+            proficiency_levels:
+              foundational:
+                description: "Deploys basic models with guidance"
+                typical_behaviors:
+                  - "Follows ML pipeline patterns"
+                  - "Uses ML frameworks (scikit-learn, TensorFlow)"
+                  - "Deploys models using standard tools"
+              working:
+                description: "Develops production ML pipelines independently"
+                typical_behaviors:
+                  - "Builds end-to-end ML pipelines"
+                  - "Implements feature stores"
+                  - "Monitors model performance"
+              advanced:
+                description: "Architects ML platforms, handles scale"
+                typical_behaviors:
+                  - "Designs ML infrastructure"
+                  - "Implements advanced MLOps practices"
+                  - "Optimizes model serving performance"
+              expert:
+                description: "Sets ML strategy, handles enterprise-scale"
+                typical_behaviors:
+                  - "Defines ML platform strategy"
+                  - "Evaluates emerging ML technologies"
+                  - "Shapes ML engineering practices"
+
+            applied_scope:
+              tools_technologies:
+                - "TensorFlow, PyTorch, scikit-learn"
+                - "MLflow, Kubeflow, SageMaker"
+                - "Feature stores (Feast, Tecton)"
+                - "Model serving (TensorFlow Serving, Seldon)"
+              methodologies_frameworks:
+                - "MLOps practices"
+                - "Model validation frameworks"
+                - "A/B testing for models"
+              standards_certifications:
+                - "ML fairness guidelines"
+                - "Model documentation standards"
+              typical_outputs:
+                - "ML pipelines"
+                - "Feature stores"
+                - "Model serving infrastructure"
+                - "Model monitoring dashboards"
+
+            development_resources:
+              formal_training:
+                - "MLOps courses"
+                - "Deep learning frameworks training"
+                - "Cloud ML platform courses"
+              experiential_learning:
+                - "ML pipeline development"
+                - "Model deployment projects"
+                - "MLOps platform improvements"
+              certifications:
+                - "TensorFlow certification"
+                - "AWS ML Specialty"
+                - "Google ML Engineer"
+
+            assessment_methods:
+              - "ML pipeline design"
+              - "Model deployment exercise"
+              - "MLOps practice review"
+              - "ML engineering interview"
+
+    # ---------------------------------------------------------------------------
+    # EMERGING COMPETENCIES
+    # ---------------------------------------------------------------------------
+    emerging_competencies:
+      - competency_id: "IT_EMRG_001"
+        name: "AI Engineering: Large Language Model Integration"
+        rationale: |
+          LLMs are rapidly becoming integral to software applications. Engineers
+          need skills in prompt engineering, RAG architectures, and responsible
+          AI practices to effectively integrate these capabilities.
+        expected_maturity: "2025-06-01"
+        draft_definition: |
+          The ability to integrate large language models into applications
+          effectively, including prompt engineering, retrieval-augmented
+          generation, and implementing appropriate safeguards.
+        industry_signals:
+          - "Rapid LLM API adoption across industries"
+          - "Growing demand for AI-powered features"
+          - "Emerging best practices in prompt engineering"
+
+      - competency_id: "IT_EMRG_002"
+        name: "Platform Engineering: Developer Experience"
+        rationale: |
+          Platform engineering is emerging as a distinct discipline focused
+          on improving developer productivity through self-service platforms,
+          golden paths, and internal developer portals.
+        expected_maturity: "2025-03-01"
+        draft_definition: |
+          The ability to build internal developer platforms that improve
+          developer productivity, including self-service infrastructure,
+          documentation, and tooling.
+        industry_signals:
+          - "Rise of platform engineering teams"
+          - "Adoption of Internal Developer Portals (Backstage)"
+          - "Focus on developer experience metrics"
+
+  # ---------------------------------------------------------------------------
+  # LEVEL-BASED EXPECTATIONS
+  # ---------------------------------------------------------------------------
+  level_expectations:
+    - level_name: "Entry"
+      level_code: "L1"
+      general_expectations:
+        autonomy: "Works with significant guidance on defined tasks"
+        complexity: "Handles straightforward, well-defined problems"
+        impact_scope: "Individual task completion"
+        collaboration: "Works within immediate team"
+        leadership: "None required; learning from others"
+      competency_depth_expectations:
+        core_competencies_proficiency: "FOUNDATIONAL"
+        specialized_competencies_count: 1
+        specialized_competencies_proficiency: "FOUNDATIONAL"
+      typical_responsibilities_patterns:
+        - "Develops features under guidance"
+        - "Fixes bugs in existing code"
+        - "Writes unit tests"
+        - "Participates in code reviews"
+        - "Documents own work"
+
+    - level_name: "Mid"
+      level_code: "L2"
+      general_expectations:
+        autonomy: "Works independently on standard tasks, seeks guidance for novel situations"
+        complexity: "Handles moderate complexity with multiple considerations"
+        impact_scope: "Component or feature level"
+        collaboration: "Works effectively across team, begins cross-team coordination"
+        leadership: "May guide entry-level engineers informally"
+      competency_depth_expectations:
+        core_competencies_proficiency: "WORKING"
+        specialized_competencies_count: 2
+        specialized_competencies_proficiency: "FOUNDATIONAL to WORKING"
+      typical_responsibilities_patterns:
+        - "Delivers features independently"
+        - "Designs component-level solutions"
+        - "Reviews code and provides feedback"
+        - "Troubleshoots production issues"
+        - "Improves existing systems"
+
+    - level_name: "Senior"
+      level_code: "L3"
+      general_expectations:
+        autonomy: "Fully autonomous; handles ambiguity effectively"
+        complexity: "Handles high complexity, makes significant technical decisions"
+        impact_scope: "System or team level"
+        collaboration: "Coordinates across teams, influences technical direction"
+        leadership: "Mentors others, leads technical initiatives"
+      competency_depth_expectations:
+        core_competencies_proficiency: "ADVANCED"
+        specialized_competencies_count: 3
+        specialized_competencies_proficiency: "WORKING to ADVANCED"
+      typical_responsibilities_patterns:
+        - "Leads technical design for complex features"
+        - "Architects system-level solutions"
+        - "Mentors junior engineers"
+        - "Drives technical standards"
+        - "Resolves complex technical issues"
+
+    - level_name: "Lead"
+      level_code: "L4"
+      general_expectations:
+        autonomy: "Sets direction, handles significant ambiguity"
+        complexity: "Handles highly complex, cross-functional challenges"
+        impact_scope: "Multiple teams or product area"
+        collaboration: "Leads cross-team initiatives, builds consensus"
+        leadership: "Technical leadership, may have direct reports"
+      competency_depth_expectations:
+        core_competencies_proficiency: "ADVANCED"
+        specialized_competencies_count: 4
+        specialized_competencies_proficiency: "ADVANCED"
+      typical_responsibilities_patterns:
+        - "Defines technical strategy for area"
+        - "Leads architecture decisions"
+        - "Builds and develops team capabilities"
+        - "Represents technical perspective in planning"
+        - "Drives technical excellence"
+
+    - level_name: "Principal"
+      level_code: "L5"
+      general_expectations:
+        autonomy: "Defines problems to solve, shapes organizational direction"
+        complexity: "Handles unprecedented, organization-wide challenges"
+        impact_scope: "Organization or company level"
+        collaboration: "Influences across organization, external visibility"
+        leadership: "Technical thought leadership, shapes practices"
+      competency_depth_expectations:
+        core_competencies_proficiency: "EXPERT"
+        specialized_competencies_count: 5
+        specialized_competencies_proficiency: "ADVANCED to EXPERT"
+      typical_responsibilities_patterns:
+        - "Sets technical direction for organization"
+        - "Solves novel, high-impact problems"
+        - "Develops future technical leaders"
+        - "Represents company externally"
+        - "Shapes industry practices"
+
+  # ---------------------------------------------------------------------------
+  # LEADERSHIP COMPETENCY BOUNDARIES
+  # ---------------------------------------------------------------------------
+  leadership_competency_boundaries:
+    description: |
+      Technical competencies focus on the application of technical skills and
+      knowledge to solve problems and deliver solutions. Leadership competencies
+      focus on influencing others, building relationships, and driving
+      organizational outcomes. This section clarifies boundaries to prevent
+      overlap between the two domains.
+
+    leadership_competencies_reference:
+      - competency_name: "Communication: Stakeholder Engagement"
+        overlap_risk_areas:
+          - "Technical presentations"
+          - "Requirements gathering"
+        differentiation_guidance: |
+          TECHNICAL: Focus on conveying technical information accurately
+          LEADERSHIP: Focus on building relationships and influence
+
+      - competency_name: "Team Leadership: People Development"
+        overlap_risk_areas:
+          - "Technical mentoring"
+          - "Code review feedback"
+        differentiation_guidance: |
+          TECHNICAL: Focus on technical skill transfer
+          LEADERSHIP: Focus on career development and motivation
+
+      - competency_name: "Collaboration: Cross-functional Partnership"
+        overlap_risk_areas:
+          - "Working with product teams"
+          - "Cross-team coordination"
+        differentiation_guidance: |
+          TECHNICAL: Focus on technical integration and alignment
+          LEADERSHIP: Focus on relationship building and influence
+
+  # ---------------------------------------------------------------------------
+  # INDUSTRY ALIGNMENT
+  # ---------------------------------------------------------------------------
+  industry_alignment:
+    frameworks_mapped:
+      - framework_name: "SFIA"
+        version: "8"
+        mapping_notes: "Core competencies align with SFIA skills 1-4 levels"
+      - framework_name: "O*NET"
+        version: "Current"
+        mapping_notes: "Mapped to Software Developer and related occupations"
+      - framework_name: "NICE"
+        version: "2.0"
+        mapping_notes: "Security competency aligns with NICE categories"
+
+    industry_benchmarks:
+      - "Levels.fyi engineering levels"
+      - "FAANG career frameworks"
+      - "Radford technology surveys"
+
+    regulatory_considerations:
+      - "SOC 2 compliance requirements (for relevant roles)"
+      - "GDPR data handling requirements"
+      - "Industry-specific regulations (finance, healthcare)"
+
+  # ---------------------------------------------------------------------------
+  # GENERATION RULES
+  # ---------------------------------------------------------------------------
+  generation_rules:
+    competency_selection:
+      min_competencies_per_role: 6
+      max_competencies_per_role: 10
+      core_competencies_minimum: 3
+      coverage_requirement: 0.80
+
+    proficiency_assignment:
+      default_by_level:
+        entry: "FOUNDATIONAL"
+        mid: "WORKING"
+        senior: "ADVANCED"
+        lead: "ADVANCED"
+        principal: "EXPERT"
+
+    customization_boundaries:
+      allow_definition_tailoring: true
+      allow_indicator_selection: true
+      allow_scope_customization: true
+      never_modify:
+        - "proficiency_level_definitions"
+        - "assessment_methods"
+
+    quality_gates:
+      - gate_name: "Definition Length"
+        rule: "50-150 words"
+      - gate_name: "Indicator Count"
+        rule: "3-7 per competency"
+      - gate_name: "Overlap Check"
+        rule: "No material overlap (>0.82 similarity) with leadership"
+      - gate_name: "Responsibility Coverage"
+        rule: ">= 80% of JD responsibilities mapped"
