@@ -1,0 +1,212 @@
+# =============================================================================
+# JOB FAMILY COMPETENCY MODEL SCHEMA
+# =============================================================================
+# This schema defines the structure for a comprehensive competency model
+# designed for a specific job family. The model serves as the foundation
+# from which role-specific competencies are generated based on Job Descriptions.
+#
+# Version: 1.0
+# Purpose: Provide structured competency framework for GPT-based generation
+# =============================================================================
+
+job_family_competency_model:
+  # ---------------------------------------------------------------------------
+  # MODEL METADATA
+  # ---------------------------------------------------------------------------
+  metadata:
+    model_id: string          # Unique identifier (e.g., "JF_IT_2024_001")
+    model_name: string        # Human-readable name
+    job_family: string        # Job family name (e.g., "Information Technology")
+    version: string           # Semantic version (e.g., "1.0.0")
+    effective_date: date      # When model becomes effective
+    review_date: date         # Next scheduled review
+    owner: string             # Model owner/maintainer
+    description: string       # Brief description of the job family scope
+
+  # ---------------------------------------------------------------------------
+  # JOB FAMILY DEFINITION
+  # ---------------------------------------------------------------------------
+  job_family_definition:
+    purpose: string           # Why this job family exists in the organization
+    scope: string             # What roles/functions are included
+    typical_roles:            # Example roles within this family
+      - role_name: string
+        level: string         # Entry, Mid, Senior, Lead, Principal, Executive
+        focus_area: string    # Primary responsibility area
+
+    career_progression:       # How roles typically progress
+      entry_to_mid:
+        typical_years: integer
+        key_transitions: [string]
+      mid_to_senior:
+        typical_years: integer
+        key_transitions: [string]
+      senior_to_lead:
+        typical_years: integer
+        key_transitions: [string]
+
+    adjacent_families:        # Related job families for career mobility
+      - family_name: string
+        relationship: string  # UPSTREAM, DOWNSTREAM, LATERAL
+        common_competencies: [string]
+
+  # ---------------------------------------------------------------------------
+  # COMPETENCY ARCHITECTURE
+  # ---------------------------------------------------------------------------
+  competency_architecture:
+    # Core competencies required across ALL roles in this job family
+    core_competencies:
+      - competency_id: string
+        name: string                    # Format: "Domain: Specific Skill"
+        category: string                # TECHNICAL, METHODOLOGICAL, DOMAIN_KNOWLEDGE
+        definition:
+          text: string                  # 50-150 words, work-context applied
+          key_elements: [string]        # 3-5 essential elements
+        why_it_matters: string          # Business impact statement
+        behavioral_indicators:          # 3-7 observable behaviors
+          - indicator: string           # "Verb + Object + Context"
+            level_applicability: [string]  # Which levels this applies to
+        proficiency_levels:
+          foundational:
+            description: string
+            typical_behaviors: [string]
+          working:
+            description: string
+            typical_behaviors: [string]
+          advanced:
+            description: string
+            typical_behaviors: [string]
+          expert:
+            description: string
+            typical_behaviors: [string]
+        applied_scope:
+          tools_technologies: [string]
+          methodologies_frameworks: [string]
+          standards_certifications: [string]
+          typical_outputs: [string]
+        development_resources:
+          formal_training: [string]
+          experiential_learning: [string]
+          certifications: [string]
+        assessment_methods: [string]
+
+    # Specialized competencies for specific sub-functions or role types
+    specialized_competencies:
+      - specialization_area: string     # e.g., "Data Engineering", "Security"
+        applicable_roles: [string]      # Which roles need this
+        competencies:
+          - competency_id: string
+            name: string
+            category: string
+            definition:
+              text: string
+              key_elements: [string]
+            why_it_matters: string
+            behavioral_indicators:
+              - indicator: string
+                level_applicability: [string]
+            proficiency_levels:
+              foundational:
+                description: string
+                typical_behaviors: [string]
+              working:
+                description: string
+                typical_behaviors: [string]
+              advanced:
+                description: string
+                typical_behaviors: [string]
+              expert:
+                description: string
+                typical_behaviors: [string]
+            applied_scope:
+              tools_technologies: [string]
+              methodologies_frameworks: [string]
+              standards_certifications: [string]
+              typical_outputs: [string]
+            development_resources:
+              formal_training: [string]
+              experiential_learning: [string]
+              certifications: [string]
+            assessment_methods: [string]
+
+    # Emerging competencies being developed for future needs
+    emerging_competencies:
+      - competency_id: string
+        name: string
+        rationale: string               # Why this is emerging
+        expected_maturity: date         # When expected to be fully defined
+        draft_definition: string
+        industry_signals: [string]      # Evidence of importance
+
+  # ---------------------------------------------------------------------------
+  # LEVEL-BASED EXPECTATIONS
+  # ---------------------------------------------------------------------------
+  level_expectations:
+    - level_name: string                # Entry, Mid, Senior, Lead, Principal
+      level_code: string                # L1, L2, L3, L4, L5
+      general_expectations:
+        autonomy: string                # Level of independence
+        complexity: string              # Types of problems handled
+        impact_scope: string            # Breadth of impact
+        collaboration: string           # Working with others
+        leadership: string              # Leadership expectations
+      competency_depth_expectations:
+        core_competencies_proficiency: string       # Minimum level
+        specialized_competencies_count: integer     # How many needed
+        specialized_competencies_proficiency: string
+      typical_responsibilities_patterns: [string]   # Common JD patterns
+
+  # ---------------------------------------------------------------------------
+  # LEADERSHIP COMPETENCIES (to avoid overlap)
+  # ---------------------------------------------------------------------------
+  leadership_competency_boundaries:
+    description: string                 # How to distinguish technical from leadership
+    leadership_competencies_reference:
+      - competency_name: string
+        overlap_risk_areas: [string]    # Where technical might overlap
+        differentiation_guidance: string # How to keep technical distinct
+
+  # ---------------------------------------------------------------------------
+  # INDUSTRY ALIGNMENT
+  # ---------------------------------------------------------------------------
+  industry_alignment:
+    frameworks_mapped:
+      - framework_name: string          # SFIA, ONET, NICE, etc.
+        version: string
+        mapping_notes: string
+    industry_benchmarks: [string]       # External validation sources
+    regulatory_considerations: [string]  # Any compliance requirements
+
+  # ---------------------------------------------------------------------------
+  # GENERATION RULES
+  # ---------------------------------------------------------------------------
+  generation_rules:
+    competency_selection:
+      min_competencies_per_role: 6
+      max_competencies_per_role: 10
+      core_competencies_minimum: 3       # At least 3 core competencies
+      coverage_requirement: 0.80         # Must cover 80% of responsibilities
+
+    proficiency_assignment:
+      default_by_level:
+        entry: "FOUNDATIONAL"
+        mid: "WORKING"
+        senior: "ADVANCED"
+        lead: "ADVANCED"
+        principal: "EXPERT"
+
+    customization_boundaries:
+      allow_definition_tailoring: true   # Can modify definitions for role
+      allow_indicator_selection: true    # Can select relevant indicators
+      allow_scope_customization: true    # Can customize applied scope
+      never_modify: ["proficiency_level_definitions", "assessment_methods"]
+
+    quality_gates:
+      - gate_name: "Definition Length"
+        rule: "50-150 words"
+      - gate_name: "Indicator Count"
+        rule: "3-7 per competency"
+      - gate_name: "Overlap Check"
+        rule: "No material overlap (>0.82 similarity) with leadership"
+      - gate_name: "Responsibility Coverage"
+        rule: ">= 80% of JD responsibilities mapped"
