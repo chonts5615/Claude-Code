@@ -1,0 +1,82 @@
+# Cargill PPTX Converter - Workflow Configuration
+# ================================================
+
+pipeline:
+  # Maximum words per content slide before splitting
+  max_words_per_slide: 150
+
+  # Maximum bullet points per slide before splitting
+  max_bullets_per_slide: 7
+
+  # Maximum total slides (warning threshold)
+  max_slides: 50
+
+  # Minimum slides for a presentation
+  min_slides: 3
+
+  # Include speaker notes in output
+  include_speaker_notes: false
+
+  # Chart rendering DPI
+  chart_dpi: 150
+
+  # Slide size: "widescreen" (16:9) or "standard" (4:3)
+  slide_size: widescreen
+
+  # Use Cargill brand fonts (set false for fallback fonts)
+  use_brand_fonts: true
+
+  # Include footer on content slides
+  include_footer: true
+
+  # Include logo placeholder on slides
+  include_logo: true
+
+# Brand compliance settings
+brand_compliance:
+  # Automatically apply terminology corrections
+  auto_correct_terminology: true
+
+  # Minimum personality trait score before flagging
+  min_personality_score: 0.5
+
+  # Run tone analysis
+  analyze_tone: true
+
+# Quality assurance settings
+quality_assurance:
+  # Minimum overall QA score to pass
+  min_qa_score: 80
+
+  # Check color compliance
+  check_colors: true
+
+  # Check typography compliance
+  check_typography: true
+
+  # Check accessibility
+  check_accessibility: true
+
+# Slide architecture settings
+architecture:
+  # Always include title slide
+  force_title_slide: true
+
+  # Always include closing slide
+  force_closing_slide: true
+
+  # Preferred closing message
+  closing_message: "Together, creating a more food secure world"
+
+# Output settings
+output:
+  # Default output directory (relative to input file)
+  output_dir: "."
+
+  # Naming pattern: {stem}_Cargill_Branded.pptx
+  naming_pattern: "{stem}_Cargill_Branded"
+
+# Logging
+logging:
+  level: INFO
+  format: "%(asctime)s [%(name)s] %(levelname)s: %(message)s"
