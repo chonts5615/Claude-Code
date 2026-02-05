@@ -1,0 +1,125 @@
+{
+  "name": "Strategic Planning Workflow Agent",
+  "description": "Multi-agent strategic planning system that creates comprehensive strategy documents with pillars, goals, initiatives, risk assessments, and implementation roadmaps. Features learning feedback loops for continuous improvement. Powered by GPT-5.2 Pro extended thinking.",
+  "instructions_file": "system_instructions.md",
+  "model": {
+    "name": "gpt-5.2-pro",
+    "extended_thinking": true,
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  "capabilities": {
+    "web_browsing": true,
+    "dalle_image_generation": true,
+    "code_interpreter": true
+  },
+  "conversation_starters": [
+    {
+      "title": "Create Strategic Plan",
+      "prompt": "I want to create a comprehensive 3-year strategic plan for my organization. Guide me through the process."
+    },
+    {
+      "title": "Talent Assessment Strategy",
+      "prompt": "Help me develop a global talent assessment strategy with clear use cases, governance, and ROI projections."
+    },
+    {
+      "title": "Analyze & Develop Pillars",
+      "prompt": "Analyze our current strategic position and help develop 3-5 strategic pillars with supporting goals."
+    },
+    {
+      "title": "Risk Assessment",
+      "prompt": "Perform a comprehensive risk assessment for our strategic initiatives and develop mitigation strategies."
+    },
+    {
+      "title": "Implementation Roadmap",
+      "prompt": "Create an optimized implementation roadmap with resource allocation and timeline for our strategy."
+    },
+    {
+      "title": "Executive Summary",
+      "prompt": "Generate an executive summary and presentation outline for our strategic plan."
+    }
+  ],
+  "knowledge_files": [
+    {
+      "name": "Strategic Planning Frameworks",
+      "description": "Reference materials on strategic planning methodologies, SMART goals, OKRs, Balanced Scorecard"
+    },
+    {
+      "name": "IO Psychology Best Practices",
+      "description": "Research on talent assessment validity, SIOP principles, evidence-based selection"
+    },
+    {
+      "name": "Risk Management Frameworks",
+      "description": "Risk assessment methodologies, mitigation strategies, governance models"
+    },
+    {
+      "name": "Organization Reference Documents",
+      "description": "Company-specific documents like competency frameworks, values, existing strategies"
+    }
+  ],
+  "behavior": {
+    "workflow_phases": [
+      "vision_extraction",
+      "context_analysis",
+      "pillar_synthesis",
+      "goal_generation",
+      "initiative_design",
+      "risk_assessment",
+      "resource_planning",
+      "timeline_optimization",
+      "validation",
+      "output_generation",
+      "feedback_loop"
+    ],
+    "quality_gates": {
+      "vision_gate": {
+        "required": ["vision_statement"],
+        "recommended": ["mission_statement", "core_values"]
+      },
+      "pillar_gate": {
+        "min_pillars": 3,
+        "max_pillars": 5
+      },
+      "goal_gate": {
+        "min_smart_score": 0.70,
+        "min_goals_per_pillar": 2
+      },
+      "initiative_gate": {
+        "min_feasibility_score": 0.60
+      },
+      "risk_gate": {
+        "min_mitigation_coverage": 0.80,
+        "max_critical_unmitigated": 3
+      },
+      "validation_gate": {
+        "min_alignment_score": 0.75,
+        "min_coherence_score": 0.80,
+        "min_completeness_score": 0.85,
+        "min_feasibility_score": 0.60
+      }
+    },
+    "feedback_loop": {
+      "enabled": true,
+      "collect_ratings": true,
+      "collect_comments": true,
+      "auto_optimize": true,
+      "learning_rate": 0.1
+    },
+    "output_formats": [
+      "executive_summary",
+      "strategy_document",
+      "presentation_outline",
+      "kpi_dashboard_spec",
+      "implementation_roadmap"
+    ]
+  },
+  "enterprise_settings": {
+    "data_retention": "organization_policy",
+    "audit_logging": true,
+    "access_control": "workspace_members",
+    "sharing": "enterprise_only"
+  },
+  "version": "1.0.0",
+  "created_date": "2026-02-04",
+  "author": "Strategy Workflow Agent Team"
+}
