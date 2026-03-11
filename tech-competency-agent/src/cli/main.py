@@ -8,6 +8,8 @@ import os
 from src.schemas.run_state import RunState, RunInputs, RunConfig, ThresholdConfig
 from src.orchestrator.graph import WorkflowOrchestrator
 from src.utils.logger import setup_logger
+from src.utils.file_analyzer import FileAnalyzer, FileAnalysis
+from src.utils.knowledge_base import KnowledgeBase
 
 
 @click.group()
@@ -31,7 +33,9 @@ def cli():
               help='Directory for output artifacts')
 @click.option('--run-id', type=str, default=None,
               help='Custom run ID (auto-generated if not provided)')
-def run(jobs_file, tech_sources, leadership_file, template_file, config, output_dir, run_id):
+@click.option('--skip-analysis', is_flag=True,
+              help='Skip file analysis and confirmation')
+def run(jobs_file, tech_sources, leadership_file, template_file, config, output_dir, run_id, skip_analysis):
     """Execute full workflow: jobs → competencies → template"""
 
     # Setup
@@ -41,6 +45,39 @@ def run(jobs_file, tech_sources, leadership_file, template_file, config, output_
 
     if not run_id:
         run_id = f"run_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
+
+    # Analyze files first (unless skipped)
+    if not skip_analysis:
+        click.echo("\n=== Analyzing Input Files ===\n")
+        analyzer = FileAnalyzer()
+
+        # Analyze each file
+        files_to_analyze = [
+            (jobs_file, "jobs"),
+            (leadership_file, "leadership"),
+            *[(f, "tech_source") for f in tech_sources]
+        ]
+
+        confirmed = True
+        for file_path, file_role in files_to_analyze:
+            analysis = analyzer.analyze_file(Path(file_path))
+            _display_file_analysis(analysis, file_role)
+
+            # Ask for confirmation
+            if analysis.confidence_score < 0.7:
+                confirm = click.confirm(
+                    f"\nLow confidence in file purpose. Continue with this file?",
+                    default=True
+                )
+                if not confirm:
+                    confirmed = False
+                    break
+
+        if not confirmed:
+            click.echo("Workflow aborted by user.")
+            return
+
+        click.echo("\n" + "="*50 + "\n")
 
     logger.info(f"Starting workflow run: {run_id}")
 
@@ -247,6 +284,226 @@ def init_config(output_dir):
     click.echo("1. Review and customize the configuration files")
     click.echo("2. Set up .env file with ANTHROPIC_API_KEY")
     click.echo("3. Run the workflow with: techcomp run --help")
+
+
+@cli.command()
+@click.argument('files', nargs=-1, type=click.Path(exists=True), required=True)
+def analyze_files(files):
+    """Analyze input files and suggest their purpose and structure"""
+
+    analyzer = FileAnalyzer()
+
+    click.echo("\n=== File Analysis Report ===\n")
+
+    for file_path in files:
+        analysis = analyzer.analyze_file(Path(file_path))
+        _display_file_analysis(analysis, "unknown")
+
+        # Show suggested mapping
+        if analysis.suggested_file_purpose in ["JOBS_FILE", "POSSIBLY_JOBS_FILE"]:
+            mapping = analyzer.suggest_column_mapping(analysis, "jobs")
+            if mapping:
+                click.echo("\n  Suggested column mapping for JOBS:")
+                for target, source in mapping.items():
+                    click.echo(f"    {target} ← {source}")
+
+        elif analysis.suggested_file_purpose in ["COMPETENCY_LIBRARY", "POSSIBLY_COMPETENCY_LIBRARY"]:
+            mapping = analyzer.suggest_column_mapping(analysis, "competencies")
+            if mapping:
+                click.echo("\n  Suggested column mapping for COMPETENCIES:")
+                for target, source in mapping.items():
+                    click.echo(f"    {target} ← {source}")
+
+        click.echo("\n" + "-"*60 + "\n")
+
+
+# Knowledge Base Commands
+@cli.group()
+def kb():
+    """Manage knowledge base documents for benchmarking"""
+    pass
+
+
+@kb.command()
+@click.argument('file', type=click.Path(exists=True))
+@click.option('--title', prompt=True, help='Document title')
+@click.option('--category', default='general',
+              type=click.Choice(['framework', 'standard', 'reference', 'general']),
+              help='Document category')
+@click.option('--tags', help='Comma-separated tags')
+@click.option('--description', help='Document description')
+@click.option('--kb-path', default='data/knowledge_base', help='Knowledge base directory')
+def add(file, title, category, tags, description, kb_path):
+    """Add a document to the knowledge base"""
+
+    kb_manager = KnowledgeBase(Path(kb_path))
+
+    tag_list = [t.strip() for t in tags.split(',')] if tags else []
+
+    click.echo(f"Adding document: {file}")
+
+    try:
+        doc_id = kb_manager.add_document(
+            file_path=Path(file),
+            title=title,
+            category=category,
+            tags=tag_list,
+            description=description
+        )
+
+        click.echo(f"✓ Document added successfully!")
+        click.echo(f"  Document ID: {doc_id}")
+        click.echo(f"  Category: {category}")
+        if tag_list:
+            click.echo(f"  Tags: {', '.join(tag_list)}")
+
+    except Exception as e:
+        click.echo(f"✗ Error adding document: {str(e)}", err=True)
+
+
+@kb.command()
+@click.option('--category', help='Filter by category')
+@click.option('--tags', help='Filter by tags (comma-separated)')
+@click.option('--kb-path', default='data/knowledge_base', help='Knowledge base directory')
+def list(category, tags, kb_path):
+    """List documents in the knowledge base"""
+
+    kb_manager = KnowledgeBase(Path(kb_path))
+
+    tag_list = [t.strip() for t in tags.split(',')] if tags else None
+
+    docs = kb_manager.list_documents(category=category, tags=tag_list)
+
+    if not docs:
+        click.echo("No documents found.")
+        return
+
+    click.echo(f"\n=== Knowledge Base Documents ({len(docs)}) ===\n")
+
+    for doc in docs:
+        click.echo(f"ID: {doc.doc_id}")
+        click.echo(f"  Title: {doc.title}")
+        click.echo(f"  Category: {doc.category}")
+        click.echo(f"  File: {doc.file_path.name}")
+        if doc.tags:
+            click.echo(f"  Tags: {', '.join(doc.tags)}")
+        if doc.word_count:
+            click.echo(f"  Words: {doc.word_count:,}")
+        click.echo(f"  Uploaded: {doc.upload_timestamp}")
+        if doc.description:
+            click.echo(f"  Description: {doc.description}")
+        click.echo()
+
+
+@kb.command()
+@click.argument('query')
+@click.option('--category', help='Filter by category')
+@click.option('--tags', help='Filter by tags (comma-separated)')
+@click.option('--top-k', default=5, help='Number of results to return')
+@click.option('--kb-path', default='data/knowledge_base', help='Knowledge base directory')
+def search(query, category, tags, top_k, kb_path):
+    """Search knowledge base documents"""
+
+    kb_manager = KnowledgeBase(Path(kb_path))
+
+    tag_list = [t.strip() for t in tags.split(',')] if tags else None
+
+    results = kb_manager.search_documents(
+        query=query,
+        category=category,
+        tags=tag_list,
+        top_k=top_k
+    )
+
+    if not results:
+        click.echo("No results found.")
+        return
+
+    click.echo(f"\n=== Search Results for: '{query}' ===\n")
+
+    for i, result in enumerate(results, 1):
+        click.echo(f"{i}. {result['doc_title']}")
+        click.echo(f"   Document: {result['doc_id']}")
+        click.echo(f"   Category: {result['category']}")
+        click.echo(f"   Relevance: {result['relevance_score']}")
+        if result['page_number']:
+            click.echo(f"   Page: {result['page_number']}")
+        click.echo(f"   Content preview:")
+        preview = result['content'][:200] + "..." if len(result['content']) > 200 else result['content']
+        click.echo(f"   {preview}\n")
+
+
+@kb.command()
+@click.argument('doc_id')
+@click.option('--kb-path', default='data/knowledge_base', help='Knowledge base directory')
+@click.confirmation_option(prompt='Are you sure you want to remove this document?')
+def remove(doc_id, kb_path):
+    """Remove a document from the knowledge base"""
+
+    kb_manager = KnowledgeBase(Path(kb_path))
+
+    if kb_manager.remove_document(doc_id):
+        click.echo(f"✓ Document {doc_id} removed successfully.")
+    else:
+        click.echo(f"✗ Document {doc_id} not found.", err=True)
+
+
+@kb.command()
+@click.option('--kb-path', default='data/knowledge_base', help='Knowledge base directory')
+def stats(kb_path):
+    """Show knowledge base statistics"""
+
+    kb_manager = KnowledgeBase(Path(kb_path))
+    stats = kb_manager.get_statistics()
+
+    click.echo("\n=== Knowledge Base Statistics ===\n")
+    click.echo(f"Total documents: {stats['total_documents']}")
+    click.echo(f"Total chunks: {stats['total_chunks']}")
+    click.echo(f"Total words: {stats['total_words']:,}")
+
+    if stats['documents_by_category']:
+        click.echo("\nDocuments by category:")
+        for cat, count in stats['documents_by_category'].items():
+            click.echo(f"  {cat}: {count}")
+
+    if stats['categories']:
+        click.echo(f"\nAvailable categories: {', '.join(stats['categories'])}")
+
+
+def _display_file_analysis(analysis: FileAnalysis, expected_role: str):
+    """Display file analysis results."""
+    click.echo(f"File: {analysis.file_path.name}")
+    click.echo(f"  Type: {analysis.file_type}")
+
+    if analysis.sheet_names:
+        click.echo(f"  Sheets: {', '.join(analysis.sheet_names)}")
+        click.echo(f"  Active sheet: {analysis.active_sheet}")
+
+    click.echo(f"  Rows: {analysis.row_count}")
+    click.echo(f"  Columns: {analysis.column_count}")
+
+    if analysis.suggested_file_purpose:
+        confidence_indicator = "✓" if analysis.confidence_score >= 0.7 else "?"
+        click.echo(f"  Suggested purpose: {analysis.suggested_file_purpose} {confidence_indicator}")
+        click.echo(f"  Confidence: {analysis.confidence_score:.1%}")
+
+    if analysis.columns:
+        click.echo(f"\n  Column details:")
+        for col in analysis.columns[:10]:  # Show first 10 columns
+            click.echo(f"    • {col.name}")
+            click.echo(f"      - Type: {col.data_type}")
+            click.echo(f"      - Purpose: {col.suggested_purpose}")
+            click.echo(f"      - Non-null: {col.non_null_count}/{col.total_rows}")
+            if col.sample_values:
+                sample = col.sample_values[0]
+                if len(sample) > 50:
+                    sample = sample[:50] + "..."
+                click.echo(f"      - Sample: {sample}")
+
+        if len(analysis.columns) > 10:
+            click.echo(f"    ... and {len(analysis.columns) - 10} more columns")
+
+    click.echo()
 
 
 if __name__ == '__main__':
