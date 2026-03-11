@@ -14,10 +14,85 @@ This system uses a multi-agent architecture orchestrated by LangGraph to convert
 - **Governance controls**: Configurable quality gates and thresholds
 - **Audit trail**: Complete before/after snapshots of all changes
 - **Multi-source benchmarking**: Validates against O*NET, SFIA, NICE frameworks
+- **🆕 Intelligent file analysis**: Automatically analyzes input files and confirms structure before processing
+- **🆕 Knowledge base management**: Upload and manage reference documents for enhanced benchmarking
+
+## New Features
+
+### Intelligent File Analysis
+
+The system now automatically analyzes your input files before processing:
+
+```bash
+# Analyze files to verify structure
+techcomp analyze-files data/input/jobs.xlsx data/input/tech_comps.xlsx
+
+# Run with automatic analysis (default)
+techcomp run --jobs-file data/input/jobs.xlsx ...
+
+# Skip analysis for trusted files
+techcomp run --skip-analysis --jobs-file data/input/jobs.xlsx ...
+```
+
+**What it does**:
+- Detects file type and structure
+- Identifies column purposes
+- Suggests column mappings
+- Provides confidence scores
+- Shows sample data
+- Confirms with user before proceeding
+
+See [File Analysis Guide](docs/file_analysis_guide.md) for details.
+
+### Knowledge Base Management
+
+Upload reference documents for enhanced competency benchmarking:
+
+```bash
+# Add documents to knowledge base
+techcomp kb add frameworks/sfia_v8.pdf \
+  --title "SFIA Framework v8" \
+  --category framework \
+  --tags "IT,skills"
+
+# List documents
+techcomp kb list
+
+# Search documents
+techcomp kb search "data analysis"
+
+# View statistics
+techcomp kb stats
+```
+
+**Supported documents**:
+- PDF files (frameworks, standards, research papers)
+- Word documents (.docx, .doc)
+- Excel/CSV files (competency libraries)
+- Text files
+
+The benchmark researcher (Step 6) automatically searches your knowledge base to validate competencies against your uploaded documents.
+
+See [Knowledge Base Guide](docs/knowledge_base_guide.md) for details.
 
 ## Quick Start
 
-### 1. Installation
+### Automated Installation (Recommended)
+
+```bash
+# One-command installation
+./install.sh
+
+# This will:
+# - Check Python version (3.11+ required)
+# - Install all dependencies
+# - Set up environment
+# - Generate configuration files
+# - Create sample data
+# - Verify installation
+```
+
+### Manual Installation
 
 ```bash
 # Clone repository
@@ -29,6 +104,12 @@ poetry install
 
 # Or using pip
 pip install -e .
+
+# Verify installation
+python verify_setup.py
+
+# Generate sample data
+python data/input/create_sample_data.py
 ```
 
 ### 2. Configuration
@@ -50,7 +131,22 @@ cp .env.example .env
 echo "ANTHROPIC_API_KEY=your_key_here" >> .env
 ```
 
-### 4. Run workflow
+### 4. Test the system (Optional but Recommended)
+
+```bash
+# Run end-to-end tests
+python test_e2e.py
+
+# This tests:
+# - File parsing
+# - File analysis
+# - Similarity engine
+# - Knowledge base
+# - Schema validation
+# - Agent execution
+```
+
+### 5. Run workflow
 
 ```bash
 techcomp run \
@@ -61,11 +157,30 @@ techcomp run \
   --output-dir data/output
 ```
 
-### 5. Inspect results
+### 6. Inspect results
 
 ```bash
 techcomp inspect data/output/run_<timestamp>_final_state.json
 ```
+
+## Testing & Verification
+
+The system includes comprehensive testing tools:
+
+- **`verify_setup.py`** - Automated installation verification
+  ```bash
+  python verify_setup.py
+  ```
+
+- **`test_e2e.py`** - End-to-end system tests
+  ```bash
+  python test_e2e.py
+  ```
+
+- **`install.sh`** - Automated installation script
+  ```bash
+  ./install.sh
+  ```
 
 ## Project Structure
 
