@@ -24,20 +24,28 @@ class CTICValidatorAgent(BaseAgent):
     def execute(self, state: RunState) -> RunState:
         state.current_step = self.agent_id
 
-        pre_state = self._load_competencies(
-            getattr(state.artifacts, "pre_feedback_snapshot", None)
-        ) or self._load_competencies(getattr(state.artifacts, "clean_v3", None))
-        post_state = self._load_competencies(
-            getattr(state.artifacts, "normalized_v2", None)
-        ) or self._load_competencies(getattr(state.artifacts, "clean_v3", None))
+        pre_source = getattr(state.artifacts, "pre_feedback_snapshot", None) \
+            or getattr(state.artifacts, "clean_v3", None)
+        post_source = getattr(state.artifacts, "normalized_v2", None) \
+            or getattr(state.artifacts, "clean_v3", None)
+        pre_state = self._load_competencies(pre_source)
+        post_state = self._load_competencies(post_source)
 
         feedback_batch = self._load_feedback_batch(state)
         targeted = self._build_targeted_set(feedback_batch)
 
         report = self._build_report(state.run_id, pre_state, post_state, targeted)
 
-        # TODO(v3.1): persist the corrected post-state back to the working store
-        # once the post-feedback artifact path is canonicalized in ArtifactRegistry.
+        # Persist the corrected post-state so downstream agents (6G, Phase 5/7)
+        # consume the reverted text, not the drifted text.
+        post_state_path = self._persist_corrected_state(
+            state.run_id, post_source, post_state
+        )
+        if post_state_path is not None:
+            try:
+                state.artifacts.post_ctic_state = post_state_path
+            except Exception:
+                pass
 
         if report.drift_rate > _DRIFT_ERROR_THRESHOLD:
             self.add_flag(
@@ -139,6 +147,42 @@ class CTICValidatorAgent(BaseAgent):
             if item.target_competency_id and item.target_field:
                 targeted.add((item.target_competency_id, item.target_field))
         return targeted
+
+    @staticmethod
+    def _persist_corrected_state(
+        run_id: str,
+        source_path: Any,
+        post_state: Dict[str, Dict[str, Any]],
+    ) -> Path | None:
+        """Write the in-memory reverted post_state back to disk so downstream
+        agents read the corrected text. Preserves the source artifact's outer
+        structure (jobs[].technical_competencies[]) when available."""
+        if not post_state:
+            return None
+        out_path = Path(f"data/output/{run_id}_6F_post_ctic_state.json")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        envelope: Dict[str, Any] = {"jobs": []}
+        if source_path:
+            try:
+                with open(Path(str(source_path))) as fh:
+                    src = json.load(fh)
+                if isinstance(src, dict) and isinstance(src.get("jobs"), list):
+                    for job in src["jobs"]:
+                        new_job = dict(job)
+                        new_job["technical_competencies"] = [
+                            post_state.get(str(comp.get("competency_id")), comp)
+                            for comp in (job.get("technical_competencies") or [])
+                        ]
+                        envelope["jobs"].append(new_job)
+            except Exception:
+                envelope = {"jobs": [{"technical_competencies": list(post_state.values())}]}
+        else:
+            envelope = {"jobs": [{"technical_competencies": list(post_state.values())}]}
+
+        with open(out_path, "w") as fh:
+            json.dump(envelope, fh, indent=2, default=str)
+        return out_path
 
     @staticmethod
     def _load_competencies(artifact_path: Any) -> Dict[str, Dict[str, Any]]:

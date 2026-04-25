@@ -10,10 +10,19 @@ v3.0 schema.
 
 from __future__ import annotations
 
+import re
 from enum import Enum
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+
+# Common abbreviations that legitimately contain periods inside a single sentence.
+# Stripped before counting sentence terminators.
+_ABBREVIATION_RE = re.compile(
+    r"\b(?:Dr|Mr|Mrs|Ms|St|vs|etc|Inc|Ltd|Co|Corp|Jr|Sr|"
+    r"e\.g|i\.e|U\.S|U\.K|U\.N|E\.U|Ph\.D|M\.D|B\.A|M\.A|B\.S|M\.S)\.",
+    re.IGNORECASE,
+)
 
 
 class LevelCode(str, Enum):
@@ -172,9 +181,15 @@ class TechnicalCompetency(BaseModel):
         n = _word_count(v)
         if not 15 <= n <= 25:
             raise ValueError(f"v3.1 definition must be 15-25 words; got {n}")
-        # one terminal period — allow trailing whitespace but only one '.'
-        if v.strip().count(".") != 1 or not v.strip().endswith("."):
-            raise ValueError("v3.1 definition must be exactly one sentence ending with a period")
+        stripped = v.strip()
+        if not stripped.endswith("."):
+            raise ValueError("v3.1 definition must end with a period")
+        # Strip well-known abbreviations (U.S., e.g., Inc., Dr., …) before
+        # counting interior sentence terminators so legitimate single-sentence
+        # definitions like "Applies U.S. GAAP frameworks to …" are accepted.
+        cleaned = _ABBREVIATION_RE.sub("", stripped)
+        if cleaned.count(".") != 1:
+            raise ValueError("v3.1 definition must be exactly one sentence")
         return v
 
     @model_validator(mode="after")

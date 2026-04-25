@@ -115,3 +115,31 @@ def test_integrity_tag_enum():
         assert c.integrity_tag == tag
     with pytest.raises(ValidationError):
         _valid_competency(integrity_tag="UNKNOWN")
+
+
+@pytest.mark.parametrize("definition", [
+    # 16 words, contains U.S. abbreviation
+    "Applies U.S. GAAP frameworks to evaluate financial controls and recommend "
+    "remediation across global operating units.",
+    # 17 words, contains e.g. abbreviation
+    "Designs structured experiments using factorial methods (e.g. Taguchi) to "
+    "isolate causal drivers across complex production systems daily.",
+    # 16 words, contains Inc. and Ltd.
+    "Negotiates strategic partnerships with Inc. and Ltd. counterparties to expand "
+    "downstream distribution capacity across emerging markets globally.",
+])
+def test_definition_allows_common_abbreviations(definition):
+    """v3.1 definitions may legitimately contain U.S., e.g., Inc., etc."""
+    assert 15 <= len(definition.split()) <= 25, "fixture word count off"
+    c = _valid_competency(definition=definition)
+    assert c.definition == definition
+
+
+def test_definition_still_rejects_real_multi_sentence():
+    """Two real sentences must still fail even with abbreviation tolerance."""
+    bad = (
+        "Applies U.S. GAAP across operations. Then publishes audit-ready "
+        "statements every quarter for review."
+    )
+    with pytest.raises(ValidationError):
+        _valid_competency(definition=bad)
