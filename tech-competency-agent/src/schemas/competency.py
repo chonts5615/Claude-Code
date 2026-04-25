@@ -189,8 +189,21 @@ class TechnicalCompetency(BaseModel):
 
 
 class JobCompetencies(BaseModel):
+    """All technical competencies assigned to a single JD. v3.1 hard-caps at 6
+    and requires top-6 to cover ≥90% of Technical EFs."""
+
     job_id: str
     technical_competencies: List[TechnicalCompetency]
+    coverage_rate: Optional[float] = Field(None, ge=0.0, le=1.0)
+
+    @field_validator("technical_competencies")
+    @classmethod
+    def cap_at_six(cls, v: List[TechnicalCompetency]) -> List[TechnicalCompetency]:
+        if len(v) > 6:
+            raise ValueError(
+                f"v3.1 caps a job description at 6 technical competencies; got {len(v)}"
+            )
+        return v
 
     def competency_count(self) -> int:
         return len(self.technical_competencies)
