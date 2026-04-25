@@ -1,13 +1,12 @@
 """Quality gates and validation logic."""
 
-from typing import List, Optional
 from pydantic import BaseModel
 
-from src.schemas.run_state import RunState, ThresholdConfig
+from src.schemas.audit import OverlapAuditOutput
 from src.schemas.job import JobExtractionOutput
 from src.schemas.mapping import CompetencyMappingOutput
-from src.schemas.audit import OverlapAuditOutput, OverlapRemediationOutput
 from src.schemas.ranking import RankingOutput
+from src.schemas.run_state import RunState, ThresholdConfig
 
 
 class ValidationResult(BaseModel):
@@ -207,11 +206,11 @@ class QualityGate:
         with open(state.artifacts.ranked_top8_v5, 'r') as f:
             ranking = RankingOutput.parse_raw(f.read())
 
-        # Check each job has appropriate number of competencies
+        # v3.1: max 6 per job description
         jobs_out_of_range = []
         for job_ranking in ranking.jobs:
             comp_count = len(job_ranking.ranked_competencies)
-            if comp_count < 6 or comp_count > 10:
+            if comp_count > 6 or comp_count < 1:
                 jobs_out_of_range.append({
                     "job_id": job_ranking.job_id,
                     "count": comp_count
@@ -221,8 +220,8 @@ class QualityGate:
             return ValidationResult(
                 rule_name="top_n_count",
                 passed=False,
-                severity="WARNING",
-                message=f"{len(jobs_out_of_range)} jobs have competency counts outside range [6-10]",
+                severity="ERROR",
+                message=f"{len(jobs_out_of_range)} jobs violate v3.1 max-6 cap",
                 metadata={"jobs_out_of_range": jobs_out_of_range}
             )
 
@@ -230,6 +229,81 @@ class QualityGate:
             rule_name="top_n_count",
             passed=True,
             severity="INFO",
-            message="All jobs have competency counts within range [6-10]",
+            message="All jobs satisfy v3.1 top-6 cap",
             metadata={}
+        )
+
+    def validate_v31_competency_format(self, state: RunState) -> ValidationResult:
+        """v3.1 structural format gate: title 3-6 words, definition 15-25
+        single-sentence words, exactly 4 levels with 3 indicators each.
+
+        Validators on TechnicalCompetency raise on construction; this gate
+        re-asserts the contract from a serialized artifact and surfaces a
+        clean RunFlag rather than a stack trace.
+        """
+        from src.schemas.competency import TechnicalCompetency
+
+        ref = state.artifacts.normalized_competencies_v3 or state.artifacts.normalized_competencies_v2
+        if not ref:
+            return ValidationResult(
+                rule_name="v31_competency_format",
+                passed=False,
+                severity="ERROR",
+                message="Cannot validate v3.1 format: normalized competencies missing",
+                metadata={},
+            )
+        import json
+        try:
+            with open(ref, "r") as f:
+                payload = json.load(f)
+            count = 0
+            for job in payload.get("jobs", []):
+                for c in job.get("technical_competencies", []):
+                    TechnicalCompetency(**c)
+                    count += 1
+        except Exception as exc:
+            return ValidationResult(
+                rule_name="v31_competency_format",
+                passed=False,
+                severity="ERROR",
+                message=f"v3.1 format violation: {exc}",
+                metadata={},
+            )
+        return ValidationResult(
+            rule_name="v31_competency_format",
+            passed=True,
+            severity="INFO",
+            message=f"All {count} competencies satisfy v3.1 structural rules",
+            metadata={"competency_count": count},
+        )
+
+    def validate_ctic_drift(self, state: RunState) -> ValidationResult:
+        """Phase 6F: drift rate must be <= configured tolerance (default 0.05)."""
+        if not state.artifacts.ctic_report:
+            return ValidationResult(
+                rule_name="ctic_drift",
+                passed=False,
+                severity="ERROR",
+                message="Cannot validate CTIC: report missing",
+                metadata={},
+            )
+        import json
+        with open(state.artifacts.ctic_report, "r") as f:
+            report = json.load(f)
+        rate = float(report.get("drift_rate", 0.0))
+        max_rate = 0.05
+        if rate > max_rate:
+            return ValidationResult(
+                rule_name="ctic_drift",
+                passed=False,
+                severity="ERROR",
+                message=f"CTIC drift rate {rate:.1%} exceeds tolerance {max_rate:.1%}",
+                metadata={"drift_rate": rate, "max_rate": max_rate},
+            )
+        return ValidationResult(
+            rule_name="ctic_drift",
+            passed=True,
+            severity="INFO",
+            message=f"CTIC drift rate {rate:.1%} within tolerance",
+            metadata={"drift_rate": rate},
         )

@@ -1,0 +1,29 @@
+# Skill mapping module config.
+
+thresholds:
+  min_mapping_confidence: 0.55       # WARN below 0.65, ERROR below 0.55
+  similarity_threshold: 0.55          # course advances competency cutoff
+  similarity_confirmed_threshold: 0.70  # >=0.70 + bloom agreement -> CONFIRMED
+  unmapped_course_rate_warn: 0.15     # WARN
+  unmapped_course_rate_error: 0.25    # ERROR
+  zero_training_competency_rate_warn: 0.20
+  zero_training_competency_rate_error: 0.40
+  audience_band_level_mismatch_rate_warn: 0.10
+  vb_common_max_similarity_floor: 0.40  # below this, route to V&B/Common tab
+
+bloom:
+  llm_tiebreak_enabled_default: true
+  tiebreak_count_delta: 1             # if top-2 verb counts within this, use LLM
+  duration_short_hours: 2.0
+  duration_long_hours: 16.0
+
+confidence_weights:
+  similarity: 0.5
+  bloom: 0.3
+  llm_agreement: 0.2
+
+bloom_confidence_components:
+  verb_signal: 0.4
+  duration_signal: 0.2
+  modality_signal: 0.2
+  llm_agreement: 0.2

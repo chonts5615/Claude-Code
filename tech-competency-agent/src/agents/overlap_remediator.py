@@ -1,16 +1,12 @@
 """Step 5: Overlap Remediator Agent - Fixes overlap issues."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
+from src.schemas.audit import OverlapRemediationOutput
 from src.schemas.run_state import RunState
-from src.schemas.audit import (
-    OverlapRemediationOutput,
-    JobRemediationLog,
-    RemediationAction
-)
 
 
 class OverlapRemediatorAgent(BaseAgent):

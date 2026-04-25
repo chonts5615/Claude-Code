@@ -1,19 +1,43 @@
-# Technical Competency Extraction Agent System
+# Technical Competency Builder v3.1 + Skill Mapping
 
-IO Psychology-grade multi-agent system for extracting validated technical competencies from job descriptions.
+LangGraph multi-agent system that operationalizes the **TCB v3.1** spec
+(April 2026) for Cargill's 15 job families, plus a downstream **L&D Skill
+Mapping** module that aligns training catalogs to published competencies.
 
 ## Overview
 
-This system uses a multi-agent architecture orchestrated by LangGraph to convert job descriptions into validated, benchmarked technical competencies with full traceability and governance controls.
+Two subsystems share schemas and utilities:
 
-### Key Features
+1. **Competency Builder (`src/agents/`, `src/orchestrator/`)** — 7-phase
+   pipeline (Parse → Research → Build → QA → Output → Feedback → Final
+   Synthesis) with R1 / R2 / FINAL / Resume stage routing, V&B / Common
+   boundary discipline, no-drift CTIC enforcement, and Cargill-branded
+   deliverables (Library Master, Job Family Package, BCO Ledger, HRLT
+   summary, Change Log, Rosetta Stone, Focus Group package).
+2. **Skill Mapping (`src/skill_mapping/`)** — ingests an L&D training
+   catalog (xlsx/csv) plus the published 23-column Library Master and
+   produces a Skill→Competency→Level crosswalk Excel with a Coverage Map,
+   Gaps, Surplus, and Common/V&B tabs.
 
-- **Schema-first architecture**: Pydantic models ensure data integrity throughout the pipeline
-- **Full traceability**: Every competency traces back to source responsibilities with evidence
-- **Research-grade rigor**: Follows IO psychology validation standards
-- **Governance controls**: Configurable quality gates and thresholds
-- **Audit trail**: Complete before/after snapshots of all changes
-- **Multi-source benchmarking**: Validates against O*NET, SFIA, NICE frameworks
+### v3.1 standards (enforced by validators)
+
+- Titles: 3–6 words.
+- Definitions: ONE sentence, 15–25 words, verb-led.
+- Proficiency: exactly four levels (L1–L4), each with exactly 3 indicators
+  (12 indicators total per competency).
+- Top 6 competencies max per JD; top 6 must cover ≥90% of Technical EFs.
+- Criticality = Coverage 0.40 + Criticality 0.30 + Distinctiveness 0.20 +
+  Assessability 0.10.
+- Boundary class per competency: V_AND_B / COMMON / TECHNICAL / MIXED.
+- Source integrity tags: CONFIRMED / CORRECTED / UNVERIFIABLE / FLAGGED.
+- CTIC drift tolerance ≤ 5 %.
+- Max 3 QA cycles before stop and escalate.
+
+### Reference docs
+
+Bundled under `docs/reference/`: `TCB_System_Instructions_v3_1.md`,
+`Cargill_VB_and_Common_Reference.md`, `TCB_Quick_Reference_Card.md`,
+`Portfolio_Status.md`, plus per-deliverable schema docs.
 
 ## Quick Start
 
@@ -50,18 +74,38 @@ cp .env.example .env
 echo "ANTHROPIC_API_KEY=your_key_here" >> .env
 ```
 
-### 4. Run workflow
+### 4. Run a competency build (R1 — full pipeline)
 
 ```bash
-techcomp run \
-  --jobs-file data/input/jobs.xlsx \
-  --tech-sources data/input/tech_competencies.xlsx \
+techcomp run --stage R1 --family Finance \
+  --jobs-file data/input/finance_jobs.xlsx \
+  --tech-sources data/input/finance_tech_sources.xlsx \
   --leadership-file data/input/core_leadership.xlsx \
-  --template-file data/input/template.xlsx \
-  --output-dir data/output
+  --template-file data/input/template.xlsx
 ```
 
-### 5. Inspect results
+### 5. Run an SME-feedback round (R2 / FINAL)
+
+```bash
+techcomp run --stage R2 --family Finance \
+  --feedback-file data/input/finance_r2_feedback.json
+# stage FINAL also runs Phase 7 learning synthesis
+```
+
+### 6. Map an L&D training catalog to v3.1 competencies
+
+```bash
+techcomp map-skills \
+  --library data/output/TechComp_Library_Master.xlsx \
+  --catalog data/lnd/finance_catalog.xlsx \
+  --family Finance \
+  --out data/output/skill_mapping/
+```
+
+Produces a 6-tab branded crosswalk: Run Metadata, Crosswalk, Coverage Map,
+Gaps, Surplus, Common-V&B Training.
+
+### 7. Inspect a run
 
 ```bash
 techcomp inspect data/output/run_<timestamp>_final_state.json
@@ -92,19 +136,31 @@ tech-competency-agent/
 
 ## Workflow Steps
 
-The system executes a 9-step workflow:
+### R1 (full pipeline, Phases 1–5)
+1. **Job Ingestion** — extract and normalize job descriptions.
+2. **Competency Mapping** — map EFs to candidate competencies (5QMT against Library).
+3. **Normalization** — emit L1–L4 with 3 indicators per level, 15–25-word definitions.
+4. **Overlap Audit** & **Remediation** — material/minor thresholds 0.82 / 0.72.
+5. **Benchmarking** — O*NET / ESCO / SFIA / NICE per `config/domain_registry.yaml`.
+6. **Criticality Ranking** — 4-factor weighted (0.40 / 0.30 / 0.20 / 0.10), top-6 hard cap.
+7. **Output** — Library Master FIRST, then Job Family Package, BCO Ledger, HRLT Summary.
 
-1. **Job Ingestion**: Extract and normalize job descriptions
-2. **Competency Mapping**: Map responsibilities to candidate competencies
-3. **Normalization**: Standardize competency format and content
-4. **Overlap Audit**: Detect overlap with core/leadership competencies
-5. **Overlap Remediation**: Fix overlap issues
-6. **Benchmarking**: Validate against industry frameworks
-7. **Criticality Ranking**: Rank by multi-factor criticality score
-8. **Template Population**: Populate output template
-9. **Packaging**: Bundle final deliverables
+### R2 / FINAL (Phase 6 feedback)
+1. **Feedback Ingestion** — Keep / Edit / Gap / Discuss / Reject classification.
+2. **REVIEW_METADATA gate** — reviewer / review_date / stage required.
+3. **6E-bis Coverage Refresh** — re-map EFs, flag jobs <90 % coverage.
+4. **6E-ter Boundary Re-Scan** — reclassify V&B / Common / Technical / Mixed.
+5. **6E-quater Overlap Re-Audit** — flag worsened or new MATERIAL overlap.
+6. **6F CTIC** — character-level diff on non-targeted competencies; revert drift.
+7. **6G Focus Group Prep** — package for SMEs when DISCUSS items exist.
+8. **Phase 5 Output** — re-emit deliverables.
+9. **Phase 7 Learning Synthesis (FINAL only)** — cross-family learnings JSON.
 
-Each step includes quality gates that validate outputs before proceeding.
+### Skill Mapping (downstream of v3.1)
+1. Catalog Loader (xlsx/csv) → 2. Library Loader (23-col) → 3. Bloom Classifier
+(verb-driven heuristic, LLM tie-break only) → 4. Semantic Matcher (sentence-transformers
+cosine, threshold 0.55) → 5. Level Resolver (confidence = 0.5·sim + 0.3·bloom + 0.2·llm)
+→ 6. Coverage Aggregator → 7. Gap Reporter → 8. Excel Writer (branded, 6 sheets).
 
 ## Configuration
 

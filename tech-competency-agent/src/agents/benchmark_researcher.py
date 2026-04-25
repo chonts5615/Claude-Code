@@ -1,12 +1,11 @@
 """Step 6: Benchmark Researcher Agent - Validates against industry standards."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
 from src.schemas.run_state import RunState
-from src.schemas.competency import NormalizedCompetenciesOutput
 
 
 class BenchmarkResearchAgent(BaseAgent):

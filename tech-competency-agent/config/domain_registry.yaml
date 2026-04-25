@@ -1,0 +1,55 @@
+# v3.1 Domain framework registry per Cargill job family.
+# Phase 2 (Research) consults this to pick benchmarking sources.
+
+families:
+  Finance:
+    primary_frameworks: [ONET, SFIA, IMA, CFA_Institute]
+    secondary: [GFOA]
+  HR:
+    primary_frameworks: [ONET, SHRM, CIPD]
+    secondary: [ATD]
+  Legal:
+    primary_frameworks: [ONET, ACC, ABA]
+    secondary: []
+  IT:
+    primary_frameworks: [SFIA, NICE, ONET]
+    secondary: [ITIL, COBIT]
+  Engineering:
+    primary_frameworks: [ONET, ASME, IEEE, AIChE]
+    secondary: [INCOSE]
+  Operations:
+    primary_frameworks: [ONET, APICS, ASCM]
+    secondary: [Lean_Six_Sigma]
+  SupplyChain:
+    primary_frameworks: [ONET, ASCM, CSCMP]
+    secondary: [APICS, SCOR]
+  Sales:
+    primary_frameworks: [ONET, ESCO]
+    secondary: [SAMA]
+  Marketing:
+    primary_frameworks: [ONET, ESCO, AMA]
+    secondary: []
+  R_and_D:
+    primary_frameworks: [ONET, ESCO]
+    secondary: [IFT]
+  Quality:
+    primary_frameworks: [ASQ, IFT, ONET]
+    secondary: [HACCP, GFSI]
+  Procurement:
+    primary_frameworks: [ONET, ISM, CIPS]
+    secondary: []
+  EHS:
+    primary_frameworks: [ONET, NSC, BCSP]
+    secondary: [OSHA]
+  Strategy:
+    primary_frameworks: [ONET, ESCO]
+    secondary: []
+  CustomerExperience:
+    primary_frameworks: [ONET, ESCO]
+    secondary: [CXPA]
+
+frameworks:
+  ONET:    {url_root: "https://www.onetonline.org/", scope: "occupations"}
+  ESCO:    {url_root: "https://esco.ec.europa.eu/", scope: "European skills"}
+  SFIA:    {url_root: "https://sfia-online.org/", scope: "IT/digital"}
+  NICE:    {url_root: "https://niccs.cisa.gov/workforce-development/nice-framework", scope: "cybersecurity"}

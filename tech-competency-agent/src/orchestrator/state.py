@@ -1,9 +1,9 @@
 """State management for workflow orchestration."""
 
-from typing import TypedDict, Annotated
 from operator import add
+from typing import Annotated, TypedDict
 
-from src.schemas.run_state import RunState, RunFlag
+from src.schemas.run_state import RunFlag, RunState
 
 
 class WorkflowState(TypedDict):

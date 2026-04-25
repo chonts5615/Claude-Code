@@ -1,13 +1,14 @@
 """Pytest fixtures for testing."""
 
-import pytest
-from pathlib import Path
-from datetime import datetime
-import tempfile
 import shutil
+import tempfile
+from datetime import datetime
+from pathlib import Path
 
-from src.schemas.run_state import RunState, RunInputs, RunConfig, ThresholdConfig
-from src.schemas.job import Job, Responsibility, JobSummary, SourceMetadata
+import pytest
+
+from src.schemas.job import Job, JobSummary, Responsibility, SourceMetadata
+from src.schemas.run_state import RunConfig, RunInputs, RunState, ThresholdConfig
 
 
 @pytest.fixture
@@ -73,23 +74,23 @@ def sample_job():
 
 @pytest.fixture
 def sample_threshold_config():
-    """Sample threshold configuration."""
+    """v3.1 sample threshold configuration."""
     return ThresholdConfig(
         overlap_material=0.82,
         overlap_minor=0.72,
         distinctness_duplicate=0.88,
-        min_responsibilities_per_job=5,
-        top_n_competencies=8,
-        min_responsibility_coverage=0.80
+        min_responsibilities_per_job=3,
+        top_n_competencies=6,
+        min_responsibility_coverage=0.90,
     )
 
 
 @pytest.fixture
 def sample_run_config(sample_threshold_config):
-    """Sample run configuration."""
+    """v3.1 sample run configuration."""
     return RunConfig(
-        top_n_competencies=8,
-        thresholds=sample_threshold_config
+        top_n_competencies=6,
+        thresholds=sample_threshold_config,
     )
 
 

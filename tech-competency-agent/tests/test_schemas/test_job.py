@@ -1,7 +1,8 @@
 """Tests for job schemas."""
 
 import pytest
-from src.schemas.job import Job, Responsibility, JobSummary, SourceMetadata
+
+from src.schemas.job import JobSummary, Responsibility
 
 
 def test_job_creation(sample_job):

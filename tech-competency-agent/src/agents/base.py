@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
+
 from pydantic import BaseModel
-from src.schemas.run_state import RunState, RunFlag
+
+from src.schemas.run_state import RunFlag, RunState
 
 InputT = TypeVar('InputT', bound=BaseModel)
 OutputT = TypeVar('OutputT', bound=BaseModel)

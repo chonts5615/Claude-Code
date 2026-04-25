@@ -1,0 +1,39 @@
+# v3.1 Band → Proficiency target mapping.
+# Used by src/utils/band_targets.py to validate competency demand against
+# career band. Mismatch emits RunFlag severity=WARNING (not ERROR — bands
+# legitimately have edge cases).
+
+bands:
+  Associate:
+    target_levels: [L1]
+    allowable_range: [L1]
+  Support:
+    target_levels: [L1]
+    allowable_range: [L1]
+  Professional:
+    target_levels: [L2]
+    allowable_range: [L1, L2]
+  SeniorAnalyst:
+    target_levels: [L2]
+    allowable_range: [L1, L2]
+  SeniorProfessional:
+    target_levels: [L2, L3]
+    allowable_range: [L2, L3]
+  AssociateAdvisor:
+    target_levels: [L2, L3]
+    allowable_range: [L2, L3]
+  Advisor:
+    target_levels: [L3]
+    allowable_range: [L2, L3]
+  ManagerI:
+    target_levels: [L3]
+    allowable_range: [L2, L3]
+  SeniorAdvisor:
+    target_levels: [L3, L4]
+    allowable_range: [L3, L4]
+  ManagerII:
+    target_levels: [L3, L4]
+    allowable_range: [L3, L4]
+  SeniorManagerI:
+    target_levels: [L4]
+    allowable_range: [L3, L4]
