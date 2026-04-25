@@ -1,10 +1,10 @@
 """Semantic similarity utilities using sentence transformers."""
 
 from typing import List, Tuple
+
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-
 
 # Global model instance (lazy loaded)
 _model = None

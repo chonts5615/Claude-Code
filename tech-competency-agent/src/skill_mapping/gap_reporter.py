@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from src.schemas.competency import LevelCode
+from src.skill_mapping.library_loader import competency_match_text
 from src.skill_mapping.schemas import (
     CoverageCell,
     GapFinding,
@@ -10,7 +11,6 @@ from src.skill_mapping.schemas import (
     SurplusFinding,
     TrainingItem,
 )
-from src.skill_mapping.library_loader import competency_match_text
 from src.skill_mapping.semantic_matcher import _course_text  # noqa: F401 — reused
 from src.utils.similarity import compute_similarity_batch
 

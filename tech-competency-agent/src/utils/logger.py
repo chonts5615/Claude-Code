@@ -1,10 +1,10 @@
 """Structured logging configuration."""
 
+import json
 import logging
 import sys
-from pathlib import Path
 from datetime import datetime
-import json
+from pathlib import Path
 
 
 class StructuredFormatter(logging.Formatter):

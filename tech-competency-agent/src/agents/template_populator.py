@@ -1,6 +1,7 @@
 """Step 8: Template Populator Agent - Populates output template."""
 
 from pathlib import Path
+
 import anthropic
 
 from src.agents.base import BaseAgent

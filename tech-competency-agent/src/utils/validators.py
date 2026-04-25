@@ -1,6 +1,7 @@
 """Schema validation utilities."""
 
 from typing import Any, List
+
 from pydantic import ValidationError
 
 

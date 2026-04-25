@@ -26,7 +26,6 @@ from src.utils.branding import (
     header_font,
 )
 
-
 _OVERVIEW_HEADERS = ["Field", "Value"]
 _JOBS_HEADERS = [
     "job_id",

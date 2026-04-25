@@ -57,10 +57,9 @@ def run(stage, family, jobs_file, tech_sources, leadership_file, template_file, 
     if stage in ("R2", "FINAL") and not feedback_file:
         raise click.UsageError("--feedback-file is required for stage R2/FINAL")
 
-    config_data = {}
     if Path(config).exists():
         with open(config, "r") as f:
-            config_data = yaml.safe_load(f) or {}
+            yaml.safe_load(f)  # presence check; per-agent config consumed downstream
 
     threshold_data = {}
     if Path(thresholds).exists():

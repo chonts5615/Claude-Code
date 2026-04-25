@@ -1,13 +1,12 @@
 """Quality gates and validation logic."""
 
-from typing import List, Optional
 from pydantic import BaseModel
 
-from src.schemas.run_state import RunState, ThresholdConfig
+from src.schemas.audit import OverlapAuditOutput
 from src.schemas.job import JobExtractionOutput
 from src.schemas.mapping import CompetencyMappingOutput
-from src.schemas.audit import OverlapAuditOutput, OverlapRemediationOutput
 from src.schemas.ranking import RankingOutput
+from src.schemas.run_state import RunState, ThresholdConfig
 
 
 class ValidationResult(BaseModel):

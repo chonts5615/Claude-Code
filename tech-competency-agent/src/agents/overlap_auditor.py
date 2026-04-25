@@ -1,17 +1,12 @@
 """Step 4: Overlap Auditor Agent - Detects overlap with core/leadership competencies."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
+from src.schemas.audit import OverlapAuditOutput
 from src.schemas.run_state import RunState
-from src.schemas.audit import (
-    OverlapAuditOutput,
-    JobOverlapAudit,
-    OverlapFlag,
-    DistinctnessFlag
-)
 
 
 class OverlapAuditorAgent(BaseAgent):

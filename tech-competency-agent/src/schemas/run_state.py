@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Dict, List, Literal, Optional
-from pydantic import BaseModel, Field
 from pathlib import Path
+from typing import Dict, List, Literal, Optional
+
+from pydantic import BaseModel, Field
 
 
 class RunInputs(BaseModel):

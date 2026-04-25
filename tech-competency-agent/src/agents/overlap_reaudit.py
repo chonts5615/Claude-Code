@@ -12,7 +12,6 @@ from src.schemas.bco_ledger import BCOLedger, OverlapEntry
 from src.schemas.run_state import RunState
 from src.utils.similarity import compute_pairwise_similarity
 
-
 _MATERIAL_THRESHOLD = 0.82
 _MINOR_THRESHOLD = 0.72
 _REGRESSION_DELTA = 0.05

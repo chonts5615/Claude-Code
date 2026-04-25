@@ -1,12 +1,11 @@
 """Step 7: Criticality Ranker Agent - Ranks competencies by criticality."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
 from src.schemas.run_state import RunState
-from src.schemas.ranking import RankingOutput
 
 
 class CriticalityRankerAgent(BaseAgent):

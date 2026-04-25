@@ -18,7 +18,6 @@ from src.utils.branding import (
     header_font,
 )
 
-
 _BOUNDARY_HEADERS = [
     "competency_id",
     "competency_name",

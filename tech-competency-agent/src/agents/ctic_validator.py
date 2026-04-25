@@ -11,7 +11,6 @@ from src.schemas.ctic import CTICDiff, CTICReport
 from src.schemas.feedback import FeedbackBatch
 from src.schemas.run_state import RunState
 
-
 _DRIFT_ERROR_THRESHOLD = 0.05
 
 

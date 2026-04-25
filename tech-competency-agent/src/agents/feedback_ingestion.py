@@ -11,7 +11,6 @@ from src.agents.base import BaseAgent
 from src.schemas.feedback import FeedbackBatch, FeedbackItem
 from src.schemas.run_state import RunState
 
-
 _REQUIRED_REVIEW_METADATA_FIELDS = ("reviewer", "review_date", "stage")
 _VALID_DISPOSITIONS = {"KEEP", "EDIT", "GAP", "DISCUSS", "REJECT"}
 

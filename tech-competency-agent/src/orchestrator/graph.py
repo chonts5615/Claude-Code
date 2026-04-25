@@ -2,25 +2,25 @@
 
 from __future__ import annotations
 
-from langgraph.graph import StateGraph, END
+from langgraph.graph import END, StateGraph
 
-from src.schemas.run_state import RunState
-from src.agents.job_ingestion import JobIngestionAgent
+from src.agents.benchmark_researcher import BenchmarkResearchAgent
+from src.agents.boundary_rescan import BoundaryRescanAgent
 from src.agents.competency_mapping import CompetencyMappingAgent
+from src.agents.coverage_refresh import CoverageRefreshAgent
+from src.agents.criticality_ranker import CriticalityRankerAgent
+from src.agents.ctic_validator import CTICValidatorAgent
+from src.agents.feedback_ingestion import FeedbackIngestionAgent
+from src.agents.focus_group_prep import FocusGroupPrepAgent
+from src.agents.job_ingestion import JobIngestionAgent
+from src.agents.learning_synthesis import LearningSynthesisAgent
 from src.agents.normalizer import NormalizerAgent
 from src.agents.overlap_auditor import OverlapAuditorAgent
-from src.agents.overlap_remediator import OverlapRemediatorAgent
-from src.agents.benchmark_researcher import BenchmarkResearchAgent
-from src.agents.criticality_ranker import CriticalityRankerAgent
-from src.agents.template_populator import TemplatePopulatorAgent
-from src.agents.feedback_ingestion import FeedbackIngestionAgent
-from src.agents.coverage_refresh import CoverageRefreshAgent
-from src.agents.boundary_rescan import BoundaryRescanAgent
 from src.agents.overlap_reaudit import OverlapReauditAgent
-from src.agents.ctic_validator import CTICValidatorAgent
-from src.agents.focus_group_prep import FocusGroupPrepAgent
-from src.agents.learning_synthesis import LearningSynthesisAgent
+from src.agents.overlap_remediator import OverlapRemediatorAgent
+from src.agents.template_populator import TemplatePopulatorAgent
 from src.orchestrator.gates import QualityGate, ValidationResult
+from src.schemas.run_state import RunState
 
 
 class WorkflowOrchestrator:

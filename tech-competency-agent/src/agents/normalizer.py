@@ -1,20 +1,14 @@
 """Step 3: Normalizer Agent - Normalizes competencies to standard format."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
-from src.schemas.run_state import RunState
 from src.schemas.competency import (
     NormalizedCompetenciesOutput,
-    JobCompetencies,
-    TechnicalCompetency,
-    AppliedScope,
-    ResponsibilityTrace,
-    OverlapCheck,
-    BenchmarkingRecord
 )
+from src.schemas.run_state import RunState
 
 
 class NormalizerAgent(BaseAgent):

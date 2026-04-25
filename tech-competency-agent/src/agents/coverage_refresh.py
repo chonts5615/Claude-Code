@@ -11,7 +11,6 @@ from src.agents.base import BaseAgent
 from src.schemas.bco_ledger import BCOLedger, CoverageEntry
 from src.schemas.run_state import RunState
 
-
 _COVERAGE_THRESHOLD = 0.90
 _TOP_K_COMPETENCIES = 6
 

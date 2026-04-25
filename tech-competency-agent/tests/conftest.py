@@ -1,13 +1,14 @@
 """Pytest fixtures for testing."""
 
-import pytest
-from pathlib import Path
-from datetime import datetime
-import tempfile
 import shutil
+import tempfile
+from datetime import datetime
+from pathlib import Path
 
-from src.schemas.run_state import RunState, RunInputs, RunConfig, ThresholdConfig
-from src.schemas.job import Job, Responsibility, JobSummary, SourceMetadata
+import pytest
+
+from src.schemas.job import Job, JobSummary, Responsibility, SourceMetadata
+from src.schemas.run_state import RunConfig, RunInputs, RunState, ThresholdConfig
 
 
 @pytest.fixture

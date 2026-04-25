@@ -18,7 +18,6 @@ from openpyxl.worksheet.worksheet import Worksheet
 from src.schemas.competency import TechnicalCompetency
 from src.schemas.library import LIBRARY_COLUMNS
 from src.utils.branding import (
-    ARIAL,
     alt_row_fill,
     body_font,
     header_fill,

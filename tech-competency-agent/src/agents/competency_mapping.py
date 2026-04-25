@@ -2,18 +2,19 @@
 
 from pathlib import Path
 from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
-from src.schemas.run_state import RunState
+from src.schemas.competency import CompetencyLibrary
 from src.schemas.job import Job, JobExtractionOutput
-from src.schemas.competency import CompetencyLibrary, CompetencyLibraryEntry
 from src.schemas.mapping import (
+    CompetencyCandidate,
     CompetencyMappingOutput,
     JobMapping,
     ResponsibilityMapping,
-    CompetencyCandidate
 )
+from src.schemas.run_state import RunState
 from src.utils.file_parsers import parse_competency_library
 from src.utils.similarity import compute_similarity
 

@@ -16,7 +16,7 @@ from pathlib import Path
 from docx import Document
 from docx.shared import Pt, RGBColor
 
-from src.utils.branding import GEORGIA, ARIAL, LEAF_GREEN, BLACK
+from src.utils.branding import ARIAL, BLACK, GEORGIA, LEAF_GREEN
 
 
 def _hex_to_rgb(hex_color: str) -> RGBColor:

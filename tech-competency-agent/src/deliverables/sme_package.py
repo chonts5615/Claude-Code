@@ -24,7 +24,6 @@ from src.utils.branding import (
     header_font,
 )
 
-
 _OVERVIEW_HEADERS = ["Field", "Value"]
 _REVIEW_HEADERS = [
     "competency_id",

@@ -1,6 +1,6 @@
 """Tests for run state schemas."""
 
-from src.schemas.run_state import RunState, RunFlag, ThresholdConfig
+from src.schemas.run_state import RunFlag, ThresholdConfig
 
 
 def test_run_state_creation(sample_run_state):
