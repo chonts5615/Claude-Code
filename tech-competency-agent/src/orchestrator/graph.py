@@ -1,4 +1,9 @@
+"""v3.1 LangGraph orchestrator with R1/R2/FINAL/Resume stage routing."""
+
+from __future__ import annotations
+
 from langgraph.graph import StateGraph, END
+
 from src.schemas.run_state import RunState
 from src.agents.job_ingestion import JobIngestionAgent
 from src.agents.competency_mapping import CompetencyMappingAgent
@@ -8,190 +13,212 @@ from src.agents.overlap_remediator import OverlapRemediatorAgent
 from src.agents.benchmark_researcher import BenchmarkResearchAgent
 from src.agents.criticality_ranker import CriticalityRankerAgent
 from src.agents.template_populator import TemplatePopulatorAgent
+from src.agents.feedback_ingestion import FeedbackIngestionAgent
+from src.agents.coverage_refresh import CoverageRefreshAgent
+from src.agents.boundary_rescan import BoundaryRescanAgent
+from src.agents.overlap_reaudit import OverlapReauditAgent
+from src.agents.ctic_validator import CTICValidatorAgent
+from src.agents.focus_group_prep import FocusGroupPrepAgent
+from src.agents.learning_synthesis import LearningSynthesisAgent
 from src.orchestrator.gates import QualityGate, ValidationResult
 
 
 class WorkflowOrchestrator:
-    """LangGraph-based workflow orchestrator."""
+    """LangGraph orchestrator that builds one of four DAGs by stage."""
 
     def __init__(self, config_path: str):
         self.config_path = config_path
-        self.graph = self._build_graph()
+        self._compiled: dict = {}
 
-    def _build_graph(self) -> StateGraph:
-        """Build workflow graph with agents and gates."""
+    def graph_for(self, stage: str):
+        if stage in self._compiled:
+            return self._compiled[stage]
+        if stage == "R1":
+            g = self._build_r1()
+        elif stage in ("R2", "FINAL"):
+            g = self._build_r2_or_final(include_phase7=(stage == "FINAL"))
+        else:
+            raise ValueError(f"Unsupported stage {stage!r} (use R1, R2, FINAL, or RESUME via run_resume)")
+        self._compiled[stage] = g
+        return g
 
-        # Initialize graph with state schema
-        workflow = StateGraph(RunState)
+    # --- R1 (full pipeline) -------------------------------------------------
 
-        # Initialize agents
-        agents = {
-            "job_ingestion": JobIngestionAgent("S1", "Job Extraction"),
-            "competency_mapping": CompetencyMappingAgent("S2", "Competency Mapping"),
-            "normalizer": NormalizerAgent("S3", "Normalization"),
-            "overlap_auditor": OverlapAuditorAgent("S4", "Overlap Audit"),
-            "overlap_remediator": OverlapRemediatorAgent("S5", "Overlap Remediation"),
-            "benchmark_researcher": BenchmarkResearchAgent("S6", "Benchmarking"),
-            "criticality_ranker": CriticalityRankerAgent("S7", "Ranking"),
-            "template_populator": TemplatePopulatorAgent("S8", "Template Population")
-        }
+    def _build_r1(self):
+        wf = StateGraph(RunState)
 
-        # Add nodes
-        workflow.add_node("s1_extract_jobs", agents["job_ingestion"].execute)
-        workflow.add_node("s1_gate", self._gate_s1)
+        wf.add_node("s1_extract_jobs", JobIngestionAgent("S1", "Job Extraction").execute)
+        wf.add_node("s1_gate", self._gate_s1)
+        wf.add_node("s2_map_competencies", CompetencyMappingAgent("S2", "Competency Mapping").execute)
+        wf.add_node("s2_gate", self._gate_s2)
+        wf.add_node("s3_normalize", NormalizerAgent("S3", "Normalization").execute)
+        wf.add_node("s3_gate", self._gate_s3_v31_format)
+        wf.add_node("s4_audit_overlap", OverlapAuditorAgent("S4", "Overlap Audit").execute)
+        wf.add_node("s5_remediate_overlap", OverlapRemediatorAgent("S5", "Overlap Remediation").execute)
+        wf.add_node("s5_gate", self._gate_s5)
+        wf.add_node("s6_benchmark", BenchmarkResearchAgent("S6", "Benchmarking").execute)
+        wf.add_node("s7_rank", CriticalityRankerAgent("S7", "Ranking").execute)
+        wf.add_node("s7_gate", self._gate_s7)
+        wf.add_node("s8_populate", TemplatePopulatorAgent("S8", "Template Population").execute)
+        wf.add_node("s9_package", self._package_for_review)
 
-        workflow.add_node("s2_map_competencies", agents["competency_mapping"].execute)
-        workflow.add_node("s2_gate", self._gate_s2)
+        wf.set_entry_point("s1_extract_jobs")
+        wf.add_edge("s1_extract_jobs", "s1_gate")
+        wf.add_conditional_edges("s1_gate", self._route, {"continue": "s2_map_competencies", "fail": END})
+        wf.add_edge("s2_map_competencies", "s2_gate")
+        wf.add_conditional_edges("s2_gate", self._route, {"continue": "s3_normalize", "fail": END})
+        wf.add_edge("s3_normalize", "s3_gate")
+        wf.add_conditional_edges("s3_gate", self._route, {"continue": "s4_audit_overlap", "fail": END})
+        wf.add_edge("s4_audit_overlap", "s5_remediate_overlap")
+        wf.add_edge("s5_remediate_overlap", "s5_gate")
+        wf.add_conditional_edges("s5_gate", self._route, {"continue": "s6_benchmark", "reaudit": "s4_audit_overlap", "fail": END})
+        wf.add_edge("s6_benchmark", "s7_rank")
+        wf.add_edge("s7_rank", "s7_gate")
+        wf.add_conditional_edges("s7_gate", self._route, {"continue": "s8_populate", "fail": END})
+        wf.add_edge("s8_populate", "s9_package")
+        wf.add_edge("s9_package", END)
+        return wf.compile()
 
-        workflow.add_node("s3_normalize", agents["normalizer"].execute)
+    # --- R2 / FINAL (feedback + 6E-bis/ter/quater + CTIC + 6G + Phase 7) ---
 
-        workflow.add_node("s4_audit_overlap", agents["overlap_auditor"].execute)
+    def _build_r2_or_final(self, include_phase7: bool):
+        wf = StateGraph(RunState)
 
-        workflow.add_node("s5_remediate_overlap", agents["overlap_remediator"].execute)
-        workflow.add_node("s5_gate", self._gate_s5)
+        wf.add_node("p6_feedback", FeedbackIngestionAgent("P6", "Feedback Ingestion").execute)
+        wf.add_node("p6_review_metadata_gate", self._gate_review_metadata)
+        wf.add_node("p6e_bis_coverage", CoverageRefreshAgent("P6E_bis", "Coverage Refresh").execute)
+        wf.add_node("p6e_ter_boundary", BoundaryRescanAgent("P6E_ter", "Boundary Re-Scan").execute)
+        wf.add_node("p6e_quater_overlap", OverlapReauditAgent("P6E_quater", "Overlap Re-Audit").execute)
+        wf.add_node("p6f_ctic", CTICValidatorAgent("P6F", "CTIC Validator").execute)
+        wf.add_node("p6f_gate", self._gate_ctic)
+        wf.add_node("p6g_focus_group", FocusGroupPrepAgent("P6G", "Focus Group Prep").execute)
+        wf.add_node("p5_output", TemplatePopulatorAgent("S8", "Template Population").execute)
+        wf.add_node("p5_package", self._package_for_review)
+        if include_phase7:
+            wf.add_node("p7_synth", LearningSynthesisAgent("P7", "Learning Synthesis").execute)
 
-        workflow.add_node("s6_benchmark", agents["benchmark_researcher"].execute)
+        wf.set_entry_point("p6_feedback")
+        wf.add_edge("p6_feedback", "p6_review_metadata_gate")
+        wf.add_conditional_edges("p6_review_metadata_gate", self._route, {"continue": "p6e_bis_coverage", "fail": END})
+        wf.add_edge("p6e_bis_coverage", "p6e_ter_boundary")
+        wf.add_edge("p6e_ter_boundary", "p6e_quater_overlap")
+        wf.add_edge("p6e_quater_overlap", "p6f_ctic")
+        wf.add_edge("p6f_ctic", "p6f_gate")
+        wf.add_conditional_edges("p6f_gate", self._route, {"continue": "p6g_focus_group", "fail": END})
+        wf.add_edge("p6g_focus_group", "p5_output")
+        wf.add_edge("p5_output", "p5_package")
+        if include_phase7:
+            wf.add_edge("p5_package", "p7_synth")
+            wf.add_edge("p7_synth", END)
+        else:
+            wf.add_edge("p5_package", END)
+        return wf.compile()
 
-        workflow.add_node("s7_rank", agents["criticality_ranker"].execute)
-        workflow.add_node("s7_gate", self._gate_s7)
+    # --- gates -------------------------------------------------------------
 
-        workflow.add_node("s8_populate", agents["template_populator"].execute)
-
-        workflow.add_node("s9_package", self._package_for_review)
-
-        # Define edges
-        workflow.set_entry_point("s1_extract_jobs")
-
-        workflow.add_edge("s1_extract_jobs", "s1_gate")
-        workflow.add_conditional_edges(
-            "s1_gate",
-            self._route_after_gate,
-            {"continue": "s2_map_competencies", "fail": END}
-        )
-
-        workflow.add_edge("s2_map_competencies", "s2_gate")
-        workflow.add_conditional_edges(
-            "s2_gate",
-            self._route_after_gate,
-            {"continue": "s3_normalize", "fail": END}
-        )
-
-        workflow.add_edge("s3_normalize", "s4_audit_overlap")
-        workflow.add_edge("s4_audit_overlap", "s5_remediate_overlap")
-
-        workflow.add_edge("s5_remediate_overlap", "s5_gate")
-        workflow.add_conditional_edges(
-            "s5_gate",
-            self._route_after_gate,
-            {"continue": "s6_benchmark", "reaudit": "s4_audit_overlap", "fail": END}
-        )
-
-        workflow.add_edge("s6_benchmark", "s7_rank")
-
-        workflow.add_edge("s7_rank", "s7_gate")
-        workflow.add_conditional_edges(
-            "s7_gate",
-            self._route_after_gate,
-            {"continue": "s8_populate", "fail": END}
-        )
-
-        workflow.add_edge("s8_populate", "s9_package")
-        workflow.add_edge("s9_package", END)
-
-        return workflow.compile()
-
-    # Quality Gates
     def _gate_s1(self, state: RunState) -> RunState:
-        """Validate job extraction."""
         gate = QualityGate("S1_Gate", state.config.thresholds)
-
-        # Check jobs were extracted
-        result = gate.validate_no_jobs_extracted(state)
-        if not result.passed:
-            self._add_gate_flag(state, result)
-
-        # Check missing summary rate
-        result = gate.validate_missing_summary_rate(state, max_rate=0.10)
-        if not result.passed:
-            self._add_gate_flag(state, result)
-
+        for r in (gate.validate_no_jobs_extracted(state),
+                  gate.validate_missing_summary_rate(state, max_rate=0.10)):
+            if not r.passed:
+                self._add_flag(state, r)
         return state
 
     def _gate_s2(self, state: RunState) -> RunState:
-        """Validate competency mapping."""
         gate = QualityGate("S2_Gate", state.config.thresholds)
+        r = gate.validate_unmapped_responsibilities(state, max_rate=0.05)
+        if not r.passed:
+            self._add_flag(state, r)
+        return state
 
-        result = gate.validate_unmapped_responsibilities(state, max_rate=0.05)
-        if not result.passed:
-            self._add_gate_flag(state, result)
-
+    def _gate_s3_v31_format(self, state: RunState) -> RunState:
+        gate = QualityGate("S3_Gate_v31", state.config.thresholds)
+        r = gate.validate_v31_competency_format(state)
+        if not r.passed:
+            self._add_flag(state, r)
         return state
 
     def _gate_s5(self, state: RunState) -> RunState:
-        """Validate overlap remediation."""
         gate = QualityGate("S5_Gate", state.config.thresholds)
-
-        result = gate.validate_overlap_resolved(state)
-        if not result.passed:
-            self._add_gate_flag(state, result)
-
+        r = gate.validate_overlap_resolved(state)
+        if not r.passed:
+            self._add_flag(state, r)
         return state
 
     def _gate_s7(self, state: RunState) -> RunState:
-        """Validate ranking."""
         gate = QualityGate("S7_Gate", state.config.thresholds)
-
-        result = gate.validate_coverage_threshold(state)
-        if not result.passed:
-            self._add_gate_flag(state, result)
-
-        result = gate.validate_top_n_count(state)
-        if not result.passed:
-            self._add_gate_flag(state, result)
-
+        for r in (gate.validate_coverage_threshold(state),
+                  gate.validate_top_n_count(state)):
+            if not r.passed:
+                self._add_flag(state, r)
         return state
 
-    def _route_after_gate(self, state: RunState) -> str:
-        """Route based on gate results."""
-        # Check for CRITICAL/ERROR flags from current step
+    def _gate_review_metadata(self, state: RunState) -> RunState:
+        if not state.artifacts.feedback_batch:
+            self._add_flag(state, ValidationResult(
+                rule_name="review_metadata",
+                passed=False,
+                severity="ERROR",
+                message="REVIEW_METADATA gate: no feedback_batch artifact",
+                metadata={},
+            ))
+            return state
+        import json
+        with open(state.artifacts.feedback_batch, "r") as f:
+            batch = json.load(f)
+        meta = batch.get("review_metadata", {}) or {}
+        missing = [k for k in ("reviewer", "review_date", "stage") if k not in meta]
+        if missing:
+            self._add_flag(state, ValidationResult(
+                rule_name="review_metadata",
+                passed=False,
+                severity="ERROR",
+                message=f"REVIEW_METADATA missing keys: {missing}",
+                metadata={"missing": missing},
+            ))
+        return state
+
+    def _gate_ctic(self, state: RunState) -> RunState:
+        gate = QualityGate("P6F_Gate", state.config.thresholds)
+        r = gate.validate_ctic_drift(state)
+        if not r.passed:
+            self._add_flag(state, r)
+        return state
+
+    def _route(self, state: RunState) -> str:
         current_step_flags = [
             f for f in state.flags
-            if f.step_id == state.current_step and
-            f.severity in ["CRITICAL", "ERROR"]
+            if f.step_id == state.current_step
+            and f.severity in ("CRITICAL", "ERROR")
         ]
-
         if current_step_flags:
             return "fail"
-
-        # Special routing for S5 (may need reaudit)
         if state.current_step == "S5_Gate":
-            # Check if remediation output indicates reaudit needed
-            # This would be read from the actual remediation output
-            # For now, simplified
-            return "continue"
-
+            return "continue"  # reaudit hook reserved for remediator output read
         return "continue"
 
-    def _add_gate_flag(self, state: RunState, result: ValidationResult):
-        """Add flag from validation result."""
+    def _add_flag(self, state: RunState, result: ValidationResult):
         from src.schemas.run_state import RunFlag
-
-        flag = RunFlag(
-            step_id=state.current_step,
+        state.flags.append(RunFlag(
+            step_id=state.current_step or "unknown",
             severity=result.severity,
             flag_type=result.rule_name,
             message=result.message,
-            metadata=result.metadata
-        )
-        state.flags.append(flag)
+            metadata=result.metadata,
+        ))
 
     def _package_for_review(self, state: RunState) -> RunState:
-        """Step 9 - Package all outputs."""
-        # This would call a packaging agent
-        # For now, just update state
         state.current_step = "S9_Package"
         return state
 
-    def run(self, initial_state: RunState) -> RunState:
-        """Execute workflow."""
-        return self.graph.invoke(initial_state)
+    # --- entry points ------------------------------------------------------
+
+    def run(self, initial_state: RunState):
+        stage = initial_state.config.stage
+        return self.graph_for(stage).invoke(initial_state)
+
+    def run_resume(self, initial_state: RunState):
+        # RESUME reads ArtifactRegistry to skip completed nodes; for now invoke
+        # the requested stage from start and rely on agents to short-circuit
+        # when their artifact already exists (TODO).
+        return self.run(initial_state)

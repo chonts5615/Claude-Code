@@ -1,5 +1,16 @@
-workflow_name: JobToTechnicalCompetencyAgent
-version: 1.0
+workflow_name: TechnicalCompetencyBuilder
+version: 3.1
+
+# v3.1 stage routing — see config/stage_routes.yaml
+default_stage: R1
+
+# Reference data files consumed at runtime
+reference:
+  band_proficiency_targets: ./config/band_proficiency_targets.yaml
+  boundary_terms: ./config/boundary_terms.yaml
+  domain_registry: ./config/domain_registry.yaml
+  stage_routes: ./config/stage_routes.yaml
+  rubric: src.schemas.rubric
 
 # Orchestration settings
 orchestration:
@@ -7,12 +18,12 @@ orchestration:
   enable_parallel_processing: false
   checkpoint_enabled: true
   checkpoint_directory: ./data/checkpoints
+  max_qa_cycles: 3
 
-# Agent-specific settings
 agents:
   job_ingestion:
-    parser_type: openpyxl  # or xlrd, pandas
-    responsibility_detection_mode: newline_split  # or bullet_detect
+    parser_type: openpyxl
+    responsibility_detection_mode: newline_split
 
   competency_mapping:
     similarity_model: sentence-transformers/all-MiniLM-L6-v2
@@ -22,9 +33,10 @@ agents:
     min_relevance_threshold: 0.6
 
   normalizer:
-    target_definition_word_count: [50, 150]
-    min_indicators: 3
-    max_indicators: 7
+    title_word_range: [3, 6]
+    definition_word_range: [15, 25]
+    proficiency_levels: 4
+    indicators_per_level: 3
 
   overlap_auditor:
     similarity_model: sentence-transformers/all-MiniLM-L6-v2
@@ -33,6 +45,7 @@ agents:
   benchmark_researcher:
     sources_priority:
       - ONET
+      - ESCO
       - SFIA
       - NICE
       - industry_specific
@@ -40,21 +53,21 @@ agents:
 
   criticality_ranker:
     factor_weights:
-      coverage: 0.25
-      impact_risk: 0.20
-      frequency: 0.15
-      complexity: 0.15
-      differentiation: 0.15
-      time_to_proficiency: 0.10
+      coverage: 0.40
+      criticality: 0.30
+      distinctiveness: 0.20
+      assessability: 0.10
 
-# LLM provider settings (uses Anthropic by default)
+  ctic_validator:
+    max_drift_rate: 0.05
+
+# LLM provider settings
 llm:
   provider: anthropic
-  model: claude-sonnet-4-20250514
+  model: claude-sonnet-4-5-20250929
   temperature: 0.3
   max_tokens: 4000
 
-# Logging
 logging:
   level: INFO
   structured: true

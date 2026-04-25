@@ -1,24 +1,46 @@
-# Quality gate thresholds
+# v3.1 Quality gate thresholds.
 
-# Step 1 - Job Extraction
 job_extraction:
-  min_responsibilities_per_job: 5
+  min_responsibilities_per_job: 3       # v3.1: stop if <3 usable EFs
   max_missing_summary_rate: 0.10
+  min_parse_confidence: 0.70
 
-# Step 2 - Competency Mapping
 competency_mapping:
   max_unmapped_responsibility_rate: 0.05
   min_candidates_per_responsibility: 1
 
-# Step 4/5 - Overlap Detection
 overlap:
-  material_threshold: 0.82  # >= this is material overlap
-  minor_threshold: 0.72     # between minor and material
-  distinctness_duplicate: 0.88  # within-job duplicate threshold
+  material_threshold: 0.82
+  minor_threshold: 0.72
+  distinctness_duplicate: 0.88
+  reaudit_worsened_delta: 0.05          # 6E-quater: flag if pair similarity rises by this
 
-# Step 7 - Ranking
+# v3.1: top 6 hard cap; top 6 must cover >=90% of Technical EFs
 ranking:
-  top_n_competencies: 8
-  min_responsibility_coverage: 0.80
-  min_competencies_per_job: 6
-  max_competencies_per_job: 10
+  top_n_competencies: 6
+  min_responsibility_coverage: 0.90
+  min_competencies_per_job: 1
+  max_competencies_per_job: 6
+  criticality_weights:
+    coverage: 0.40
+    criticality: 0.30
+    distinctiveness: 0.20
+    assessability: 0.10
+
+# v3.1: standards
+competency_format:
+  title_min_words: 3
+  title_max_words: 6
+  definition_min_words: 15
+  definition_max_words: 25
+  definition_max_sentences: 1
+  indicators_per_level: 3
+  proficiency_levels: 4
+
+# v3.1: max QA cycles before stop and escalate
+qa:
+  max_cycles: 3
+
+# v3.1: CTIC drift tolerance
+ctic:
+  max_drift_rate: 0.05
