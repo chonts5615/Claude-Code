@@ -72,6 +72,48 @@ def _shift(level: LevelCode, delta: int) -> LevelCode:
     return _LEVEL_ORDER[new_idx]
 
 
+def _duration_signal(hours: float | None, level: LevelCode) -> float:
+    """Map (duration, target level) -> [0, 1] confidence weight.
+
+    Bloom literature roughly maps lower levels to short exposure and higher
+    levels to extended practice. We score how well the item's duration matches
+    the canonical band for the chosen level.
+    """
+    if not hours or hours <= 0:
+        return 0.5
+    bands: dict[LevelCode, tuple[float, float]] = {
+        LevelCode.L1: (0.5, 4.0),
+        LevelCode.L2: (4.0, 16.0),
+        LevelCode.L3: (16.0, 40.0),
+        LevelCode.L4: (40.0, 200.0),
+    }
+    lo, hi = bands[level]
+    if lo <= hours <= hi:
+        return 0.9
+    # Distance penalty (linear, capped at 0.3).
+    distance = (lo - hours) if hours < lo else (hours - hi)
+    span = max(hi - lo, 1.0)
+    return max(0.3, 0.9 - 0.6 * (distance / span))
+
+
+def _modality_signal(modality: str | None, level: LevelCode) -> float:
+    """Modality fit by canonical level.
+
+    eLearning / ILT cluster around L1-L2; coaching / OJT cluster around L3-L4;
+    blended is a neutral 0.7.
+    """
+    if not modality:
+        return 0.5
+    fit: dict[str, dict[LevelCode, float]] = {
+        "ELEARNING": {LevelCode.L1: 0.9, LevelCode.L2: 0.8, LevelCode.L3: 0.5, LevelCode.L4: 0.3},
+        "ILT":       {LevelCode.L1: 0.7, LevelCode.L2: 0.9, LevelCode.L3: 0.7, LevelCode.L4: 0.5},
+        "COACHING":  {LevelCode.L1: 0.4, LevelCode.L2: 0.6, LevelCode.L3: 0.9, LevelCode.L4: 0.9},
+        "OJT":       {LevelCode.L1: 0.5, LevelCode.L2: 0.7, LevelCode.L3: 0.9, LevelCode.L4: 0.9},
+        "BLENDED":   {LevelCode.L1: 0.7, LevelCode.L2: 0.7, LevelCode.L3: 0.7, LevelCode.L4: 0.7},
+    }
+    return fit.get(modality.upper(), {}).get(level, 0.5)
+
+
 def _snap_to_band(level: LevelCode, targets: list[LevelCode]) -> LevelCode:
     if not targets:
         return level
@@ -155,11 +197,12 @@ def classify(item: TrainingItem, llm_tiebreak: bool = True) -> BloomLevelEstimat
     if needs_tiebreak:
         adjustments.append("LLM_TIEBREAK_NEEDED")
 
-    # Confidence assembly.
+    # Confidence assembly. Each signal is in [0, 1] and reflects how strongly
+    # the corresponding item attribute supports the chosen level.
     verb_signal = (max(counts.values()) / total_hits) if total_hits else 0.0
     verb_signal = max(0.0, min(1.0, verb_signal))
-    duration_signal = 0.7
-    modality_signal = 0.7
+    duration_signal = _duration_signal(item.duration_hours, level)
+    modality_signal = _modality_signal(item.modality, level)
     llm_agreement = 0.5 if needs_tiebreak else 1.0
     confidence = (
         0.4 * verb_signal

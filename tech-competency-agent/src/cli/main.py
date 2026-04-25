@@ -80,7 +80,7 @@ def run(stage, family, jobs_file, tech_sources, leadership_file, template_file, 
             }
 
     inputs = RunInputs(
-        jobs_file=Path(jobs_file) if jobs_file else Path("data/input/_placeholder.xlsx"),
+        jobs_file=Path(jobs_file) if jobs_file else None,
         tech_comp_source_files=[Path(p) for p in tech_sources],
         core_leadership_file=Path(leadership_file) if leadership_file else None,
         output_template_file=Path(template_file) if template_file else None,

@@ -2,12 +2,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RunInputs(BaseModel):
-    """Input files for a workflow run."""
-    jobs_file: Path
+    """Input files for a workflow run.
+
+    `jobs_file` is required for stage R1 (enforced at the CLI / orchestrator
+    boundary) but may be omitted for R2/FINAL/RESUME runs that operate on
+    artifacts from an earlier run.
+    """
+    jobs_file: Optional[Path] = None
     tech_comp_source_files: List[Path] = Field(default_factory=list)
     core_leadership_file: Optional[Path] = None
     output_template_file: Optional[Path] = None
@@ -68,6 +73,7 @@ class ArtifactRegistry(BaseModel):
     boundary_rescan: Optional[Path] = None       # 6E-ter
     overlap_reaudit: Optional[Path] = None       # 6E-quater
     ctic_report: Optional[Path] = None           # 6F
+    post_ctic_state: Optional[Path] = None       # 6F: post-feedback state after non-targeted drift reverts
     focus_group_package: Optional[Path] = None   # 6G
     learning_synthesis: Optional[Path] = None    # Phase 7
 
@@ -93,6 +99,11 @@ class QASummary(BaseModel):
 
 class RunState(BaseModel):
     """Complete state of workflow run - passed between agents."""
+    # Pydantic v2 serializes datetime/Path natively via model_dump_json; no
+    # legacy json_encoders needed. arbitrary_types_allowed kept for safety on
+    # any future field additions.
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     run_id: str
     run_timestamp_utc: datetime = Field(default_factory=datetime.utcnow)
     inputs: RunInputs
@@ -101,9 +112,3 @@ class RunState(BaseModel):
     flags: List[RunFlag] = Field(default_factory=list)
     qa_summary: Optional[QASummary] = None
     current_step: Optional[str] = None
-
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            Path: lambda v: str(v)
-        }

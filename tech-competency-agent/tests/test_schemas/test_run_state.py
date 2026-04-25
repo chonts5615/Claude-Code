@@ -44,3 +44,42 @@ def test_invalid_severity():
             flag_type="TEST",
             message="Test message"
         )
+
+
+def test_run_inputs_jobs_file_optional():
+    """R2/FINAL/RESUME runs may omit jobs_file (consume artifacts instead)."""
+    from pathlib import Path
+
+    from src.schemas.run_state import RunInputs
+
+    inputs = RunInputs(jobs_file=None, feedback_file=Path("data/feedback.json"))
+    assert inputs.jobs_file is None
+    assert inputs.feedback_file == Path("data/feedback.json")
+
+
+def test_run_state_serializes_path_and_datetime():
+    """Verify Pydantic v2 ConfigDict (no legacy json_encoders) still serializes
+    Path and datetime cleanly."""
+    import json
+    from pathlib import Path
+
+    from src.schemas.run_state import RunConfig, RunInputs, RunState
+
+    state = RunState(
+        run_id="t",
+        inputs=RunInputs(jobs_file=Path("x.xlsx")),
+        config=RunConfig(),
+    )
+    payload = json.loads(state.model_dump_json())
+    assert payload["run_id"] == "t"
+    assert payload["inputs"]["jobs_file"] == "x.xlsx"
+    assert "T" in payload["run_timestamp_utc"]  # ISO format
+
+
+def test_artifact_registry_has_post_ctic_state():
+    """6F revert path requires a dedicated artifact pointer."""
+    from src.schemas.run_state import ArtifactRegistry
+
+    reg = ArtifactRegistry()
+    assert hasattr(reg, "post_ctic_state")
+    assert reg.post_ctic_state is None
