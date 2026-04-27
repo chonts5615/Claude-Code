@@ -67,6 +67,30 @@ techcomp run \
 techcomp inspect data/output/run_<timestamp>_final_state.json
 ```
 
+### 6. Build a technical competency development program
+
+```bash
+techcomp build-program \
+  --ranking-file data/output/s7_ranked_top8_v5.json \
+  --output-file data/output/competency_builder_program.md \
+  --weeks 12 \
+  --max-competencies 8
+```
+
+This command converts ranked competencies into a practical week-by-week builder program
+with module sequencing, intensity levels, and expected outcomes.
+
+### 7. Validate competency packages against TCB v3.1 standards
+
+```bash
+techcomp validate-tcb \
+  --input-file data/input/job_families.json \
+  --output-file data/output/tcb_validation_report.json
+```
+
+This check enforces non-negotiable constraints (title/definition length, indicator counts
+for L1-L4, max competencies per family, and minimum technical EF coverage).
+
 ## Project Structure
 
 ```

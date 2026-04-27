@@ -1,13 +1,21 @@
+import json
+import uuid
+from datetime import datetime
+from pathlib import Path
+
 import click
 import yaml
-from pathlib import Path
-from datetime import datetime
-import uuid
-import os
 
-from src.schemas.run_state import RunState, RunInputs, RunConfig, ThresholdConfig
 from src.orchestrator.graph import WorkflowOrchestrator
+from src.schemas.ranking import RankingOutput
+from src.schemas.run_state import RunConfig, RunInputs, RunState, ThresholdConfig
+from src.schemas.tcb_builder import JobFamilyCompetencySet
 from src.utils.logger import setup_logger
+from src.utils.program_builder import (
+    TechnicalCompetencyProgramBuilder,
+    render_program_markdown,
+)
+from src.utils.tcb_standards import TCBStandardsValidator
 
 
 @click.group()
@@ -124,11 +132,11 @@ def inspect(state_file):
     click.echo(f"\n=== Run State: {state.run_id} ===")
     click.echo(f"Timestamp: {state.run_timestamp_utc}")
     click.echo(f"Current step: {state.current_step}")
-    click.echo(f"\nInputs:")
+    click.echo("\nInputs:")
     click.echo(f"  Jobs file: {state.inputs.jobs_file}")
     click.echo(f"  Tech sources: {len(state.inputs.tech_comp_source_files)}")
 
-    click.echo(f"\nArtifacts generated:")
+    click.echo("\nArtifacts generated:")
     for key, value in state.artifacts.dict().items():
         if value:
             click.echo(f"  {key}: {value}")
@@ -247,6 +255,98 @@ def init_config(output_dir):
     click.echo("1. Review and customize the configuration files")
     click.echo("2. Set up .env file with ANTHROPIC_API_KEY")
     click.echo("3. Run the workflow with: techcomp run --help")
+
+
+@cli.command()
+@click.option(
+    "--ranking-file",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to ranking output JSON (for example s7_ranked_top8_v5.json)",
+)
+@click.option(
+    "--output-file",
+    type=click.Path(),
+    required=True,
+    help="Path to write the generated competency builder markdown",
+)
+@click.option("--job-id", type=str, default=None, help="Optional job_id filter")
+@click.option("--weeks", type=int, default=12, show_default=True, help="Program duration in weeks")
+@click.option(
+    "--max-competencies",
+    type=int,
+    default=8,
+    show_default=True,
+    help="Maximum competencies to include in the program",
+)
+def build_program(ranking_file, output_file, job_id, weeks, max_competencies):
+    """Generate a technical competency builder program from ranking output."""
+    with open(ranking_file, "r") as f:
+        ranking_data = json.load(f)
+
+    ranking_output = RankingOutput.model_validate(ranking_data)
+    selected_job = None
+
+    if job_id:
+        selected_job = next((job for job in ranking_output.jobs if job.job_id == job_id), None)
+        if not selected_job:
+            raise click.ClickException(f"Job ID not found in ranking file: {job_id}")
+    elif ranking_output.jobs:
+        selected_job = ranking_output.jobs[0]
+    else:
+        raise click.ClickException("No job rankings found in ranking file.")
+
+    builder = TechnicalCompetencyProgramBuilder(
+        total_weeks=weeks,
+        max_competencies=max_competencies,
+    )
+    program = builder.build_for_job(selected_job)
+    report = render_program_markdown(program)
+
+    output_path = Path(output_file)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(report)
+
+    click.echo(f"Generated competency builder program for job: {selected_job.job_id}")
+    click.echo(f"Saved to: {output_path}")
+
+
+@cli.command(name="validate-tcb")
+@click.option(
+    "--input-file",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to JSON file containing job family competency packages.",
+)
+@click.option(
+    "--output-file",
+    type=click.Path(),
+    required=True,
+    help="Path to write JSON standards validation report.",
+)
+def validate_tcb(input_file, output_file):
+    """Validate competency packages against TCB v3.1 non-negotiable standards."""
+    with open(input_file, "r") as f:
+        payload = json.load(f)
+
+    if isinstance(payload, dict) and "job_families" in payload:
+        job_families = [JobFamilyCompetencySet.model_validate(item) for item in payload["job_families"]]
+    elif isinstance(payload, list):
+        job_families = [JobFamilyCompetencySet.model_validate(item) for item in payload]
+    else:
+        raise click.ClickException("Input must be a list of job families or an object with `job_families`.")
+
+    report = TCBStandardsValidator().validate(job_families)
+    output_path = Path(output_file)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(report.model_dump_json(indent=2))
+
+    click.echo(
+        f"Validated {report.total_competencies} competencies across "
+        f"{report.total_job_families} job families."
+    )
+    click.echo(f"Report valid: {report.report_is_valid}")
+    click.echo(f"Saved to: {output_path}")
 
 
 if __name__ == '__main__':
