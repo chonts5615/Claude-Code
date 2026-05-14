@@ -1,21 +1,35 @@
 """Semantic similarity utilities using sentence transformers."""
 
 from typing import List, Tuple
+
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 # Global model instance (lazy loaded)
 _model = None
+_model_unavailable = False
 
 
 def get_similarity_model() -> SentenceTransformer:
     """Get or initialize the similarity model."""
-    global _model
-    if _model is None:
-        _model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    global _model, _model_unavailable
+    if _model is None and not _model_unavailable:
+        try:
+            _model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        except Exception:
+            _model_unavailable = True
     return _model
+
+
+def _lexical_similarity(text1: str, text2: str) -> float:
+    words1 = set(text1.lower().split())
+    words2 = set(text2.lower().split())
+    if not words1 or not words2:
+        return 0.0
+    overlap = len(words1.intersection(words2))
+    denom = len(words1.union(words2))
+    return overlap / denom if denom else 0.0
 
 
 def compute_similarity(text1: str, text2: str) -> float:
@@ -33,12 +47,11 @@ def compute_similarity(text1: str, text2: str) -> float:
         return 0.0
 
     model = get_similarity_model()
-
-    # Encode texts
-    embeddings = model.encode([text1, text2])
-
-    # Compute cosine similarity
-    similarity = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+    if model is None:
+        similarity = _lexical_similarity(text1, text2)
+    else:
+        embeddings = model.encode([text1, text2])
+        similarity = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
 
     # Ensure in range [0, 1]
     return max(0.0, min(1.0, float(similarity)))
@@ -64,13 +77,12 @@ def compute_similarity_batch(
         return []
 
     model = get_similarity_model()
-
-    # Encode query and candidates
-    query_embedding = model.encode([query])[0]
-    candidate_embeddings = model.encode(candidates)
-
-    # Compute similarities
-    similarities = cosine_similarity([query_embedding], candidate_embeddings)[0]
+    if model is None:
+        similarities = np.array([_lexical_similarity(query, candidate) for candidate in candidates])
+    else:
+        query_embedding = model.encode([query])[0]
+        candidate_embeddings = model.encode(candidates)
+        similarities = cosine_similarity([query_embedding], candidate_embeddings)[0]
 
     # Get top k indices
     top_indices = np.argsort(similarities)[::-1][:top_k]
@@ -95,12 +107,15 @@ def compute_pairwise_similarity(texts: List[str]) -> np.ndarray:
         return np.array([])
 
     model = get_similarity_model()
-
-    # Encode all texts
-    embeddings = model.encode(texts)
-
-    # Compute pairwise cosine similarity
-    similarity_matrix = cosine_similarity(embeddings)
+    if model is None:
+        n = len(texts)
+        similarity_matrix = np.zeros((n, n), dtype=float)
+        for i in range(n):
+            for j in range(n):
+                similarity_matrix[i, j] = _lexical_similarity(texts[i], texts[j]) if i != j else 1.0
+    else:
+        embeddings = model.encode(texts)
+        similarity_matrix = cosine_similarity(embeddings)
 
     return similarity_matrix
 

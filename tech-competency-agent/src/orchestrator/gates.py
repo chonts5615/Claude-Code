@@ -1,13 +1,12 @@
 """Quality gates and validation logic."""
 
-from typing import List, Optional
 from pydantic import BaseModel
 
-from src.schemas.run_state import RunState, ThresholdConfig
+from src.schemas.audit import OverlapAuditOutput
 from src.schemas.job import JobExtractionOutput
 from src.schemas.mapping import CompetencyMappingOutput
-from src.schemas.audit import OverlapAuditOutput, OverlapRemediationOutput
 from src.schemas.ranking import RankingOutput
+from src.schemas.run_state import RunState, ThresholdConfig
 
 
 class ValidationResult(BaseModel):
@@ -208,10 +207,13 @@ class QualityGate:
             ranking = RankingOutput.parse_raw(f.read())
 
         # Check each job has appropriate number of competencies
+        min_count = self.thresholds.min_competencies_per_job
+        max_count = self.thresholds.max_competencies_per_job
+
         jobs_out_of_range = []
         for job_ranking in ranking.jobs:
             comp_count = len(job_ranking.ranked_competencies)
-            if comp_count < 6 or comp_count > 10:
+            if comp_count < min_count or comp_count > max_count:
                 jobs_out_of_range.append({
                     "job_id": job_ranking.job_id,
                     "count": comp_count
@@ -222,7 +224,10 @@ class QualityGate:
                 rule_name="top_n_count",
                 passed=False,
                 severity="WARNING",
-                message=f"{len(jobs_out_of_range)} jobs have competency counts outside range [6-10]",
+                message=(
+                    f"{len(jobs_out_of_range)} jobs have competency counts outside "
+                    f"range [{min_count}-{max_count}]"
+                ),
                 metadata={"jobs_out_of_range": jobs_out_of_range}
             )
 
@@ -230,6 +235,6 @@ class QualityGate:
             rule_name="top_n_count",
             passed=True,
             severity="INFO",
-            message="All jobs have competency counts within range [6-10]",
+            message=f"All jobs have competency counts within range [{min_count}-{max_count}]",
             metadata={}
         )

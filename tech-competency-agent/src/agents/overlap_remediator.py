@@ -1,16 +1,12 @@
 """Step 5: Overlap Remediator Agent - Fixes overlap issues."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
+from src.schemas.audit import OverlapRemediationOutput
 from src.schemas.run_state import RunState
-from src.schemas.audit import (
-    OverlapRemediationOutput,
-    JobRemediationLog,
-    RemediationAction
-)
 
 
 class OverlapRemediatorAgent(BaseAgent):
@@ -49,7 +45,7 @@ class OverlapRemediatorAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s5_remediation_log.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
         # Save cleaned competencies (v3)
         clean_output_path = Path(f"data/output/{state.run_id}_s5_clean_v3.json")

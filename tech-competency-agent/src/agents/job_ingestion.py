@@ -1,20 +1,17 @@
 """Step 1: Job Ingestion Agent - Extracts jobs from Excel/Word/PDF files."""
 
 from pathlib import Path
-from datetime import datetime
 from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
-from src.schemas.run_state import RunState
 from src.schemas.job import (
+    ExtractionWarning,
     Job,
-    Responsibility,
-    JobSummary,
-    SourceMetadata,
     JobExtractionOutput,
-    ExtractionWarning
 )
+from src.schemas.run_state import RunState
 from src.utils.file_parsers import parse_excel_jobs
 
 
@@ -53,7 +50,7 @@ class JobIngestionAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s1_jobs_extracted.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
         state.artifacts.jobs_extracted = output_path
 

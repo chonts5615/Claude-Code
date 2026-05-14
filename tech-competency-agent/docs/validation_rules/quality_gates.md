@@ -54,13 +54,13 @@ This document defines validation rules applied at each quality gate.
 
 ### Rule: Coverage Below Threshold
 - **Severity**: WARNING
-- **Threshold**: Average coverage <80% of responsibilities
+- **Threshold**: Average coverage <90% of responsibilities
 - **Action**: Flag low-coverage jobs
 - **Remediation**: Review competency selection criteria, consider additional competencies
 
-### Rule: Top N Out of Range
+### Rule: Top N Must Equal 6
 - **Severity**: WARNING
-- **Condition**: Job has <6 or >10 ranked competencies
+- **Condition**: Job has count different from 6 ranked competencies
 - **Action**: Flag for review
 - **Remediation**: Adjust ranking criteria or top N setting
 
@@ -105,6 +105,6 @@ overlap:
   minor_threshold: 0.72
 
 ranking:
-  min_responsibility_coverage: 0.80
-  top_n_competencies: 8
+  min_responsibility_coverage: 0.90
+  top_n_competencies: 6
 ```

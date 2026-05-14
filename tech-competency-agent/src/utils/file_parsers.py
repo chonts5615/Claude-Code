@@ -1,13 +1,14 @@
 """File parsing utilities for Excel, Word, and PDF files."""
 
+import re
+from datetime import datetime
 from pathlib import Path
 from typing import List, Tuple
-import openpyxl
-from datetime import datetime
-import re
 
-from src.schemas.job import Job, Responsibility, JobSummary, SourceMetadata, ExtractionWarning
+import openpyxl
+
 from src.schemas.competency import CompetencyLibraryEntry, SourceEvidence
+from src.schemas.job import ExtractionWarning, Job, JobSummary, Responsibility, SourceMetadata
 
 
 def parse_excel_jobs(file_path: Path) -> Tuple[List[Job], List[ExtractionWarning]]:
@@ -64,7 +65,7 @@ def parse_excel_jobs(file_path: Path) -> Tuple[List[Job], List[ExtractionWarning
                         warnings.append(ExtractionWarning(
                             job_id=job.job_id,
                             warning_type="MISSING_SUMMARY",
-                            message=f"Job missing summary",
+                            message="Job missing summary",
                             severity="WARNING"
                         ))
 
