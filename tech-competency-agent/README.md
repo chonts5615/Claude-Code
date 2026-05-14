@@ -1,6 +1,6 @@
 # Technical Competency Extraction Agent System
 
-IO Psychology-grade multi-agent system for extracting validated technical competencies from job descriptions.
+IO Psychology-grade multi-agent system for extracting validated technical competencies from job descriptions under the TCB v3.2 contract.
 
 ## Overview
 
@@ -46,7 +46,7 @@ vim config/workflow_config.yaml
 
 ```bash
 cp .env.example .env
-# Add your Anthropic API key
+# Add your LLM provider API key (provider configured in config/workflow_config.yaml)
 echo "ANTHROPIC_API_KEY=your_key_here" >> .env
 ```
 
@@ -80,7 +80,7 @@ techcomp build-program \
 This command converts ranked competencies into a practical week-by-week builder program
 with module sequencing, intensity levels, and expected outcomes.
 
-### 7. Validate competency packages against TCB v3.1 standards
+### 7. Validate competency packages against TCB v3.2 standards
 
 ```bash
 techcomp validate-tcb \

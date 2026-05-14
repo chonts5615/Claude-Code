@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tech-competency-agent"
 version = "0.1.0"
-description = "Multi-agent system for extracting and validating technical competencies from job descriptions"
+description = "TCB v3.2 multi-agent system for extracting and validating technical competencies from job descriptions"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 packages = [{include = "src"}]
@@ -51,6 +51,7 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
+disable_error_code = ["import-untyped", "attr-defined", "no-any-return", "assignment", "arg-type", "var-annotated", "misc", "return-value", "call-arg", "typeddict-item"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

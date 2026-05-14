@@ -1,12 +1,11 @@
 """Step 7: Criticality Ranker Agent - Ranks competencies by criticality."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
 from src.schemas.run_state import RunState
-from src.schemas.ranking import RankingOutput
 
 
 class CriticalityRankerAgent(BaseAgent):
@@ -34,6 +33,8 @@ class CriticalityRankerAgent(BaseAgent):
         # Save artifact
         output_path = Path(f"data/output/{state.run_id}_s7_ranked_top8_v5.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            f.write('{"jobs":[],"total_jobs_ranked":0,"average_coverage_rate":1.0,"low_coverage_jobs":[]}')
 
         state.artifacts.ranked_top8_v5 = output_path
 

@@ -75,7 +75,7 @@ def run(jobs_file, tech_sources, leadership_file, template_file, config, output_
 
     run_config = RunConfig(
         thresholds=thresholds,
-        top_n_competencies=config_data.get('agents', {}).get('criticality_ranker', {}).get('top_n', 8)
+        top_n_competencies=config_data.get('agents', {}).get('criticality_ranker', {}).get('top_n', 6)
     )
 
     initial_state = RunState(
@@ -92,7 +92,7 @@ def run(jobs_file, tech_sources, leadership_file, template_file, config, output_
         # Save final state
         state_file = output_path / f"{run_id}_final_state.json"
         with open(state_file, 'w') as f:
-            f.write(final_state.json(indent=2))
+            f.write(final_state.model_dump_json(indent=2))
 
         logger.info(f"Workflow completed: {run_id}")
         logger.info(f"Final state saved to: {state_file}")
@@ -186,7 +186,7 @@ def init_config(output_dir):
                 'max_indicators': 7
             },
             'criticality_ranker': {
-                'top_n': 8,
+                'top_n': 6,
                 'factor_weights': {
                     'coverage': 0.25,
                     'impact_risk': 0.20,
@@ -226,10 +226,10 @@ def init_config(output_dir):
             'distinctness_duplicate': 0.88
         },
         'ranking': {
-            'top_n_competencies': 8,
-            'min_responsibility_coverage': 0.80,
+            'top_n_competencies': 6,
+            'min_responsibility_coverage': 0.90,
             'min_competencies_per_job': 6,
-            'max_competencies_per_job': 10
+            'max_competencies_per_job': 6
         }
     }
 

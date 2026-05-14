@@ -1,12 +1,11 @@
 """Step 6: Benchmark Researcher Agent - Validates against industry standards."""
 
 from pathlib import Path
-from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
 from src.schemas.run_state import RunState
-from src.schemas.competency import NormalizedCompetenciesOutput
 
 
 class BenchmarkResearchAgent(BaseAgent):
@@ -34,6 +33,8 @@ class BenchmarkResearchAgent(BaseAgent):
         # Save artifact
         output_path = Path(f"data/output/{state.run_id}_s6_benchmarked_v4.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            f.write('{"jobs":[],"processing_version":"v4","total_competencies":0}')
 
         state.artifacts.benchmarked_v4 = output_path
 

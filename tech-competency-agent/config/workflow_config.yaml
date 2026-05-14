@@ -1,5 +1,6 @@
 workflow_name: JobToTechnicalCompetencyAgent
 version: 1.0
+tcb_contract_version: "3.2"
 
 # Orchestration settings
 orchestration:

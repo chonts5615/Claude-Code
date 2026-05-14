@@ -2,18 +2,19 @@
 
 from pathlib import Path
 from typing import List
+
 import anthropic
 
 from src.agents.base import BaseAgent
-from src.schemas.run_state import RunState
+from src.schemas.competency import CompetencyLibrary
 from src.schemas.job import Job, JobExtractionOutput
-from src.schemas.competency import CompetencyLibrary, CompetencyLibraryEntry
 from src.schemas.mapping import (
+    CompetencyCandidate,
     CompetencyMappingOutput,
     JobMapping,
     ResponsibilityMapping,
-    CompetencyCandidate
 )
+from src.schemas.run_state import RunState
 from src.utils.file_parsers import parse_competency_library
 from src.utils.similarity import compute_similarity
 
@@ -76,7 +77,7 @@ class CompetencyMappingAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s2_competency_map_v1.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
         state.artifacts.competency_map_v1 = output_path
 

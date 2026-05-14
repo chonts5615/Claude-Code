@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Dict, List, Optional
-from pydantic import BaseModel, Field
 from pathlib import Path
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class RunInputs(BaseModel):
@@ -18,13 +19,15 @@ class ThresholdConfig(BaseModel):
     overlap_minor: float = Field(0.72, ge=0.0, le=1.0)
     distinctness_duplicate: float = Field(0.88, ge=0.0, le=1.0)
     min_responsibilities_per_job: int = Field(5, ge=1)
-    top_n_competencies: int = Field(8, ge=1, le=12)
-    min_responsibility_coverage: float = Field(0.80, ge=0.0, le=1.0)
+    top_n_competencies: int = Field(6, ge=1, le=12)
+    min_responsibility_coverage: float = Field(0.90, ge=0.0, le=1.0)
+    min_competencies_per_job: int = Field(6, ge=1, le=12)
+    max_competencies_per_job: int = Field(6, ge=1, le=12)
 
 
 class RunConfig(BaseModel):
     """Configuration for workflow execution."""
-    top_n_competencies: int = 8
+    top_n_competencies: int = 6
     thresholds: ThresholdConfig = Field(default_factory=ThresholdConfig)
     template_spec_path: Optional[Path] = None
     competency_format_spec_path: Optional[Path] = None

@@ -18,7 +18,7 @@ overlap:
 
 # Step 7 - Ranking
 ranking:
-  top_n_competencies: 8
-  min_responsibility_coverage: 0.80
+  top_n_competencies: 6
+  min_responsibility_coverage: 0.90
   min_competencies_per_job: 6
-  max_competencies_per_job: 10
+  max_competencies_per_job: 6
