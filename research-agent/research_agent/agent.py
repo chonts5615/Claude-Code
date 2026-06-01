@@ -14,6 +14,7 @@ to logs/.
 
 import asyncio
 import os
+import shutil
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -46,11 +47,14 @@ def load_prompt(filename: str) -> str:
 async def chat() -> None:
     """Start an interactive chat session with the research agent."""
 
-    # Check API key first, before creating any files.
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("\nError: ANTHROPIC_API_KEY not found.")
-        print("Set it in a .env file or export it in your shell.")
-        print("Get your key at: https://console.anthropic.com/settings/keys\n")
+    # Verify we can authenticate before creating any files. The SDK can use
+    # either an ANTHROPIC_API_KEY or the credentials of an installed `claude`
+    # CLI (e.g. in a managed Claude Code environment), so accept either.
+    if not os.environ.get("ANTHROPIC_API_KEY") and shutil.which("claude") is None:
+        print("\nError: no Anthropic credentials found.")
+        print("Set ANTHROPIC_API_KEY in a .env file or your shell, or install and")
+        print("authenticate the Claude Code CLI.")
+        print("Get an API key at: https://console.anthropic.com/settings/keys\n")
         return
 
     # Set up session directory and transcript.
