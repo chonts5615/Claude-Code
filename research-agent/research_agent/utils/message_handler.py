@@ -2,6 +2,10 @@
 
 from typing import Any
 
+# Names under which the SDK surfaces a subagent spawn. Older builds used
+# "Task"; current builds (>=0.2) emit the tool-use block as "Agent".
+SPAWN_TOOL_NAMES = {"Task", "Agent"}
+
 # Track whether a tool was just used (for formatting purposes).
 _tool_just_used = False
 
@@ -36,9 +40,9 @@ def process_assistant_message(msg: Any, tracker: Any, transcript: Any) -> None:
             # Mark that a tool was used.
             _tool_just_used = True
 
-            # Only the Task tool (subagent spawning) is surfaced to the user
-            # here; all other tool calls are reported via the tracker hooks.
-            if block.name == "Task":
+            # Only subagent-spawn tools are surfaced to the user here; all
+            # other tool calls are reported via the tracker hooks.
+            if block.name in SPAWN_TOOL_NAMES:
                 subagent_type = block.input.get("subagent_type", "unknown")
                 description = block.input.get("description", "no description")
                 prompt = block.input.get("prompt", "")

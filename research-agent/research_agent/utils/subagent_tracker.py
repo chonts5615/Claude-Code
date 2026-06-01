@@ -32,6 +32,12 @@ _TYPE_PREFIXES = {
 # Identifier used for tool calls made directly by the lead/main agent.
 _LEAD_ID = "LEAD"
 
+# Tool names under which the SDK surfaces a subagent spawn. These are handled
+# by the message handler (which calls register_subagent_spawn), so the hooks
+# skip them to avoid double-counting. "Task" is the legacy name; current SDK
+# builds emit "Agent".
+_SPAWN_TOOLS = {"Task", "Agent"}
+
 
 @dataclass
 class ToolCallRecord:
@@ -132,8 +138,8 @@ class SubagentTracker:
         tool_name = input_data.get("tool_name", "unknown")
         tool_input = input_data.get("tool_input", {}) or {}
 
-        # Task spawns are surfaced by the message handler, not here.
-        if tool_name == "Task":
+        # Subagent spawns are surfaced by the message handler, not here.
+        if tool_name in _SPAWN_TOOLS:
             return {}
 
         subagent_id = self._current_subagent_id
@@ -157,7 +163,7 @@ class SubagentTracker:
     ) -> dict:
         """Attach the result to the pending record and log it."""
         tool_name = input_data.get("tool_name", "unknown")
-        if tool_name == "Task":
+        if tool_name in _SPAWN_TOOLS:
             return {}
 
         record = self._pending.pop(tool_use_id, None) if tool_use_id else None
