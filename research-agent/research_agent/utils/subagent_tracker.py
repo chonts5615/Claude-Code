@@ -1,19 +1,16 @@
 """Tracking of subagent tool calls via Claude Agent SDK hooks.
 
-The tracker correlates two streams of information:
+Every tool call flows through the ``PreToolUse`` / ``PostToolUse`` hooks. The SDK
+includes ``agent_id`` and ``agent_type`` in the hook payload for calls made by a
+subagent (the lead agent's own calls omit them), so each call can be attributed
+to the exact subagent that made it — independent of message ordering and safe
+under parallel subagents.
 
-1. ``register_subagent_spawn`` is called from the message handler whenever the
-   lead agent emits a ``Task`` tool-use block. It mints a stable, human-readable
-   id (e.g. ``RESEARCHER-1``) and remembers which ``Task`` tool_use_id it
-   belongs to.
-2. ``set_current_context`` is called for every assistant message with that
-   message's ``parent_tool_use_id``. A subagent's messages carry the spawning
-   ``Task`` id as their parent, so this tells the tracker which subagent is
-   currently "active".
-
-The ``PreToolUse`` / ``PostToolUse`` hooks then attribute each tool call to the
-active subagent (or the lead agent when there is no parent), print a readable
-line to the transcript, and append a structured record to ``tool_calls.jsonl``.
+The tracker mints a stable, human-readable id per subagent (e.g. ``RESEARCHER-1``)
+the first time it sees that subagent's ``agent_id``, prints a readable line to
+the transcript, and appends a structured record to ``tool_calls.jsonl``. The
+message handler additionally calls :meth:`register_subagent_spawn` so spawns are
+announced to the user and logged as they happen.
 """
 
 import json
@@ -22,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
-# Map a subagent_type (as used in the Task tool) to a short id prefix.
+# Map an agent/subagent type to a short id prefix.
 _TYPE_PREFIXES = {
     "researcher": "RESEARCHER",
     "data-analyst": "DATA-ANALYST",
@@ -32,10 +29,9 @@ _TYPE_PREFIXES = {
 # Identifier used for tool calls made directly by the lead/main agent.
 _LEAD_ID = "LEAD"
 
-# Tool names under which the SDK surfaces a subagent spawn. These are handled
-# by the message handler (which calls register_subagent_spawn), so the hooks
-# skip them to avoid double-counting. "Task" is the legacy name; current SDK
-# builds emit "Agent".
+# Tool names under which the SDK surfaces a subagent spawn. These are announced
+# by the message handler, so the hooks skip them to avoid double-counting.
+# "Task" is the legacy name; current SDK builds emit "Agent".
 _SPAWN_TOOLS = {"Task", "Agent"}
 
 
@@ -57,8 +53,6 @@ class SubagentSession:
 
     subagent_id: str
     subagent_type: str
-    description: str
-    prompt: str
     spawned_at: str
     tool_calls: list = field(default_factory=list)
 
@@ -70,17 +64,14 @@ class SubagentTracker:
         self.transcript = transcript_writer
         self.session_dir = session_dir
 
-        # Per-type counters for minting ids like RESEARCHER-1, RESEARCHER-2.
+        # Per-prefix counters for minting ids like RESEARCHER-1, RESEARCHER-2.
         self._counters: dict[str, int] = {}
 
-        # tool_use_id (of the spawning Task call) -> subagent_id.
-        self._id_by_parent: dict[str, str] = {}
+        # SDK agent_id -> our stable subagent_id.
+        self._id_by_agent: dict[str, str] = {}
 
         # subagent_id -> SubagentSession.
         self.sessions: dict[str, SubagentSession] = {}
-
-        # The currently active subagent id (set per message). Defaults to LEAD.
-        self._current_subagent_id: str = _LEAD_ID
 
         # tool_use_id -> ToolCallRecord for in-flight calls (pre -> post).
         self._pending: dict[str, ToolCallRecord] = {}
@@ -91,42 +82,43 @@ class SubagentTracker:
             self._jsonl = open(session_dir / "tool_calls.jsonl", "w", encoding="utf-8")
 
     # ------------------------------------------------------------------ #
-    # Subagent registration / context
+    # Subagent registration / attribution
     # ------------------------------------------------------------------ #
-    def register_subagent_spawn(
-        self, tool_use_id: str, subagent_type: str, description: str, prompt: str
-    ) -> str:
-        """Register a newly spawned subagent and return its stable id."""
-        prefix = _TYPE_PREFIXES.get(subagent_type, subagent_type.upper())
-        self._counters[prefix] = self._counters.get(prefix, 0) + 1
-        subagent_id = f"{prefix}-{self._counters[prefix]}"
-
-        self._id_by_parent[tool_use_id] = subagent_id
-        self.sessions[subagent_id] = SubagentSession(
-            subagent_id=subagent_id,
-            subagent_type=subagent_type,
-            description=description,
-            prompt=prompt,
-            spawned_at=datetime.now().isoformat(),
-        )
-
+    def register_subagent_spawn(self, subagent_type: str, description: str) -> None:
+        """Log a subagent spawn announced by the message handler."""
         self._write_jsonl(
             {
                 "event": "subagent_spawn",
-                "subagent_id": subagent_id,
                 "subagent_type": subagent_type,
                 "description": description,
                 "timestamp": datetime.now().isoformat(),
             }
         )
-        return subagent_id
 
-    def set_current_context(self, parent_tool_use_id: Optional[str]) -> None:
-        """Set the active agent based on a message's parent_tool_use_id."""
-        if parent_tool_use_id and parent_tool_use_id in self._id_by_parent:
-            self._current_subagent_id = self._id_by_parent[parent_tool_use_id]
-        else:
-            self._current_subagent_id = _LEAD_ID
+    def _resolve_subagent_id(self, input_data: dict) -> str:
+        """Return the stable id of the agent that made this tool call.
+
+        Uses ``agent_id`` / ``agent_type`` from the hook payload; calls without
+        an ``agent_id`` were made by the lead agent.
+        """
+        agent_id = input_data.get("agent_id")
+        if not agent_id:
+            return _LEAD_ID
+        if agent_id in self._id_by_agent:
+            return self._id_by_agent[agent_id]
+
+        agent_type = input_data.get("agent_type", "subagent")
+        prefix = _TYPE_PREFIXES.get(agent_type, agent_type.upper())
+        self._counters[prefix] = self._counters.get(prefix, 0) + 1
+        subagent_id = f"{prefix}-{self._counters[prefix]}"
+
+        self._id_by_agent[agent_id] = subagent_id
+        self.sessions[subagent_id] = SubagentSession(
+            subagent_id=subagent_id,
+            subagent_type=agent_type,
+            spawned_at=datetime.now().isoformat(),
+        )
+        return subagent_id
 
     # ------------------------------------------------------------------ #
     # Hooks
@@ -142,7 +134,7 @@ class SubagentTracker:
         if tool_name in _SPAWN_TOOLS:
             return {}
 
-        subagent_id = self._current_subagent_id
+        subagent_id = self._resolve_subagent_id(input_data)
         record = ToolCallRecord(
             subagent_id=subagent_id,
             tool_name=tool_name,
@@ -169,7 +161,7 @@ class SubagentTracker:
         record = self._pending.pop(tool_use_id, None) if tool_use_id else None
         if record is None:
             record = ToolCallRecord(
-                subagent_id=self._current_subagent_id,
+                subagent_id=self._resolve_subagent_id(input_data),
                 tool_name=tool_name,
                 tool_input=input_data.get("tool_input", {}) or {},
                 timestamp=datetime.now().isoformat(),

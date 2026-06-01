@@ -20,12 +20,6 @@ def process_assistant_message(msg: Any, tracker: Any, transcript: Any) -> None:
     """
     global _tool_just_used
 
-    # Update the tracker context with the parent_tool_use_id from the message.
-    # When a subagent produces a message, parent_tool_use_id points at the Task
-    # tool call that spawned it; for the lead agent it is None.
-    parent_id = getattr(msg, "parent_tool_use_id", None)
-    tracker.set_current_context(parent_id)
-
     for block in msg.content:
         block_type = type(block).__name__
 
@@ -43,20 +37,16 @@ def process_assistant_message(msg: Any, tracker: Any, transcript: Any) -> None:
             # Only subagent-spawn tools are surfaced to the user here; all
             # other tool calls are reported via the tracker hooks.
             if block.name in SPAWN_TOOL_NAMES:
-                subagent_type = block.input.get("subagent_type", "unknown")
+                subagent_type = block.input.get("subagent_type", "subagent")
                 description = block.input.get("description", "no description")
-                prompt = block.input.get("prompt", "")
 
-                # Register with the tracker and get the subagent ID back.
-                subagent_id = tracker.register_subagent_spawn(
-                    tool_use_id=block.id,
-                    subagent_type=subagent_type,
-                    description=description,
-                    prompt=prompt,
-                )
+                # Log the spawn. Per-subagent run ids (RESEARCHER-1, ...) are
+                # minted by the tracker hooks from the SDK's agent_id, so a
+                # numbered id is intentionally not used in this announcement.
+                tracker.register_subagent_spawn(subagent_type, description)
 
-                # User-facing output with the subagent ID.
+                # User-facing output.
                 transcript.write(
-                    f"\n\n[\U0001f680 Spawning {subagent_id}: {description}]\n",
+                    f"\n\n[\U0001f680 Spawning {subagent_type} subagent: {description}]\n",
                     end="",
                 )
