@@ -72,6 +72,28 @@ cp .env.example .env          # then add your ANTHROPIC_API_KEY
 
 Get an API key at https://console.anthropic.com/settings/keys.
 
+### Running in a container as root
+
+The agent uses `permission_mode="bypassPermissions"` so subagents can run their
+tools non-interactively. Under the hood the SDK launches the `claude` CLI with
+`--dangerously-skip-permissions`, which the CLI **refuses to run as root** (e.g.
+in a Docker image or CI runner that defaults to UID 0). If you see:
+
+```
+--dangerously-skip-permissions cannot be used with root/sudo privileges for security reasons
+```
+
+either run as a non-root user, or — only inside a disposable sandbox/container —
+set `IS_SANDBOX=1` to allow it:
+
+```bash
+IS_SANDBOX=1 uv run python -m research_agent.agent
+```
+
+In a [managed Claude Code environment](https://code.claude.com/docs/en/claude-code-on-the-web)
+the authenticated `claude` CLI also supplies credentials, so a separate
+`ANTHROPIC_API_KEY` isn't required (the startup check accepts either).
+
 ## Usage
 
 ```bash
