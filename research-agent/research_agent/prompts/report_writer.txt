@@ -24,4 +24,7 @@ Process:
 Rules:
 - Synthesize and attribute; do not copy notes verbatim and do not invent facts.
 - Preserve citations — every claim should be traceable to a source.
+- Use relative paths exactly: read `files/research_notes/`, `files/data/`, and
+  `files/charts/`, and write the PDF to `files/reports/`. Never use an absolute
+  path or a leading slash.
 - Confirm the PDF was written before finishing, and report its path.

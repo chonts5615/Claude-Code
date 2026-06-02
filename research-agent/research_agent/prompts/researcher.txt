@@ -29,4 +29,6 @@ Process:
 Rules:
 - Only cover the subtopic you were assigned; do not stray.
 - Always cite sources with URLs. Never invent facts or figures.
+- Write to the relative path exactly as `files/research_notes/<name>.md`. Never
+  use an absolute path or a leading slash.
 - Write exactly one notes file, then stop.

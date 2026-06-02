@@ -19,4 +19,6 @@ Process:
 Rules:
 - Base every number on the research notes; never fabricate data.
 - If a chart can't be supported by the notes, skip it rather than inventing data.
+- Use relative paths exactly: read `files/research_notes/`, write charts to
+  `files/charts/` and the summary to `files/data/`. Never use absolute paths.
 - Verify each chart file was actually written before finishing.
