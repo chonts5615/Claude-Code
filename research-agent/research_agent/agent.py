@@ -125,6 +125,9 @@ async def chat() -> None:
 
     options = ClaudeAgentOptions(
         permission_mode="bypassPermissions",
+        cwd=str(Path.cwd()),  # Pin the working dir so every agent and subagent
+                              # resolves relative output paths (files/...) to the
+                              # same place, regardless of project --add-dir roots.
         setting_sources=["project"],  # Load skills/commands from project .claude directory
         system_prompt=lead_agent_prompt,
         allowed_tools=["Task"],
