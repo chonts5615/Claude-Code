@@ -1,0 +1,126 @@
+# Multi-Agent Research System
+
+A small multi-agent research system built on the [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python).
+A **Lead Agent** breaks a request into subtopics and orchestrates a team of
+specialized subagents to research the web, analyze the findings, and produce a
+polished PDF report — all from a single interactive prompt.
+
+This is an independent re-implementation of the structure demonstrated in
+Anthropic's [`research-agent`](https://github.com/anthropics/claude-agent-sdk-demos/tree/main/research-agent)
+demo, written from scratch.
+
+## Architecture
+
+The Lead Agent's only tool is `Task`. It delegates every step to three
+specialized subagents defined via `AgentDefinition`:
+
+| Agent | Tools | Purpose |
+|-------|-------|---------|
+| **Lead Agent** | `Task` | Plans subtopics and coordinates the workflow |
+| **researcher** | `WebSearch`, `Write` | Web research → Markdown notes in `files/research_notes/` |
+| **data-analyst** | `Glob`, `Read`, `Bash`, `Write` | Extracts metrics, renders charts to `files/charts/`, summary to `files/data/` |
+| **report-writer** | `Skill`, `Write`, `Glob`, `Read`, `Bash` | Synthesizes a PDF report into `files/reports/` |
+
+Typical workflow:
+
+1. The Lead Agent splits the request into 2–4 subtopics.
+2. It spawns one **researcher** per subtopic, **in parallel**, each writing notes.
+3. It spawns a **data-analyst** to extract numbers and build charts.
+4. It spawns a **report-writer** to produce the final PDF with embedded visuals.
+
+### Subagent tracking & logging
+
+SDK `PreToolUse` / `PostToolUse` hooks track every tool call and attribute it to
+the subagent that made it (e.g. `RESEARCHER-1`). Each session writes two logs to
+`logs/session_<timestamp>/`:
+
+- `transcript.txt` — a human-readable transcript of the conversation.
+- `tool_calls.jsonl` — one structured JSON record per tool call (agent id, tool,
+  input, output, timestamp).
+
+## Project layout
+
+```
+research-agent/
+├── research_agent/
+│   ├── agent.py                 # Entry point: defines agents, hooks, chat loop
+│   ├── prompts/                 # System prompt per agent (.txt)
+│   │   ├── lead_agent.txt
+│   │   ├── researcher.txt
+│   │   ├── data_analyst.txt
+│   │   └── report_writer.txt
+│   └── utils/
+│       ├── subagent_tracker.py  # Hook-based tool-call tracking + JSONL log
+│       ├── transcript.py        # Session setup + transcript writer
+│       └── message_handler.py   # Streams assistant messages to the transcript
+├── .claude/commands/            # Slash commands (/research, /fact-check, …)
+├── files/                       # Runtime outputs (notes, data, charts, reports)
+├── logs/                        # Per-session transcripts + tool-call logs
+├── .env.example
+└── pyproject.toml
+```
+
+## Setup
+
+Requires Python 3.10+. Using [`uv`](https://github.com/astral-sh/uv):
+
+```bash
+cd research-agent
+uv sync                       # or: pip install -e .
+cp .env.example .env          # then add your ANTHROPIC_API_KEY
+```
+
+Get an API key at https://console.anthropic.com/settings/keys.
+
+### Running in a container as root
+
+The agent uses `permission_mode="bypassPermissions"` so subagents can run their
+tools non-interactively. Under the hood the SDK launches the `claude` CLI with
+`--dangerously-skip-permissions`, which the CLI **refuses to run as root** (e.g.
+in a Docker image or CI runner that defaults to UID 0). If you see:
+
+```
+--dangerously-skip-permissions cannot be used with root/sudo privileges for security reasons
+```
+
+either run as a non-root user, or — only inside a disposable sandbox/container —
+set `IS_SANDBOX=1` to allow it:
+
+```bash
+IS_SANDBOX=1 uv run python -m research_agent.agent
+```
+
+In a [managed Claude Code environment](https://code.claude.com/docs/en/claude-code-on-the-web)
+the authenticated `claude` CLI also supplies credentials, so a separate
+`ANTHROPIC_API_KEY` isn't required (the startup check accepts either).
+
+## Usage
+
+```bash
+uv run python -m research_agent.agent
+# or:
+uv run python research_agent/agent.py
+```
+
+Then research any topic in natural language, or use a slash command:
+
+```
+You: /research electric vehicle adoption in Europe 2024
+You: /competitive-analysis Notion vs Obsidian vs Roam
+You: /market-trends global solar energy market
+You: /fact-check "the human body has 206 bones"
+You: /summarize
+```
+
+Type `exit` to quit. When you do, the paths to the session transcript and
+tool-call log are printed.
+
+## How it maps to the Agent SDK
+
+- `AgentDefinition` defines each subagent's tools, model, and system prompt.
+- `ClaudeAgentOptions(allowed_tools=["Task"], agents=...)` restricts the lead
+  agent to delegation only.
+- `setting_sources=["project"]` loads the `.claude/` commands and any skills.
+- `HookMatcher` wires the tracker into `PreToolUse` / `PostToolUse`.
+- `permission_mode="bypassPermissions"` lets subagents run their tools without
+  interactive prompts (this is a non-interactive batch workflow).

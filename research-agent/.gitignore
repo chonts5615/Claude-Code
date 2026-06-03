@@ -1,0 +1,19 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Runtime outputs (generated per run)
+logs/
+files/research_notes/*
+files/data/*
+files/charts/*
+files/reports/*
+!files/**/.gitkeep
