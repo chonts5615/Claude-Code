@@ -33,6 +33,20 @@ Two subsystems share schemas and utilities:
 - CTIC drift tolerance ≤ 5 %.
 - Max 3 QA cycles before stop and escalate.
 
+
+### v3.7/v3.8 end-to-end assurance build plan
+
+A forward-only end-to-end assurance build plan has been added under
+`docs/roadmap/TCB_v3_8_optimal_build_plan.md`. It orients the updated TCB around
+phase-native rule checks, QA, and multi-lens review while incorporating the
+operative v3.7 content ruleset: 3-5 indicators per level, AS-7 parsimony with a
+recommended 4-6 competency range, independently justified competencies 7-8, and
+a governance route at 9+. The plan also retains the v3.8 assurance layer:
+risk-tiered intake, input-packet completeness gates, quantitative
+AC1/CVI/Aiken/slice validation, patch-only no-drift controls,
+evaluator-optimizer pre-gates, Competency Release Cards, Phase 9 stewardship,
+and ChatGPT Agents/GitHub connector enablement. A ready-to-paste ChatGPT platform Agent prompt is available at `docs/agent_prompts/chatgpt_platform_agent_prompt.md`.
+
 ### Reference docs
 
 Bundled under `docs/reference/`: `TCB_System_Instructions_v3_1.md`,

@@ -214,8 +214,60 @@ class WorkflowOrchestrator:
     # --- entry points ------------------------------------------------------
 
     def run(self, initial_state: RunState):
+        """Run a workflow stage.
+
+        LangGraph remains available through ``graph_for`` for future durable
+        orchestration, but the CLI uses this deterministic linear runner today.
+        It avoids nested Pydantic mutation loss in end-to-end runs and mirrors
+        the same node/gate order as the compiled graph.
+        """
         stage = initial_state.config.stage
-        return self.graph_for(stage).invoke(initial_state)
+        if stage == "R1":
+            return self._run_r1_linear(initial_state)
+        if stage in ("R2", "FINAL"):
+            return self._run_r2_or_final_linear(initial_state, include_phase7=(stage == "FINAL"))
+        raise ValueError(f"Unsupported stage {stage!r} (use R1, R2, FINAL, or RESUME via run_resume)")
+
+    def _run_r1_linear(self, state: RunState) -> RunState:
+        steps = [
+            (JobIngestionAgent("S1", "Job Extraction").execute, self._gate_s1),
+            (CompetencyMappingAgent("S2", "Competency Mapping").execute, self._gate_s2),
+            (NormalizerAgent("S3", "Normalization").execute, self._gate_s3_v31_format),
+            (OverlapAuditorAgent("S4", "Overlap Audit").execute, None),
+            (OverlapRemediatorAgent("S5", "Overlap Remediation").execute, self._gate_s5),
+            (BenchmarkResearchAgent("S6", "Benchmarking").execute, None),
+            (CriticalityRankerAgent("S7", "Ranking").execute, self._gate_s7),
+            (TemplatePopulatorAgent("S8", "Template Population").execute, None),
+            (self._package_for_review, None),
+        ]
+        for node, gate in steps:
+            state = node(state)
+            if gate:
+                state = gate(state)
+                if self._route(state) == "fail":
+                    return state
+        return state
+
+    def _run_r2_or_final_linear(self, state: RunState, include_phase7: bool) -> RunState:
+        steps = [
+            (FeedbackIngestionAgent("P6", "Feedback Ingestion").execute, self._gate_review_metadata),
+            (CoverageRefreshAgent("P6E_bis", "Coverage Refresh").execute, None),
+            (BoundaryRescanAgent("P6E_ter", "Boundary Re-Scan").execute, None),
+            (OverlapReauditAgent("P6E_quater", "Overlap Re-Audit").execute, None),
+            (CTICValidatorAgent("P6F", "CTIC Validator").execute, self._gate_ctic),
+            (FocusGroupPrepAgent("P6G", "Focus Group Prep").execute, None),
+            (TemplatePopulatorAgent("S8", "Template Population").execute, None),
+            (self._package_for_review, None),
+        ]
+        if include_phase7:
+            steps.append((LearningSynthesisAgent("P7", "Learning Synthesis").execute, None))
+        for node, gate in steps:
+            state = node(state)
+            if gate:
+                state = gate(state)
+                if self._route(state) == "fail":
+                    return state
+        return state
 
     def run_resume(self, initial_state: RunState):
         # RESUME reads ArtifactRegistry to skip completed nodes; for now invoke

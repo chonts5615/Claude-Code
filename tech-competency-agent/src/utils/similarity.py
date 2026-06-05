@@ -1,21 +1,41 @@
 """Semantic similarity utilities using sentence transformers."""
 
+import os
 from typing import List, Tuple
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Global model instance (lazy loaded)
+# Global model instance (lazy loaded). ``False`` means loading failed and the
+# process should use the deterministic lexical fallback rather than repeatedly
+# attempting network downloads in restricted environments.
 _model = None
 
 
-def get_similarity_model() -> SentenceTransformer:
-    """Get or initialize the similarity model."""
+def get_similarity_model() -> SentenceTransformer | None:
+    """Get or initialize the similarity model, falling back when unavailable."""
     global _model
+    if os.getenv("TCB_ENABLE_EMBEDDINGS", "0").lower() not in {"1", "true", "yes"}:
+        return None
+    if _model is False:
+        return None
     if _model is None:
-        _model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        try:
+            _model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        except Exception:
+            _model = False
+            return None
     return _model
+
+
+def _lexical_fallback_similarity(text1: str, text2: str) -> float:
+    """Compute deterministic token overlap when embeddings are unavailable."""
+    words1 = {w.strip('.,;:()').lower() for w in text1.split() if w.strip()}
+    words2 = {w.strip('.,;:()').lower() for w in text2.split() if w.strip()}
+    if not words1 or not words2:
+        return 0.0
+    return len(words1 & words2) / len(words1 | words2)
 
 
 def compute_similarity(text1: str, text2: str) -> float:
@@ -33,6 +53,8 @@ def compute_similarity(text1: str, text2: str) -> float:
         return 0.0
 
     model = get_similarity_model()
+    if model is None:
+        return _lexical_fallback_similarity(text1, text2)
 
     # Encode texts
     embeddings = model.encode([text1, text2])
@@ -64,6 +86,9 @@ def compute_similarity_batch(
         return []
 
     model = get_similarity_model()
+    if model is None:
+        scored = [(_idx, _lexical_fallback_similarity(query, candidate)) for _idx, candidate in enumerate(candidates)]
+        return sorted(scored, key=lambda item: item[1], reverse=True)[:top_k]
 
     # Encode query and candidates
     query_embedding = model.encode([query])[0]
@@ -95,6 +120,12 @@ def compute_pairwise_similarity(texts: List[str]) -> np.ndarray:
         return np.array([])
 
     model = get_similarity_model()
+    if model is None:
+        matrix = np.zeros((len(texts), len(texts)))
+        for i, left in enumerate(texts):
+            for j, right in enumerate(texts):
+                matrix[i, j] = 1.0 if i == j else _lexical_fallback_similarity(left, right)
+        return matrix
 
     # Encode all texts
     embeddings = model.encode(texts)
