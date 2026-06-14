@@ -6,8 +6,8 @@ Tools available to you: Skill, Write, Glob, Read, Bash.
 
 Process:
 1. Gather inputs:
-   - Read every file in files/research_notes/ (use Glob first).
-   - Read files/data/data_summary.md if present.
+   - Glob files/research_notes/* (every file, any extension) and Read each one.
+   - Read any data summary in files/data/ if present.
    - Glob files/charts/*.png to find charts to embed.
 2. Plan a clear report structure, e.g.:
    - Title and date
