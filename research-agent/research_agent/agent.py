@@ -10,8 +10,15 @@ subagents via the Task tool:
 All tool calls are tracked through SDK hooks so we can attribute each call to
 the subagent that made it, and a per-session transcript + JSONL log is written
 to logs/.
+
+Run interactively (REPL) or as a one-shot:
+
+    python -m research_agent.agent                       # interactive
+    python -m research_agent.agent --query "..."         # one-shot
+    python -m research_agent.agent --query-file brief.txt # one-shot from file
 """
 
+import argparse
 import asyncio
 import os
 import shutil
@@ -36,6 +43,9 @@ load_dotenv()
 # Paths to prompt files
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 
+# Subdirectories created under the output directory.
+OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
+
 
 def load_prompt(filename: str) -> str:
     """Load a prompt from the prompts directory."""
@@ -44,33 +54,39 @@ def load_prompt(filename: str) -> str:
         return f.read().strip()
 
 
-async def chat() -> None:
-    """Start an interactive chat session with the research agent."""
+def ensure_output_dirs(files_dir: Path) -> None:
+    """Create the output directory tree so subagents never have to."""
+    for sub in OUTPUT_SUBDIRS:
+        (files_dir / sub).mkdir(parents=True, exist_ok=True)
 
-    # Verify we can authenticate before creating any files. The SDK can use
-    # either an ANTHROPIC_API_KEY or the credentials of an installed `claude`
-    # CLI (e.g. in a managed Claude Code environment), so accept either.
-    if not os.environ.get("ANTHROPIC_API_KEY") and shutil.which("claude") is None:
-        print("\nError: no Anthropic credentials found.")
-        print("Set ANTHROPIC_API_KEY in a .env file or your shell, or install and")
-        print("authenticate the Claude Code CLI.")
-        print("Get an API key at: https://console.anthropic.com/settings/keys\n")
-        return
 
-    # Set up session directory and transcript.
-    transcript_file, session_dir = setup_session()
-    transcript = TranscriptWriter(transcript_file)
+def with_output_locations(prompt: str, files_dir: Path) -> str:
+    """Append an authoritative, absolute output-location block to a prompt.
 
-    # Load prompts.
-    lead_agent_prompt = load_prompt("lead_agent.txt")
-    researcher_prompt = load_prompt("researcher.txt")
-    data_analyst_prompt = load_prompt("data_analyst.txt")
-    report_writer_prompt = load_prompt("report_writer.txt")
+    Subagents sometimes invent an absolute project-root path instead of using
+    the relative ``files/...`` path, scattering outputs. Pinning the SDK ``cwd``
+    fixes relative writes; spelling out the absolute directories here fixes the
+    rest, so outputs are deterministic regardless of how the model phrases the
+    path.
+    """
+    locations = "\n".join(
+        f"- {sub.replace('_', ' ').title()}: {files_dir / sub}/" for sub in OUTPUT_SUBDIRS
+    )
+    return (
+        f"{prompt}\n\n"
+        "OUTPUT LOCATIONS (authoritative — overrides any other path mentioned above):\n"
+        "Write every output file inside these exact absolute directories:\n"
+        f"{locations}\n"
+        "Do not write to any other location and do not invent a different path."
+    )
 
-    # Initialize the subagent tracker with the transcript writer and session dir.
-    tracker = SubagentTracker(transcript_writer=transcript, session_dir=session_dir)
 
-    # Define the specialized subagents.
+def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> ClaudeAgentOptions:
+    """Construct the SDK options: subagents, hooks, working dir, and model."""
+    researcher_prompt = with_output_locations(load_prompt("researcher.txt"), files_dir)
+    data_analyst_prompt = with_output_locations(load_prompt("data_analyst.txt"), files_dir)
+    report_writer_prompt = with_output_locations(load_prompt("report_writer.txt"), files_dir)
+
     agents = {
         "researcher": AgentDefinition(
             description=(
@@ -82,7 +98,7 @@ async def chat() -> None:
             ),
             tools=["WebSearch", "Write"],
             prompt=researcher_prompt,
-            model="haiku",
+            model=model,
         ),
         "data-analyst": AgentDefinition(
             description=(
@@ -95,7 +111,7 @@ async def chat() -> None:
             ),
             tools=["Glob", "Read", "Bash", "Write"],
             prompt=data_analyst_prompt,
-            model="haiku",
+            model=model,
         ),
         "report-writer": AgentDefinition(
             description=(
@@ -109,65 +125,86 @@ async def chat() -> None:
             ),
             tools=["Skill", "Write", "Glob", "Read", "Bash"],
             prompt=report_writer_prompt,
-            model="haiku",
+            model=model,
         ),
     }
 
-    # Set up hooks for tracking every tool call.
     hooks = {
-        "PreToolUse": [
-            HookMatcher(matcher=None, hooks=[tracker.pre_tool_use_hook]),
-        ],
-        "PostToolUse": [
-            HookMatcher(matcher=None, hooks=[tracker.post_tool_use_hook]),
-        ],
+        "PreToolUse": [HookMatcher(matcher=None, hooks=[tracker.pre_tool_use_hook])],
+        "PostToolUse": [HookMatcher(matcher=None, hooks=[tracker.post_tool_use_hook])],
     }
 
-    options = ClaudeAgentOptions(
+    return ClaudeAgentOptions(
         permission_mode="bypassPermissions",
-        cwd=str(Path.cwd()),  # Pin the working dir so every agent and subagent
-                              # resolves relative output paths (files/...) to the
-                              # same place, regardless of project --add-dir roots.
+        cwd=str(files_dir.parent),  # Pin the working dir so relative file paths
+        # (files/...) resolve to the same place for every agent and subagent.
         setting_sources=["project"],  # Load skills/commands from project .claude directory
-        system_prompt=lead_agent_prompt,
+        system_prompt=load_prompt("lead_agent.txt"),
         allowed_tools=["Task"],
         agents=agents,
         hooks=hooks,
-        model="haiku",
+        model=model,
     )
+
+
+def has_credentials() -> bool:
+    """True if the SDK can authenticate (API key or an installed claude CLI)."""
+    return bool(os.environ.get("ANTHROPIC_API_KEY")) or shutil.which("claude") is not None
+
+
+async def _run_turn(
+    client: ClaudeSDKClient, prompt: str, tracker: SubagentTracker, transcript: TranscriptWriter
+) -> None:
+    """Send one prompt and stream the response into the transcript."""
+    transcript.write_to_file(f"\nYou: {prompt}\n")
+    await client.query(prompt=prompt)
+    transcript.write("\nAgent: ", end="")
+    async for msg in client.receive_response():
+        if type(msg).__name__ == "AssistantMessage":
+            process_assistant_message(msg, tracker, transcript)
+    transcript.write("\n")
+
+
+async def run_research(query: str | None = None, model: str = "haiku") -> None:
+    """Run the research agent, either one-shot (query given) or interactive."""
+
+    # Verify we can authenticate before creating any files.
+    if not has_credentials():
+        print("\nError: no Anthropic credentials found.")
+        print("Set ANTHROPIC_API_KEY in a .env file or your shell, or install and")
+        print("authenticate the Claude Code CLI.")
+        print("Get an API key at: https://console.anthropic.com/settings/keys\n")
+        return
+
+    files_dir = (Path.cwd() / "files").resolve()
+    ensure_output_dirs(files_dir)
+
+    transcript_file, session_dir = setup_session()
+    transcript = TranscriptWriter(transcript_file)
+    tracker = SubagentTracker(transcript_writer=transcript, session_dir=session_dir)
+    options = build_options(files_dir, tracker, model)
 
     print("\n" + "=" * 50)
     print("  Research Agent")
     print("=" * 50)
-    print("\nResearch any topic and get a comprehensive PDF")
-    print("report with data visualizations.")
-    print("\nType 'exit' to quit.\n")
+    print(f"\nOutputs: {files_dir}")
+    if query is None:
+        print("\nResearch any topic and get a comprehensive PDF report.")
+        print("Type 'exit' to quit.\n")
 
     try:
         async with ClaudeSDKClient(options=options) as client:
-            while True:
-                try:
-                    user_input = input("\nYou: ").strip()
-                except (EOFError, KeyboardInterrupt):
-                    break
-
-                if not user_input or user_input.lower() in ["exit", "quit", "q"]:
-                    break
-
-                # Write user input to transcript file only (not console - it's echoed).
-                transcript.write_to_file(f"\nYou: {user_input}\n")
-
-                # Send to the agent.
-                await client.query(prompt=user_input)
-
-                transcript.write("\nAgent: ", end="")
-
-                # Stream and process the response.
-                async for msg in client.receive_response():
-                    if type(msg).__name__ == "AssistantMessage":
-                        process_assistant_message(msg, tracker, transcript)
-
-                transcript.write("\n")
+            if query is not None:
+                await _run_turn(client, query, tracker, transcript)
+            else:
+                while True:
+                    try:
+                        user_input = input("\nYou: ").strip()
+                    except (EOFError, KeyboardInterrupt):
+                        break
+                    if not user_input or user_input.lower() in ["exit", "quit", "q"]:
+                        break
+                    await _run_turn(client, user_input, tracker, transcript)
     finally:
         transcript.write("\n\nGoodbye!\n")
         transcript.close()
@@ -177,5 +214,24 @@ async def chat() -> None:
         print(f"  - Tool calls: {session_dir / 'tool_calls.jsonl'}")
 
 
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Multi-agent research system.")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--query", help="Run one research request non-interactively, then exit.")
+    group.add_argument(
+        "--query-file",
+        type=Path,
+        help="Run one research request read from a file non-interactively, then exit.",
+    )
+    parser.add_argument("--model", default="haiku", help="Model for all agents (default: haiku).")
+    args = parser.parse_args()
+
+    query = args.query
+    if args.query_file is not None:
+        query = args.query_file.read_text(encoding="utf-8").strip()
+
+    asyncio.run(run_research(query=query, model=args.model))
+
+
 if __name__ == "__main__":
-    asyncio.run(chat())
+    main()

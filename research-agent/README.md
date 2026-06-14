@@ -96,10 +96,10 @@ the authenticated `claude` CLI also supplies credentials, so a separate
 
 ## Usage
 
+### Interactive
+
 ```bash
-uv run python -m research_agent.agent
-# or:
-uv run python research_agent/agent.py
+uv run python -m research_agent.agent   # or: research-agent
 ```
 
 Then research any topic in natural language, or use a slash command:
@@ -114,6 +114,29 @@ You: /summarize
 
 Type `exit` to quit. When you do, the paths to the session transcript and
 tool-call log are printed.
+
+### One-shot (non-interactive)
+
+Useful for automation and long unattended runs:
+
+```bash
+research-agent --query "EV adoption in Norway: market share, growth, drivers"
+research-agent --query-file brief.txt          # read the request from a file
+research-agent --query "..." --model sonnet     # override the model (default: haiku)
+```
+
+Outputs always land under `./files/` (created automatically) relative to the
+directory you launch from — `research_notes/`, `data/`, `charts/`, `reports/`.
+
+## Tests
+
+Offline unit tests (no API key or network needed) cover the tracker attribution
+logic, the message handler, and output-path handling:
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
 
 ## How it maps to the Agent SDK
 
