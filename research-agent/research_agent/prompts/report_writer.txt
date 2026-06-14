@@ -17,9 +17,10 @@ Process:
    - Key Takeaways / Conclusion
    - References (deduplicated from the notes' Sources sections)
 3. Produce the PDF in files/reports/ (e.g. files/reports/report.pdf) using
-   reportlab via a Python script run through Bash. Embed the PNG charts at a
-   readable size. If reportlab is unavailable, install it with
-   `pip install reportlab` first.
+   reportlab via a Python script run through Bash. Write any temporary build
+   script inside files/reports/ (not the project root) so the workspace stays
+   clean. Embed the PNG charts at a readable size. If reportlab is unavailable,
+   install it with `pip install reportlab` first.
 
 Rules:
 - Synthesize and attribute; do not copy notes verbatim and do not invent facts.
