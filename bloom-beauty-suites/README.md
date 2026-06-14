@@ -80,8 +80,14 @@ npm run preview    # optional: preview the production build locally
 
 ### Deploy (pick one — all free for this size)
 
-- **Netlify / Vercel:** drag-and-drop the `dist/` folder, or connect the repo
-  and set **build command** `npm run build` and **publish directory** `dist`.
+A `netlify.toml` and `vercel.json` are included for **one-click deploys**:
+
+- **Netlify (no code):** run `npm run build`, then drag the `dist/` folder onto
+  <https://app.netlify.com/drop>. Done.
+- **Netlify / Vercel (from the repo):** both read the included config files.
+  Because the app is in a sub-folder, set the **base directory** to
+  `bloom-beauty-suites` in the dashboard; build command `npm run build`, output
+  `dist`.
 - **GitHub Pages / any static host:** upload the contents of `dist/`. The build
   uses relative paths, so it works from a sub-folder too.
 
