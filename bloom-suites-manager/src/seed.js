@@ -60,6 +60,8 @@ export const DEFAULT_SETTINGS = {
   lateGraceDays: 5, // days after due date before rent is "late"
   leaseRenewalWindowDays: 60, // start renewal outreach this far ahead
   monthlyExpenses: { mortgage: 4200, utilities: 680, insurance: 240, cleaning: 320, internet: 140, other: 200 },
+  welcomeDismissed: false, // first-run welcome banner
+  lastBackup: null, // ISO date of the last data backup (for the reminder)
 };
 
 function buildTenants() {

@@ -25,8 +25,10 @@ export default function Schedule() {
   const [scheduleDate, setScheduleDate] = useState(todayISO());
   const [booking, setBooking] = useState(false);
 
+  // Strip follows the selected day so any future date (e.g. a cadence-based
+  // rebook weeks out) is reachable by stepping or via the date picker.
   const dates = [];
-  for (let i = -3; i <= 10; i++) dates.push(addDays(todayISO(), i));
+  for (let i = -3; i <= 10; i++) dates.push(addDays(scheduleDate, i));
 
   const dayAppts = data.appointments
     .filter((a) => a.date === scheduleDate)
@@ -39,6 +41,12 @@ export default function Schedule() {
         <button onClick={() => setBooking(true)} style={{ display: "flex", alignItems: "center", gap: 4, background: C.rose, color: C.white, border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
           <Icon d={Icons.plus} size={16} color={C.white} /> Book
         </button>
+      </div>
+
+      {/* Jump to any date (rebooks can land weeks out) */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, alignItems: "center" }}>
+        <input type="date" value={scheduleDate} onChange={(e) => e.target.value && setScheduleDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", borderRadius: 10, border: `1px solid ${C.grayBorder}`, fontSize: 14, background: C.white, color: C.charcoal, outline: "none" }} />
+        <button onClick={() => setScheduleDate(todayISO())} style={{ padding: "9px 14px", borderRadius: 10, border: `1px solid ${C.rose}`, background: C.roseLight, color: C.rose, fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Today</button>
       </div>
 
       <div style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>

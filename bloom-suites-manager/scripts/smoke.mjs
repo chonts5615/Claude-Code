@@ -45,9 +45,10 @@ assert(ac.groups.maintenance.length === 3, `3 open maintenance tickets (got ${ac
 const noticeSuite = data.suites.find((s) => suiteStatus(s, data.tenants) === "notice");
 assert(!!noticeSuite, "found the suite on notice");
 
-// Rent status: an unpaid current-month row is late (past grace)
+// Rent status: an unpaid current-month row is collectible (due early in the
+// month, late once past the grace period — both are "to collect").
 const unpaid = data.ledger.find((r) => r.month === monthKey() && !r.paidDate);
-assert(rentStatus(unpaid, data.settings) === "late", "unpaid current-month rent reads as late");
+assert(["due", "late"].includes(rentStatus(unpaid, data.settings)), "unpaid current-month rent is due or late");
 
 // Messages personalized
 const t = data.tenants[0];

@@ -11,7 +11,7 @@ import { Icon, Icons } from "../icons";
 import { fmt, monthLabel, monthKey } from "../format";
 import {
   Card, SectionHeader, SearchBar, StatusBadge, Avatar, BackButton, PageTitle,
-  Field, Input, Select, Textarea, PrimaryButton, GhostButton, copyText,
+  Field, Input, Select, Textarea, PrimaryButton, GhostButton, copyText, smsHref,
 } from "../ui";
 
 function TenantForm({ onCancel, onSubmit, vacantSuites }) {
@@ -76,8 +76,11 @@ function TenantDetail({ tenant, onBack }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
-          <a href={`tel:${tenant.phone}`} style={{ flex: "1 1 100px", textAlign: "center", padding: 10, borderRadius: 10, background: C.roseLight, color: C.rose, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>Call</a>
-          {currentDue && <GhostButton style={{ flex: "1 1 100px", textAlign: "center" }} onClick={() => copy(rentReminder(tenant, currentDue, data.settings))}>Rent reminder</GhostButton>}
+          <a href={`tel:${tenant.phone}`} style={{ flex: "1 1 80px", textAlign: "center", padding: 10, borderRadius: 10, background: C.roseLight, color: C.rose, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>Call</a>
+          {currentDue && (
+            <a href={smsHref(tenant.phone, rentReminder(tenant, currentDue, data.settings))} style={{ flex: "1 1 80px", textAlign: "center", padding: 10, borderRadius: 10, background: C.rose, color: C.white, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>Text rent</a>
+          )}
+          {currentDue && <GhostButton style={{ flex: "1 1 80px", textAlign: "center" }} onClick={() => copy(rentReminder(tenant, currentDue, data.settings))}>Copy</GhostButton>}
         </div>
       </Card>
 

@@ -170,6 +170,8 @@ export const DEFAULT_SETTINGS = {
   cogsRate: 0.065, // share of revenue spent on product per service
   taxReserveRate: 0.37, // SE + federal + state set-aside
   lapseGraceDays: 10, // days past usual cadence before a client is "due"
+  welcomeDismissed: false, // first-run welcome banner
+  lastBackup: null, // ISO date of the last data backup (for the reminder)
 };
 
 // Build a complete fresh dataset for a new install.

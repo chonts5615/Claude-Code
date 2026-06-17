@@ -153,8 +153,9 @@ export function BloomProvider({ children }) {
         notify("Appointment removed");
       },
 
-      // Rebook a client at their usual cadence. `fromApptId` marks the source
-      // completed appointment as rebooked so the rebook-rate metric updates.
+      // Rebook a client at their usual cadence. The source completed appointment
+      // (passed in, or the client's most recent visit) is marked rebooked so the
+      // rebook-rate metric updates, and its service is used by default.
       rebookClient(clientId, { serviceId, fromApptId } = {}) {
         const client = data.clients.find((c) => c.id === clientId);
         if (!client) return null;
@@ -162,8 +163,13 @@ export function BloomProvider({ children }) {
         // Schedule from whichever is later: their cadence from last visit, or today.
         const fromLast = addDays(client.lastVisit, interval);
         const date = fromLast > todayISO() ? fromLast : addDays(todayISO(), interval);
-        const svcId =
-          serviceId || data.appointments.find((a) => a.clientId === clientId)?.serviceId || "classic-fill";
+        // Most recent completed visit drives the default service and rebook flag.
+        const history = data.appointments
+          .filter((a) => a.clientId === clientId)
+          .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+        const lastVisit = history.find((a) => a.status === "completed");
+        const sourceId = fromApptId ?? lastVisit?.id;
+        const svcId = serviceId || lastVisit?.serviceId || history[0]?.serviceId || "classic-fill";
         const svc = data.services.find((s) => s.id === svcId) || SERVICES.find((s) => s.id === svcId);
         const created = {
           id: nextId(data.appointments),
@@ -182,7 +188,7 @@ export function BloomProvider({ children }) {
         setData((d) => ({
           ...d,
           appointments: [
-            ...d.appointments.map((a) => (a.id === fromApptId ? { ...a, rebooked: true } : a)),
+            ...d.appointments.map((a) => (a.id === sourceId ? { ...a, rebooked: true } : a)),
             created,
           ],
         }));
@@ -191,6 +197,26 @@ export function BloomProvider({ children }) {
       },
 
       // --- Inventory ---
+      addInventoryItem(form) {
+        update((d) => ({
+          inventory: [
+            ...d.inventory,
+            {
+              id: nextId(d.inventory),
+              name: form.name.trim(),
+              category: form.category || "Consumables",
+              qty: Number(form.qty) || 0,
+              reorder: Number(form.reorder) || 1,
+              cost: Number(form.cost) || 0,
+              supplier: form.supplier || "",
+              expires: form.expires || null,
+              lastOrdered: todayISO(),
+              onOrder: false,
+            },
+          ],
+        }));
+        notify("Item added");
+      },
       adjustInventory(id, delta) {
         update((d) => ({
           inventory: d.inventory.map((i) =>
@@ -242,6 +268,30 @@ export function BloomProvider({ children }) {
         update((d) => ({ waitlist: d.waitlist.filter((w) => w.id !== id) }));
       },
 
+      // --- Services (the menu the owner prices and offers) ---
+      addService(form) {
+        const base = (form.name || "service").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "service";
+        update((d) => {
+          let id = base;
+          let n = 2;
+          while (d.services.some((s) => s.id === id)) id = `${base}-${n++}`;
+          return {
+            services: [
+              ...d.services,
+              { id, name: form.name.trim(), category: form.category || "Other", price: Number(form.price) || 0, duration: Number(form.duration) || 60 },
+            ],
+          };
+        });
+        notify("Service added");
+      },
+      updateService(id, patch) {
+        update((d) => ({ services: d.services.map((s) => (s.id === id ? { ...s, ...patch } : s)) }));
+      },
+      deleteService(id) {
+        update((d) => ({ services: d.services.filter((s) => s.id !== id) }));
+        notify("Service removed");
+      },
+
       // --- Settings ---
       updateSettings(patch) {
         update((d) => ({ settings: { ...d.settings, ...patch } }));
@@ -250,6 +300,22 @@ export function BloomProvider({ children }) {
       // --- Data safety: backup / restore / reset ---
       exportData() {
         return JSON.stringify(data, null, 2);
+      },
+      // Download a backup file and record the date (powers the backup reminder).
+      backupData() {
+        try {
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `bloom-backup-${todayISO()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } catch {
+          /* download may be blocked; still record the attempt below */
+        }
+        update((d) => ({ settings: { ...d.settings, lastBackup: todayISO() } }));
+        notify("Backup downloaded");
       },
       importData(json) {
         const parsed = JSON.parse(json);
@@ -263,14 +329,16 @@ export function BloomProvider({ children }) {
         setData(buildSeedData());
         notify("Reset to sample data");
       },
+      // Keep the owner's own services + settings; clear the demo records and
+      // sample inventory so the fresh state has nothing they didn't enter.
       clearAll() {
-        const seed = buildSeedData();
-        setData({
-          ...seed,
+        setData((d) => ({
+          ...d,
           clients: [],
           appointments: [],
           waitlist: [],
-        });
+          inventory: [],
+        }));
         notify("Started fresh");
       },
     };

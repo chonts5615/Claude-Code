@@ -5,23 +5,28 @@ import { useBloom } from "../store";
 import { lowStockItems, expiringItems, waitlistMessage } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
-import { fmt, fmtD, todayISO } from "../format";
+import { fmt, fmtD } from "../format";
 import {
   Card, SectionHeader, StatusBadge, BackButton, PageTitle, EmptyState,
   Field, Input, Select, PrimaryButton, GhostButton, Modal, copyText,
 } from "../ui";
 
 // ---------- Inventory ----------
+const INV_CATS = ["Adhesive", "Lash Trays", "Consumables", "Solutions", "Tools"];
+const EMPTY_INV = { name: "", category: "Consumables", qty: "", reorder: "", cost: "", supplier: "", expires: "" };
+
 function Inventory({ onBack }) {
   const { data, actions } = useBloom();
   const low = lowStockItems(data.inventory);
   const expiring = expiringItems(data.inventory);
-  const cats = ["Adhesive", "Lash Trays", "Consumables", "Solutions", "Tools"];
+  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState(EMPTY_INV);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   return (
     <div style={{ padding: "16px 16px 100px" }}>
       <BackButton onClick={onBack} />
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.charcoal, margin: "0 0 16px" }}>Inventory</h2>
+      <PageTitle right={<button onClick={() => { setForm(EMPTY_INV); setAdding(true); }} style={addBtn}><Icon d={Icons.plus} size={16} color={C.white} /> Add</button>}>Inventory</PageTitle>
 
       {(low.length > 0 || expiring.length > 0) && (
         <div style={{ marginBottom: 16 }}>
@@ -38,7 +43,9 @@ function Inventory({ onBack }) {
         </div>
       )}
 
-      {cats.map((cat) => {
+      {data.inventory.length === 0 && <EmptyState icon={Icons.box} text="No inventory yet — tap Add to track your first supply" />}
+
+      {INV_CATS.map((cat) => {
         const items = data.inventory.filter((i) => i.category === cat);
         if (!items.length) return null;
         return (
@@ -77,6 +84,23 @@ function Inventory({ onBack }) {
           </div>
         );
       })}
+
+      <Modal open={adding} onClose={() => setAdding(false)} title="Add Inventory Item">
+        <Field label="Name"><Input value={form.name} onChange={set("name")} placeholder="e.g. Classic Lash Tray — C 0.15" /></Field>
+        <Field label="Category">
+          <Select value={form.category} onChange={set("category")}>{INV_CATS.map((c) => <option key={c} value={c}>{c}</option>)}</Select>
+        </Field>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Quantity on hand"><Input type="number" inputMode="numeric" value={form.qty} onChange={set("qty")} /></Field>
+          <Field label="Reorder at"><Input type="number" inputMode="numeric" value={form.reorder} onChange={set("reorder")} /></Field>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Cost ($)"><Input type="number" inputMode="decimal" value={form.cost} onChange={set("cost")} /></Field>
+          <Field label="Supplier"><Input value={form.supplier} onChange={set("supplier")} /></Field>
+        </div>
+        <Field label="Expiry date (optional)"><Input type="date" value={form.expires} onChange={set("expires")} /></Field>
+        <PrimaryButton disabled={!form.name} onClick={() => { actions.addInventoryItem(form); setAdding(false); }}>Add Item</PrimaryButton>
+      </Modal>
     </div>
   );
 }
@@ -158,34 +182,69 @@ function Waitlist({ onBack }) {
 }
 const btn = (solid) => ({ padding: "8px 12px", borderRadius: 8, border: solid ? "none" : `1px solid ${C.rose}`, background: solid ? C.rose : C.roseLight, color: solid ? C.white : C.rose, fontSize: 12, fontWeight: 600, cursor: "pointer" });
 
-// ---------- Services ----------
+// ---------- Services (editable: owners change prices and offerings) ----------
+const SVC_CATS = ["Full Set", "Fill", "Other"];
+const EMPTY_SVC = { name: "", category: "Full Set", price: "", duration: "" };
+
 function Services({ onBack }) {
-  const { data } = useBloom();
+  const { data, actions } = useBloom();
+  const [editing, setEditing] = useState(null); // service object, or "new", or null
+  const [form, setForm] = useState(EMPTY_SVC);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const openNew = () => { setForm(EMPTY_SVC); setEditing("new"); };
+  const openEdit = (s) => { setForm({ name: s.name, category: s.category, price: s.price, duration: s.duration }); setEditing(s); };
+  const save = () => {
+    if (editing === "new") actions.addService(form);
+    else actions.updateService(editing.id, { name: form.name.trim(), category: form.category, price: Number(form.price) || 0, duration: Number(form.duration) || 0 });
+    setEditing(null);
+  };
+
   return (
     <div style={{ padding: "16px 16px 100px" }}>
       <BackButton onClick={onBack} />
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.charcoal, margin: "0 0 16px" }}>Service Menu</h2>
-      {["Full Set", "Fill", "Other"].map((cat) => (
-        <div key={cat} style={{ marginBottom: 20 }}>
-          <h3 style={{ fontSize: 12, fontWeight: 700, color: C.rose, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 0.5 }}>{cat}s</h3>
-          {data.services.filter((s) => s.category === cat).map((s) => (
-            <div key={s.id} style={{ background: C.white, borderRadius: 12, padding: "12px 16px", marginBottom: 6, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{s.name}</div>
-                <div style={{ fontSize: 12, color: C.gray }}>{s.duration} min</div>
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: C.gold }}>{fmt(s.price)}</div>
-            </div>
-          ))}
+      <PageTitle right={<button onClick={openNew} style={addBtn}><Icon d={Icons.plus} size={16} color={C.white} /> Add</button>}>Service Menu</PageTitle>
+      {SVC_CATS.map((cat) => {
+        const items = data.services.filter((s) => s.category === cat);
+        if (!items.length) return null;
+        return (
+          <div key={cat} style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 12, fontWeight: 700, color: C.rose, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 0.5 }}>{cat}s</h3>
+            {items.map((s) => (
+              <button key={s.id} onClick={() => openEdit(s)} style={{ width: "100%", textAlign: "left", background: C.white, borderRadius: 12, padding: "12px 16px", marginBottom: 6, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{s.name}</div>
+                  <div style={{ fontSize: 12, color: C.gray }}>{s.duration} min · tap to edit</div>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: C.gold }}>{fmt(s.price)}</div>
+              </button>
+            ))}
+          </div>
+        );
+      })}
+
+      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing === "new" ? "Add Service" : "Edit Service"}>
+        <Field label="Name"><Input value={form.name} onChange={set("name")} placeholder="e.g. Volume Full Set" /></Field>
+        <Field label="Category">
+          <Select value={form.category} onChange={set("category")}>{SVC_CATS.map((c) => <option key={c} value={c}>{c}</option>)}</Select>
+        </Field>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Price ($)"><Input type="number" inputMode="decimal" value={form.price} onChange={set("price")} /></Field>
+          <Field label="Duration (min)"><Input type="number" inputMode="numeric" value={form.duration} onChange={set("duration")} /></Field>
         </div>
-      ))}
+        <PrimaryButton disabled={!form.name} onClick={save}>{editing === "new" ? "Add Service" : "Save Changes"}</PrimaryButton>
+        {editing && editing !== "new" && (
+          <button onClick={() => { if (confirm(`Remove "${editing.name}" from your menu?`)) { actions.deleteService(editing.id); setEditing(null); } }} style={{ width: "100%", marginTop: 10, padding: 12, borderRadius: 10, border: `1px solid ${C.red}`, background: C.redLight, color: C.red, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Remove Service</button>
+        )}
+      </Modal>
     </div>
   );
 }
+const addBtn = { display: "flex", alignItems: "center", gap: 4, background: C.rose, color: C.white, border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" };
 
 // ---------- Settings ----------
 function Settings({ onBack }) {
-  const { data, actions, notify } = useBloom();
+  const { data, actions } = useBloom();
   const { settings } = data;
   const fileRef = useRef(null);
 
@@ -193,16 +252,7 @@ function Settings({ onBack }) {
   const setExpense = (k) => (e) =>
     actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Number(e.target.value) || 0 } });
 
-  const backup = () => {
-    const blob = new Blob([actions.exportData()], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `bloom-backup-${todayISO()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    notify("Backup downloaded");
-  };
+  const backup = () => actions.backupData();
   const restore = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;

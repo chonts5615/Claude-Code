@@ -40,7 +40,7 @@ export const lowStockItems = (inventory) =>
   inventory.filter((i) => i.qty <= i.reorder && !i.onOrder);
 
 export const expiringItems = (inventory, base = todayISO()) =>
-  inventory.filter((i) => i.expires && i.expires <= addDays(base, EXPIRY_WINDOW_DAYS));
+  inventory.filter((i) => i.expires && i.expires <= addDays(base, EXPIRY_WINDOW_DAYS) && !i.onOrder);
 
 // --- The Action Center: the automated daily to-do list ---------------------
 // Returns grouped tasks plus a total count. The UI renders each group and wires

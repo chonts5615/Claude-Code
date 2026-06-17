@@ -10,6 +10,7 @@ import { C, PIE_COLORS } from "../theme";
 import { fmt, todayISO, addDays, dayName, longDate } from "../format";
 import { Card, KPI, SectionHeader, StatusBadge } from "../ui";
 import ActionCenter from "./ActionCenter";
+import { Banners } from "./Banners";
 
 export default function Dashboard({ onOpenClient, goTo }) {
   const { data } = useBloom();
@@ -73,6 +74,8 @@ export default function Dashboard({ onOpenClient, goTo }) {
         </h2>
         <p style={{ fontSize: 13, color: C.grayLight, margin: 0 }}>{longDate()}</p>
       </div>
+
+      <Banners goTo={goTo} />
 
       {/* Automated daily task list */}
       <ActionCenter onOpenClient={onOpenClient} />

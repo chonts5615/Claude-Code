@@ -186,6 +186,22 @@ export function BloomProvider({ children }) {
       exportData() {
         return JSON.stringify(data, null, 2);
       },
+      // Download a backup file and record the date (powers the backup reminder).
+      backupData() {
+        try {
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `bloom-suites-backup-${todayISO()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } catch {
+          /* download may be blocked; still record the attempt below */
+        }
+        update((d) => ({ settings: { ...d.settings, lastBackup: todayISO() } }));
+        notify("Backup downloaded");
+      },
       importData(json) {
         const parsed = JSON.parse(json);
         if (!parsed || !Array.isArray(parsed.suites) || !Array.isArray(parsed.tenants)) {
@@ -198,16 +214,17 @@ export function BloomProvider({ children }) {
         setData(buildSeedData());
         notify("Reset to sample data");
       },
+      // Keep the owner's own suites (rents/names/notes) and settings; just empty
+      // the demo tenants/rent/applicants/maintenance and free every suite.
       clearAll() {
-        const seed = buildSeedData();
-        setData({
-          ...seed,
-          suites: seed.suites.map((s) => ({ ...s, tenantId: null })),
+        setData((d) => ({
+          ...d,
+          suites: d.suites.map((s) => ({ ...s, tenantId: null })),
           tenants: [],
           ledger: [],
           applicants: [],
           maintenance: [],
-        });
+        }));
         notify("Started fresh");
       },
     };

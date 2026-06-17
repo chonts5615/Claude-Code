@@ -8,6 +8,7 @@ import { C } from "../theme";
 import { fmt, longDate, monthKey, monthLabel, monthShortLabel, addMonths } from "../format";
 import { Card, KPI, SectionHeader } from "../ui";
 import ActionCenter from "./ActionCenter";
+import { Banners } from "./Banners";
 
 export default function Dashboard({ onOpenTenant, goTo }) {
   const { data } = useBloom();
@@ -25,7 +26,9 @@ export default function Dashboard({ onOpenTenant, goTo }) {
       trend.push({ month: monthShortLabel(mk), collected: monthTotals(data, mk).collected });
     }
     const collectRate = totals.billed ? Math.round((totals.collected / totals.billed) * 100) : 0;
-    return { occ, totals, roll, trend, cur, collectRate };
+    const expenses = Object.values(data.settings.monthlyExpenses).reduce((s, v) => s + v, 0);
+    const net = totals.collected - expenses;
+    return { occ, totals, roll, trend, cur, collectRate, expenses, net };
   }, [data]);
 
   return (
@@ -36,6 +39,8 @@ export default function Dashboard({ onOpenTenant, goTo }) {
         </h2>
         <p style={{ fontSize: 13, color: C.grayLight, margin: 0 }}>{longDate()}</p>
       </div>
+
+      <Banners goTo={goTo} />
 
       <ActionCenter onOpenTenant={onOpenTenant} goTo={goTo} />
 
@@ -78,19 +83,22 @@ export default function Dashboard({ onOpenTenant, goTo }) {
       </Card>
 
       <Card>
-        <SectionHeader title="This Month" action="Rent" onAction={() => goTo("rent")} />
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
-          <span style={{ color: C.gray }}>Billed ({monthLabel(m.cur)})</span>
-          <span style={{ fontWeight: 600, color: C.charcoal }}>{fmt(m.totals.billed)}</span>
+        <SectionHeader title={`This Month · ${monthLabel(m.cur).split(" ")[0]}`} action="Rent" onAction={() => goTo("rent")} />
+        {[
+          ["Rent collected", fmt(m.totals.collected), C.green],
+          ["Still outstanding", fmt(m.totals.outstanding), m.totals.outstanding > 0 ? C.red : C.gray],
+          ["Expenses", `(${fmt(m.expenses)})`, C.red],
+        ].map(([label, val, color]) => (
+          <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
+            <span style={{ color: C.gray }}>{label}</span>
+            <span style={{ fontWeight: 600, color }}>{val}</span>
+          </div>
+        ))}
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 14, borderTop: `2px solid ${C.gold}`, marginTop: 4, paddingTop: 8 }}>
+          <span style={{ fontWeight: 700, color: C.charcoal }}>Net so far</span>
+          <span style={{ fontWeight: 700, color: m.net >= 0 ? C.green : C.red }}>{fmt(m.net)}</span>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13 }}>
-          <span style={{ color: C.gray }}>Collected</span>
-          <span style={{ fontWeight: 600, color: C.green }}>{fmt(m.totals.collected)}</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13, borderTop: `2px solid ${C.rose}`, marginTop: 4, paddingTop: 8 }}>
-          <span style={{ fontWeight: 700, color: C.charcoal }}>Outstanding</span>
-          <span style={{ fontWeight: 700, color: m.totals.outstanding > 0 ? C.red : C.green }}>{fmt(m.totals.outstanding)}</span>
-        </div>
+        <p style={{ fontSize: 11, color: C.grayLight, margin: "6px 0 0" }}>Rent collected minus your monthly expenses (set in Settings).</p>
       </Card>
     </div>
   );

@@ -224,3 +224,11 @@ export async function copyText(text) {
     return false;
   }
 }
+
+// One-tap contact links. `sms:` uses the "?&body=" form that works on both iOS
+// and Android, so tapping opens the phone's Messages app with the text ready.
+const digits = (phone) => (phone || "").replace(/[^0-9+]/g, "");
+export const telHref = (phone) => `tel:${digits(phone)}`;
+export const smsHref = (phone, body) => `sms:${digits(phone)}?&body=${encodeURIComponent(body || "")}`;
+export const emailHref = (email, subject, body) =>
+  `mailto:${email || ""}?subject=${encodeURIComponent(subject || "")}&body=${encodeURIComponent(body || "")}`;

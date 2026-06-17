@@ -10,7 +10,7 @@ import {
 } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
-import { Card, SectionHeader, copyText } from "../ui";
+import { Card, SectionHeader, copyText, smsHref } from "../ui";
 import { fmtD } from "../format";
 
 const TASK_META = {
@@ -38,6 +38,16 @@ const ActionBtn = ({ children, onClick, primary }) => (
   >
     {children}
   </button>
+);
+
+// Like ActionBtn, but an <a> so it can open the phone's Messages app (sms:).
+const TextBtn = ({ phone, body }) => (
+  <a
+    href={smsHref(phone, body)}
+    style={{ padding: "7px 12px", borderRadius: 9, border: "none", background: C.rose, color: C.white, fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 5 }}
+  >
+    <Icon d={Icons.phone} size={13} color={C.white} /> Text
+  </a>
 );
 
 function TaskRow({ meta, title, subtitle, children, onOpen }) {
@@ -111,8 +121,9 @@ export default function ActionCenter({ onOpenClient }) {
               <ActionBtn primary onClick={() => actions.rebookClient(t.client.id)}>
                 Rebook
               </ActionBtn>
+              <TextBtn phone={t.client.phone} body={rebookMessage(t.client, data.settings)} />
               <ActionBtn onClick={() => copy(rebookMessage(t.client, data.settings))}>
-                Copy reminder
+                Copy
               </ActionBtn>
             </TaskRow>
           ))}
@@ -125,8 +136,9 @@ export default function ActionCenter({ onOpenClient }) {
               title={`Win back ${t.client.name}`}
               subtitle={`${t.daysSince} days since last visit`}
             >
+              <TextBtn phone={t.client.phone} body={winbackMessage(t.client, data.settings)} />
               <ActionBtn onClick={() => copy(winbackMessage(t.client, data.settings))}>
-                Copy win-back message
+                Copy win-back
               </ActionBtn>
             </TaskRow>
           ))}
@@ -165,8 +177,9 @@ export default function ActionCenter({ onOpenClient }) {
               <ActionBtn primary onClick={() => actions.setWaitlistStatus(t.entry.id, "booked")}>
                 Mark booked
               </ActionBtn>
+              <TextBtn phone={t.entry.phone} body={waitlistMessage(t.entry, data.settings)} />
               <ActionBtn onClick={() => copy(waitlistMessage(t.entry, data.settings))}>
-                Copy text
+                Copy
               </ActionBtn>
               {t.entry.status === "waiting" && (
                 <ActionBtn onClick={() => actions.setWaitlistStatus(t.entry.id, "contacted")}>

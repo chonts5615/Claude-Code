@@ -6,7 +6,7 @@ import { applicantMessage, tenantById, suiteById } from "../automation";
 import { PROFESSIONS } from "../seed";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
-import { fmt, todayISO, daysAgo } from "../format";
+import { fmt, daysAgo } from "../format";
 import {
   Card, SectionHeader, StatusBadge, BackButton, PageTitle, EmptyState,
   Field, Input, Select, Textarea, PrimaryButton, GhostButton, Modal, copyText,
@@ -126,21 +126,14 @@ function Maintenance({ onBack }) {
 
 // ---------- Settings ----------
 function Settings({ onBack }) {
-  const { data, actions, notify } = useBloom();
+  const { data, actions } = useBloom();
   const { settings } = data;
   const fileRef = useRef(null);
   const setField = (k) => (e) => actions.updateSettings({ [k]: e.target.value });
   const setNum = (k) => (e) => actions.updateSettings({ [k]: Number(e.target.value) || 0 });
   const setExpense = (k) => (e) => actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Number(e.target.value) || 0 } });
 
-  const backup = () => {
-    const blob = new Blob([actions.exportData()], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `bloom-suites-backup-${todayISO()}.json`; a.click();
-    URL.revokeObjectURL(url);
-    notify("Backup downloaded");
-  };
+  const backup = () => actions.backupData();
   const restore = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;

@@ -5,7 +5,7 @@ import { useBloom } from "../store";
 import { buildActionCenter, rentReminder, renewalMessage, applicantMessage } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
-import { Card, copyText } from "../ui";
+import { Card, copyText, smsHref } from "../ui";
 import { fmt, monthLabel } from "../format";
 
 const META = {
@@ -20,6 +20,13 @@ const ActionBtn = ({ children, onClick, primary }) => (
   <button onClick={onClick} style={{ padding: "7px 12px", borderRadius: 9, border: primary ? "none" : `1px solid ${C.grayBorder}`, background: primary ? C.rose : C.white, color: primary ? C.white : C.charcoal, fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>
     {children}
   </button>
+);
+
+// An <a> styled like ActionBtn that opens the phone's Messages app (sms:).
+const TextBtn = ({ phone, body }) => (
+  <a href={smsHref(phone, body)} style={{ padding: "7px 12px", borderRadius: 9, border: "none", background: C.rose, color: C.white, fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 5 }}>
+    <Icon d={Icons.phone} size={13} color={C.white} /> Text
+  </a>
 );
 
 function Row({ meta, title, subtitle, onOpen, children }) {
@@ -76,7 +83,8 @@ export default function ActionCenter({ onOpenTenant, goTo }) {
               title={`Collect rent — ${t.tenant.name}`}
               subtitle={`${monthLabel(t.row.month)} · ${fmt(t.row.amount)} · ${t.status === "late" ? `${t.overdue} days overdue` : "due now"} · ${t.tenant.suite}`}>
               <ActionBtn primary onClick={() => actions.markRentPaid(t.row.id)}>Mark paid</ActionBtn>
-              <ActionBtn onClick={() => copy(rentReminder(t.tenant, t.row, data.settings))}>Copy reminder</ActionBtn>
+              <TextBtn phone={t.tenant.phone} body={rentReminder(t.tenant, t.row, data.settings)} />
+              <ActionBtn onClick={() => copy(rentReminder(t.tenant, t.row, data.settings))}>Copy</ActionBtn>
             </Row>
           ))}
 
@@ -85,7 +93,8 @@ export default function ActionCenter({ onOpenTenant, goTo }) {
               title={`Renew lease — ${t.tenant.name}`}
               subtitle={t.daysLeft < 0 ? `Lease expired ${-t.daysLeft} days ago · ${t.tenant.suite}` : `${t.daysLeft} days left · ${t.tenant.suite}`}>
               <ActionBtn primary onClick={() => actions.renewLease(t.tenant.id)}>Renew 1 yr</ActionBtn>
-              <ActionBtn onClick={() => copy(renewalMessage(t.tenant, data.settings))}>Copy message</ActionBtn>
+              <TextBtn phone={t.tenant.phone} body={renewalMessage(t.tenant, data.settings)} />
+              <ActionBtn onClick={() => copy(renewalMessage(t.tenant, data.settings))}>Copy</ActionBtn>
             </Row>
           ))}
 
@@ -113,7 +122,8 @@ export default function ActionCenter({ onOpenTenant, goTo }) {
               <ActionBtn primary onClick={() => actions.setApplicantStatus(t.applicant.id, t.applicant.status === "new" ? "toured" : "applied")}>
                 {t.applicant.status === "new" ? "Mark toured" : "Mark applied"}
               </ActionBtn>
-              <ActionBtn onClick={() => copy(applicantMessage(t.applicant, data.settings))}>Copy text</ActionBtn>
+              <TextBtn phone={t.applicant.phone} body={applicantMessage(t.applicant, data.settings)} />
+              <ActionBtn onClick={() => copy(applicantMessage(t.applicant, data.settings))}>Copy</ActionBtn>
             </Row>
           ))}
         </div>

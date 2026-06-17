@@ -8,7 +8,7 @@ import { Icon, Icons } from "../icons";
 import { fmt, daysAgo } from "../format";
 import {
   Card, SectionHeader, SearchBar, StatusBadge, Avatar, BackButton, PageTitle,
-  Field, Input, Select, Textarea, PrimaryButton, GhostButton, copyText,
+  Field, Input, Select, Textarea, PrimaryButton, GhostButton, copyText, smsHref,
 } from "../ui";
 import BookAppointmentModal from "./BookAppointmentModal";
 
@@ -99,9 +99,10 @@ function ClientDetail({ client, onBack, onEdit }) {
       {due <= 7 && status !== "lost" && (
         <div style={{ background: C.amberLight, border: `1px solid ${C.amber}`, borderRadius: 12, padding: "10px 14px", marginBottom: 12, fontSize: 13, color: C.amber, fontWeight: 600, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <span>{due < 0 ? `⏰ Overdue by ${-due} days` : due === 0 ? "⏰ Due for rebooking today" : `⏰ Due in ${due} days`}</span>
-          <button onClick={copyReminder} style={{ background: C.amber, color: C.white, border: "none", borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-            Copy reminder
-          </button>
+          <div style={{ display: "flex", gap: 6 }}>
+            <a href={smsHref(client.phone, rebookMessage(client, data.settings))} style={{ background: C.amber, color: C.white, borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>Text</a>
+            <button onClick={copyReminder} style={{ background: C.white, color: C.amber, border: `1px solid ${C.amber}`, borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>Copy</button>
+          </div>
         </div>
       )}
 
