@@ -9,6 +9,22 @@ const BloomContext = createContext(null);
 
 const nextId = (list) => (list.length ? Math.max(...list.map((x) => x.id)) + 1 : 1);
 
+// First start time (09:00–18:00, 30-min steps) on `date` that doesn't overlap an
+// existing scheduled/completed appointment for the given duration. Used by quick
+// rebook so one-tap shortcuts don't silently double-book. Falls back to 10:00.
+const toMin = (t) => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+};
+function firstFreeTime(appointments, date, duration) {
+  const sameDay = appointments.filter((a) => a.date === date && (a.status === "scheduled" || a.status === "completed"));
+  const overlaps = (start) => sameDay.some((a) => start < toMin(a.time) + a.duration && toMin(a.time) < start + duration);
+  for (let mins = 9 * 60; mins <= 18 * 60; mins += 30) {
+    if (!overlaps(mins)) return `${String(Math.floor(mins / 60)).padStart(2, "0")}:${mins % 60 === 0 ? "00" : "30"}`;
+  }
+  return "10:00";
+}
+
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -129,6 +145,8 @@ export function BloomProvider({ children }) {
         update((d) => {
           const appt = d.appointments.find((a) => a.id === id);
           if (!appt || appt.status === "completed") return {};
+          // Don't log a visit that hasn't happened yet (guards stray calls).
+          if (appt.date > todayISO()) return {};
           const appointments = d.appointments.map((a) =>
             a.id === id ? { ...a, status: "completed" } : a
           );
@@ -187,7 +205,8 @@ export function BloomProvider({ children }) {
           clientId,
           clientName: client.name,
           date,
-          time: "10:00",
+          // Pick the first open slot that day so the shortcut won't double-book.
+          time: firstFreeTime(data.appointments, date, svc.duration),
           serviceId: svc.id,
           serviceName: svc.name,
           price: svc.price,

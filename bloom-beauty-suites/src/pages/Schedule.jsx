@@ -111,8 +111,9 @@ export default function Schedule() {
 
               {a.status === "scheduled" && (
                 <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-                  <MiniBtn solid onClick={() => actions.completeAppointment(a.id)}>✓ Complete</MiniBtn>
-                  <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "no-show")}>No-show</MiniBtn>
+                  {/* Complete/No-show only make sense once the day has arrived. */}
+                  {a.date <= todayISO() && <MiniBtn solid onClick={() => actions.completeAppointment(a.id)}>✓ Complete</MiniBtn>}
+                  {a.date <= todayISO() && <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "no-show")}>No-show</MiniBtn>}
                   <MiniBtn color={C.gray} onClick={() => actions.deleteAppointment(a.id)}>Cancel</MiniBtn>
                 </div>
               )}

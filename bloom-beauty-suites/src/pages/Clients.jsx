@@ -14,7 +14,7 @@ import BookAppointmentModal from "./BookAppointmentModal";
 
 const CURLS = ["J", "B", "C", "D", "L"];
 const STYLES = ["Natural", "Cat Eye", "Doll Eye", "Wispy", "Hybrid", "Volume", "Mega Volume"];
-const EMPTY = { name: "", phone: "", email: "", curl: "C", style: "Natural", allergies: "None", notes: "" };
+const EMPTY = { name: "", phone: "", email: "", curl: "C", style: "Natural", length: "", diameter: "", allergies: "None", notes: "" };
 
 function ClientForm({ initial, title, submitLabel, onCancel, onSubmit }) {
   const [form, setForm] = useState(initial);
@@ -38,6 +38,10 @@ function ClientForm({ initial, title, submitLabel, onCancel, onSubmit }) {
               {STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
             </Select>
           </Field>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Length"><Input value={form.length} onChange={set("length")} placeholder="e.g. 11-13mm" /></Field>
+          <Field label="Diameter"><Input value={form.diameter} onChange={set("diameter")} placeholder="e.g. 0.07mm" /></Field>
         </div>
         <Field label="Allergies / Sensitivities">
           <Input value={form.allergies} onChange={set("allergies")} placeholder="None, or describe…" />
