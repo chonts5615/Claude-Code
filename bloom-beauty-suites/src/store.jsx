@@ -1,7 +1,7 @@
 // Central data store: loads/saves to localStorage automatically and exposes
 // every mutation as a named action. Components never touch storage directly.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { buildSeedData } from "./seed";
+import { buildSeedData, DEFAULT_SETTINGS } from "./seed";
 import { todayISO, addDays } from "./format";
 
 const STORAGE_KEY = "bloom.v1";
@@ -333,12 +333,13 @@ export function BloomProvider({ children }) {
       },
       importData(json) {
         const parsed = JSON.parse(json);
-        const ok =
-          parsed &&
-          ["clients", "appointments", "services", "inventory", "waitlist"].every((k) => Array.isArray(parsed[k])) &&
-          parsed.settings && typeof parsed.settings === "object";
+        const ok = parsed && ["clients", "appointments", "services", "inventory", "waitlist"].every((k) => Array.isArray(parsed[k]));
         if (!ok) throw new Error("That file doesn't look like a complete Bloom backup.");
-        setData(parsed);
+        // Merge defaults so an older/partial backup (e.g. empty settings) can't
+        // leave required fields undefined and crash the app on render.
+        const src = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : {};
+        const settings = { ...DEFAULT_SETTINGS, ...src, monthlyExpenses: { ...DEFAULT_SETTINGS.monthlyExpenses, ...(src.monthlyExpenses || {}) } };
+        setData({ ...parsed, settings });
         notify("Backup restored");
       },
       resetToSample() {

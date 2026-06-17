@@ -72,7 +72,9 @@ export default function Schedule() {
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
         {[
           [dayAppts.length, "Appointments"],
-          [fmt(dayAppts.reduce((s, a) => s + a.price, 0)), "Revenue"],
+          // Revenue excludes no-shows / late-cancels (matches Finances, which
+          // only counts completed/expected visits as earned).
+          [fmt(dayAppts.filter((a) => a.status !== "no-show" && a.status !== "late-cancel").reduce((s, a) => s + a.price, 0)), "Revenue"],
           [`${dayAppts.reduce((s, a) => s + a.duration, 0)}m`, "Booked Time"],
         ].map(([v, l]) => (
           <div key={l} style={{ flex: 1, background: C.white, borderRadius: 12, padding: 12, textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>

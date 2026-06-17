@@ -1,7 +1,7 @@
 // Central data store: loads/saves to localStorage automatically and exposes
 // every mutation as a named action. Components never touch storage directly.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { buildSeedData } from "./seed";
+import { buildSeedData, DEFAULT_SETTINGS } from "./seed";
 import { todayISO, monthKey, addDays } from "./format";
 
 const STORAGE_KEY = "bloom-suites.v1";
@@ -69,8 +69,10 @@ export function BloomProvider({ children }) {
               (t) =>
                 t.status !== "past" &&
                 !existing.has(t.id) &&
-                // Don't bill a month before the tenant moved in.
-                (t.moveIn || t.leaseStart || "").substring(0, 7) <= mk
+                // Only bill months the tenant actually occupies: on/after move-in
+                // and on/before their lease-end (move-out) month.
+                (t.moveIn || t.leaseStart || "").substring(0, 7) <= mk &&
+                (t.leaseEnd || "9999-12").substring(0, 7) >= mk
             )
             .map((t, i) => ({ id: nextId(d.ledger) + i, tenantId: t.id, month: mk, amount: t.rent, dueDate: `${mk}-01`, paidDate: null }));
           added = newRows.length;
@@ -102,8 +104,9 @@ export function BloomProvider({ children }) {
           ...d,
           tenants: [...d.tenants, created],
           suites: d.suites.map((s) => (s.id === Number(form.suiteId) ? { ...s, tenantId: created.id } : s)),
-          // Bill the current month right away so rent shows as due.
-          ledger: [...d.ledger, { id: nextId(d.ledger), tenantId: created.id, month: monthKey(), amount: created.rent, dueDate: `${monthKey()}-01`, paidDate: null }],
+          // Bill the current month, due on the move-in date so a mid-month new
+          // tenant isn't flagged late/overdue on day one.
+          ledger: [...d.ledger, { id: nextId(d.ledger), tenantId: created.id, month: monthKey(), amount: created.rent, dueDate: todayISO(), paidDate: null }],
         }));
         notify(`${created.name.split(" ")[0]} added`);
         return created;
@@ -210,12 +213,13 @@ export function BloomProvider({ children }) {
       },
       importData(json) {
         const parsed = JSON.parse(json);
-        const ok =
-          parsed &&
-          ["suites", "tenants", "ledger", "applicants", "maintenance"].every((k) => Array.isArray(parsed[k])) &&
-          parsed.settings && typeof parsed.settings === "object";
+        const ok = parsed && ["suites", "tenants", "ledger", "applicants", "maintenance"].every((k) => Array.isArray(parsed[k]));
         if (!ok) throw new Error("That file doesn't look like a complete Bloom Suites backup.");
-        setData(parsed);
+        // Merge defaults so an older/partial backup (e.g. empty settings) can't
+        // leave required fields undefined and crash the app on render.
+        const src = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : {};
+        const settings = { ...DEFAULT_SETTINGS, ...src, monthlyExpenses: { ...DEFAULT_SETTINGS.monthlyExpenses, ...(src.monthlyExpenses || {}) } };
+        setData({ ...parsed, settings });
         notify("Backup restored");
       },
       resetToSample() {

@@ -67,9 +67,9 @@ export function buildActionCenter(state, base = todayISO()) {
     }))
     .sort((a, b) => b.priority - a.priority);
 
-  // 2. Win-back: clients who have fully lapsed into "lost".
+  // 2. Win-back: clients who have fully lapsed into "lost" with nothing booked.
   const winback = clients
-    .filter((c) => clientStatus(c, base) === "lost")
+    .filter((c) => clientStatus(c, base) === "lost" && !hasUpcomingAppointment(c.id, appointments, base))
     .map((c) => ({
       id: `winback-${c.id}`,
       kind: "winback",

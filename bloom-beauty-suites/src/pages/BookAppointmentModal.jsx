@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useBloom } from "../store";
 import { todayISO } from "../format";
+import { C } from "../theme";
 import { Modal, Field, Select, Input, Textarea, PrimaryButton } from "../ui";
 
 const TIMES = [];
@@ -34,6 +35,19 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const canBook = form.clientId && form.serviceId && form.date && form.time;
+
+  // Detect a time clash with an existing appointment on that day (overlap by
+  // service duration), so the solo owner doesn't accidentally double-book a slot.
+  const toMin = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+  const dur = data.services.find((s) => s.id === form.serviceId)?.duration || 60;
+  const start = toMin(form.time);
+  const conflict = data.appointments.find(
+    (a) =>
+      a.date === form.date &&
+      (a.status === "scheduled" || a.status === "completed") &&
+      start < toMin(a.time) + a.duration &&
+      toMin(a.time) < start + dur
+  );
 
   return (
     <Modal open={open} onClose={onClose} title="Book Appointment">
@@ -75,9 +89,15 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
       <Field label="Notes (optional)">
         <Textarea rows={2} value={form.notes} onChange={set("notes")} placeholder="Anything to remember for this visit…" />
       </Field>
+      {conflict && (
+        <div style={{ background: C.amberLight, border: `1px solid ${C.amber}`, borderRadius: 10, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: C.charcoal }}>
+          ⚠ This overlaps <strong>{conflict.clientName}</strong> at {conflict.time}. You'll be asked to confirm.
+        </div>
+      )}
       <PrimaryButton
         disabled={!canBook}
         onClick={() => {
+          if (conflict && !window.confirm(`This time overlaps ${conflict.clientName} at ${conflict.time}. Book anyway?`)) return;
           actions.bookAppointment({ ...form, clientId: Number(form.clientId) });
           onClose();
         }}
