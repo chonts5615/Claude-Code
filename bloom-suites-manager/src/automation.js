@@ -95,9 +95,10 @@ export function buildActionCenter(state, base = todayISO()) {
     .map((m) => ({ id: `maint-${m.id}`, kind: "maintenance", ticket: m, suite: suiteById(suites, m.suiteId), priority: 60 + (m.priority === "high" ? 30 : m.priority === "normal" ? 10 : 0) }))
     .sort((a, b) => b.priority - a.priority);
 
-  // 5. Applicant follow-ups.
+  // 5. Applicant follow-ups (still "new" — touring/applying clears the task so
+  // recording progress removes it instead of re-surfacing it).
   const leads = applicants
-    .filter((a) => (a.status === "new" || a.status === "toured") && daysAgo(a.added, base) >= APPLICANT_FOLLOWUP_DAYS)
+    .filter((a) => a.status === "new" && daysAgo(a.added, base) >= APPLICANT_FOLLOWUP_DAYS)
     .map((a) => ({ id: `lead-${a.id}`, kind: "applicant", applicant: a, waitingDays: daysAgo(a.added, base), priority: 50 }));
 
   const groups = { rent, renewals, vacancies, maintenance: maint, leads };

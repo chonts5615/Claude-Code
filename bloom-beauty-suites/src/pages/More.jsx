@@ -198,7 +198,7 @@ function Services({ onBack }) {
   const openEdit = (s) => { setForm({ name: s.name, category: s.category, price: s.price, duration: s.duration }); setEditing(s); };
   const save = () => {
     if (editing === "new") actions.addService(form);
-    else actions.updateService(editing.id, { name: form.name.trim(), category: form.category, price: Number(form.price) || 0, duration: Number(form.duration) || 0 });
+    else actions.updateService(editing.id, { name: form.name.trim(), category: form.category, price: Number(form.price) || 0, duration: Number(form.duration) || 60 });
     setEditing(null);
   };
 
@@ -325,7 +325,7 @@ function Settings({ onBack }) {
             Load Sample Data
           </button>
           <button
-            onClick={() => { if (confirm("Erase all clients, appointments, and waitlist so you can enter your own? This cannot be undone — back up first!")) actions.clearAll(); }}
+            onClick={() => { if (confirm("Erase all clients, appointments, waitlist, and inventory so you can enter your own? Your service menu and settings are kept. This cannot be undone — back up first!")) actions.clearAll(); }}
             style={{ padding: 12, borderRadius: 10, border: `1px solid ${C.red}`, background: C.redLight, color: C.red, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
           >
             Clear &amp; Start Fresh
