@@ -110,15 +110,17 @@ const qtyBtn = { width: 28, height: 28, borderRadius: 8, border: `1px solid ${C.
 function Waitlist({ onBack }) {
   const { data, actions, notify } = useBloom();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", service: "Classic Full Set", preferred: "" });
+  const blankWaitlist = () => ({ name: "", phone: "", service: data.services[0]?.name || "", preferred: "" });
+  const [form, setForm] = useState(blankWaitlist);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const openAdd = () => { setForm(blankWaitlist()); setAdding(true); };
 
   return (
     <div style={{ padding: "16px 16px 100px" }}>
       <BackButton onClick={onBack} />
       <PageTitle
         right={
-          <button onClick={() => setAdding(true)} style={{ display: "flex", alignItems: "center", gap: 4, background: C.rose, color: C.white, border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+          <button onClick={openAdd} style={{ display: "flex", alignItems: "center", gap: 4, background: C.rose, color: C.white, border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
             <Icon d={Icons.plus} size={16} color={C.white} /> Add
           </button>
         }
@@ -170,7 +172,7 @@ function Waitlist({ onBack }) {
           disabled={!form.name || !form.phone}
           onClick={() => {
             actions.addWaitlist(form);
-            setForm({ name: "", phone: "", service: "Classic Full Set", preferred: "" });
+            setForm(blankWaitlist());
             setAdding(false);
           }}
         >

@@ -69,10 +69,12 @@ export function BloomProvider({ children }) {
               (t) =>
                 t.status !== "past" &&
                 !existing.has(t.id) &&
-                // Only bill months the tenant actually occupies: on/after move-in
-                // and on/before their lease-end (move-out) month.
+                // Bill from move-in onward...
                 (t.moveIn || t.leaseStart || "").substring(0, 7) <= mk &&
-                (t.leaseEnd || "9999-12").substring(0, 7) >= mk
+                // ...and, only for tenants on notice (an actual move-out), stop
+                // after their lease-end month. An active lapsed lease still
+                // occupies the suite, so it stays billable until renewed/ended.
+                (t.status !== "notice" || (t.leaseEnd || "9999-12").substring(0, 7) >= mk)
             )
             .map((t, i) => ({ id: nextId(d.ledger) + i, tenantId: t.id, month: mk, amount: t.rent, dueDate: `${mk}-01`, paidDate: null }));
           added = newRows.length;

@@ -10,8 +10,9 @@ const BloomContext = createContext(null);
 const nextId = (list) => (list.length ? Math.max(...list.map((x) => x.id)) + 1 : 1);
 
 // First start time (09:00–18:00, 30-min steps) on `date` that doesn't overlap an
-// existing scheduled/completed appointment for the given duration. Used by quick
-// rebook so one-tap shortcuts don't silently double-book. Falls back to 10:00.
+// existing scheduled/completed appointment for the given duration. Returns null
+// if the whole day is booked, so callers can pick another day instead of
+// silently double-booking.
 const toMin = (t) => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
@@ -22,7 +23,7 @@ function firstFreeTime(appointments, date, duration) {
   for (let mins = 9 * 60; mins <= 18 * 60; mins += 30) {
     if (!overlaps(mins)) return `${String(Math.floor(mins / 60)).padStart(2, "0")}:${mins % 60 === 0 ? "00" : "30"}`;
   }
-  return "10:00";
+  return null;
 }
 
 function loadData() {
@@ -193,20 +194,33 @@ export function BloomProvider({ children }) {
           .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
         const lastVisit = history.find((a) => a.status === "completed");
         const sourceId = fromApptId ?? lastVisit?.id;
-        // Default to the client's latest service, then any current menu item.
-        const svcId = serviceId || lastVisit?.serviceId || history[0]?.serviceId || data.services[0]?.id;
+        // Default to the client's latest service; if that one's been removed from
+        // the menu, fall back to a current service.
+        let svcId = serviceId || lastVisit?.serviceId || history[0]?.serviceId;
+        if (!data.services.some((s) => s.id === svcId)) svcId = data.services[0]?.id;
         const svc = data.services.find((s) => s.id === svcId);
         if (!svc) {
           notify("Add a service first");
           return null;
         }
+        // Find the first day from the target date with an open slot (don't
+        // silently double-book a fully booked day).
+        let bookDate = date;
+        let time = null;
+        for (let i = 0; i < 30 && !time; i++) {
+          time = firstFreeTime(data.appointments, bookDate, svc.duration);
+          if (!time) bookDate = addDays(bookDate, 1);
+        }
+        if (!time) {
+          bookDate = date;
+          time = "10:00";
+        }
         const created = {
           id: nextId(data.appointments),
           clientId,
           clientName: client.name,
-          date,
-          // Pick the first open slot that day so the shortcut won't double-book.
-          time: firstFreeTime(data.appointments, date, svc.duration),
+          date: bookDate,
+          time,
           serviceId: svc.id,
           serviceName: svc.name,
           price: svc.price,
