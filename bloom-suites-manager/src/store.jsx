@@ -65,7 +65,13 @@ export function BloomProvider({ children }) {
         setData((d) => {
           const existing = new Set(d.ledger.filter((r) => r.month === mk).map((r) => r.tenantId));
           const newRows = d.tenants
-            .filter((t) => t.status !== "past" && !existing.has(t.id))
+            .filter(
+              (t) =>
+                t.status !== "past" &&
+                !existing.has(t.id) &&
+                // Don't bill a month before the tenant moved in.
+                (t.moveIn || t.leaseStart || "").substring(0, 7) <= mk
+            )
             .map((t, i) => ({ id: nextId(d.ledger) + i, tenantId: t.id, month: mk, amount: t.rent, dueDate: `${mk}-01`, paidDate: null }));
           added = newRows.length;
           return { ...d, ledger: [...d.ledger, ...newRows] };
@@ -204,9 +210,11 @@ export function BloomProvider({ children }) {
       },
       importData(json) {
         const parsed = JSON.parse(json);
-        if (!parsed || !Array.isArray(parsed.suites) || !Array.isArray(parsed.tenants)) {
-          throw new Error("That file doesn't look like a Bloom Suites backup.");
-        }
+        const ok =
+          parsed &&
+          ["suites", "tenants", "ledger", "applicants", "maintenance"].every((k) => Array.isArray(parsed[k])) &&
+          parsed.settings && typeof parsed.settings === "object";
+        if (!ok) throw new Error("That file doesn't look like a complete Bloom Suites backup.");
         setData(parsed);
         notify("Backup restored");
       },

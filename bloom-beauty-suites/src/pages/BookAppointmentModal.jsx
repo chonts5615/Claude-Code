@@ -14,7 +14,7 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
   const { data, actions } = useBloom();
   const [form, setForm] = useState({
     clientId: "",
-    serviceId: "classic-fill",
+    serviceId: data.services[0]?.id || "",
     date: presetDate || todayISO(),
     time: "10:00",
     notes: "",
@@ -25,10 +25,12 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
       setForm((f) => ({
         ...f,
         clientId: presetClientId ? String(presetClientId) : "",
+        // Default to a service that's actually on the current menu.
+        serviceId: data.services.some((s) => s.id === f.serviceId) ? f.serviceId : data.services[0]?.id || "",
         date: presetDate || todayISO(),
       }));
     }
-  }, [open, presetClientId, presetDate]);
+  }, [open, presetClientId, presetDate, data.services]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const canBook = form.clientId && form.serviceId && form.date && form.time;

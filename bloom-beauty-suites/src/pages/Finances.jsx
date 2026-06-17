@@ -98,11 +98,11 @@ export default function Finances() {
         <SectionHeader title="Tax Reserve" />
         <div style={{ display: "flex", gap: 10 }}>
           <div style={{ flex: 1, background: C.amberLight, borderRadius: 10, padding: 12, textAlign: "center" }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: C.amber }}>{fmt(Math.round(f.estProfit * 0.141))}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: C.amber }}>{fmt(Math.round(Math.max(0, f.estProfit) * 0.141))}</div>
             <div style={{ fontSize: 11, color: C.amber }}>SE Tax (14.1%)</div>
           </div>
           <div style={{ flex: 1, background: C.roseLight, borderRadius: 10, padding: 12, textAlign: "center" }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: C.rose }}>{fmt(Math.round(f.estProfit * settings.taxReserveRate))}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: C.rose }}>{fmt(Math.round(Math.max(0, f.estProfit) * settings.taxReserveRate))}</div>
             <div style={{ fontSize: 11, color: C.rose }}>Total to Set Aside</div>
           </div>
         </div>

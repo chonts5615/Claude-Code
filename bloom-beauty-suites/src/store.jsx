@@ -1,7 +1,7 @@
 // Central data store: loads/saves to localStorage automatically and exposes
 // every mutation as a named action. Components never touch storage directly.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { buildSeedData, SERVICES } from "./seed";
+import { buildSeedData } from "./seed";
 import { todayISO, addDays } from "./format";
 
 const STORAGE_KEY = "bloom.v1";
@@ -99,7 +99,12 @@ export function BloomProvider({ children }) {
       // --- Appointments ---
       bookAppointment({ clientId, date, time, serviceId, notes = "" }) {
         const client = data.clients.find((c) => c.id === clientId);
-        const svc = data.services.find((s) => s.id === serviceId) || SERVICES.find((s) => s.id === serviceId);
+        // Only book a service that's actually on the current menu.
+        const svc = data.services.find((s) => s.id === serviceId);
+        if (!svc) {
+          notify("Pick a service first");
+          return null;
+        }
         const created = {
           id: nextId(data.appointments),
           clientId,
@@ -107,9 +112,9 @@ export function BloomProvider({ children }) {
           date,
           time,
           serviceId,
-          serviceName: svc ? svc.name : serviceId,
-          price: svc ? svc.price : 0,
-          duration: svc ? svc.duration : 60,
+          serviceName: svc.name,
+          price: svc.price,
+          duration: svc.duration,
           status: "scheduled",
           notes,
           rebooked: false,
@@ -160,27 +165,33 @@ export function BloomProvider({ children }) {
         const client = data.clients.find((c) => c.id === clientId);
         if (!client) return null;
         const interval = client.avgInterval || 21;
-        // Schedule from whichever is later: their cadence from last visit, or today.
+        // Next visit lands one cadence after the last one — but if that date has
+        // already passed (client is due/overdue), book them in the next few days.
         const fromLast = addDays(client.lastVisit, interval);
-        const date = fromLast > todayISO() ? fromLast : addDays(todayISO(), interval);
+        const date = fromLast > todayISO() ? fromLast : addDays(todayISO(), 3);
         // Most recent completed visit drives the default service and rebook flag.
         const history = data.appointments
           .filter((a) => a.clientId === clientId)
           .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
         const lastVisit = history.find((a) => a.status === "completed");
         const sourceId = fromApptId ?? lastVisit?.id;
-        const svcId = serviceId || lastVisit?.serviceId || history[0]?.serviceId || "classic-fill";
-        const svc = data.services.find((s) => s.id === svcId) || SERVICES.find((s) => s.id === svcId);
+        // Default to the client's latest service, then any current menu item.
+        const svcId = serviceId || lastVisit?.serviceId || history[0]?.serviceId || data.services[0]?.id;
+        const svc = data.services.find((s) => s.id === svcId);
+        if (!svc) {
+          notify("Add a service first");
+          return null;
+        }
         const created = {
           id: nextId(data.appointments),
           clientId,
           clientName: client.name,
           date,
           time: "10:00",
-          serviceId: svcId,
-          serviceName: svc ? svc.name : svcId,
-          price: svc ? svc.price : 0,
-          duration: svc ? svc.duration : 60,
+          serviceId: svc.id,
+          serviceName: svc.name,
+          price: svc.price,
+          duration: svc.duration,
           status: "scheduled",
           notes: "",
           rebooked: false,
@@ -219,9 +230,12 @@ export function BloomProvider({ children }) {
       },
       adjustInventory(id, delta) {
         update((d) => ({
-          inventory: d.inventory.map((i) =>
-            i.id === id ? { ...i, qty: Math.max(0, i.qty + delta) } : i
-          ),
+          inventory: d.inventory.map((i) => {
+            if (i.id !== id) return i;
+            const qty = Math.max(0, i.qty + delta);
+            // Restocking back above the reorder level clears the "on order" flag.
+            return { ...i, qty, onOrder: qty > i.reorder ? false : i.onOrder };
+          }),
         }));
       },
       markOrdered(id) {
@@ -319,9 +333,11 @@ export function BloomProvider({ children }) {
       },
       importData(json) {
         const parsed = JSON.parse(json);
-        if (!parsed || !Array.isArray(parsed.clients) || !Array.isArray(parsed.appointments)) {
-          throw new Error("That file doesn't look like a Bloom backup.");
-        }
+        const ok =
+          parsed &&
+          ["clients", "appointments", "services", "inventory", "waitlist"].every((k) => Array.isArray(parsed[k])) &&
+          parsed.settings && typeof parsed.settings === "object";
+        if (!ok) throw new Error("That file doesn't look like a complete Bloom backup.");
         setData(parsed);
         notify("Backup restored");
       },

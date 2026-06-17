@@ -96,9 +96,9 @@ export function buildActionCenter(state, base = todayISO()) {
     priority: 60,
   }));
 
-  // 5. Waitlist follow-ups (still waiting after a few days).
+  // 5. Waitlist follow-ups (still waiting — not yet contacted or booked).
   const waitlistFollowups = waitlist
-    .filter((w) => w.status !== "booked" && daysAgo(w.added, base) >= WAITLIST_FOLLOWUP_DAYS)
+    .filter((w) => w.status === "waiting" && daysAgo(w.added, base) >= WAITLIST_FOLLOWUP_DAYS)
     .map((w) => ({
       id: `waitlist-${w.id}`,
       kind: "waitlist",
