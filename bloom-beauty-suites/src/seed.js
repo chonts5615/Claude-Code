@@ -1,7 +1,7 @@
 // Sample data used to seed a brand-new install so the owner can explore a
 // populated app before entering real data. All dates are generated RELATIVE to
 // today, so the demo always shows a current, realistic week.
-import { todayISO, addDays, toISO } from "./format";
+import { todayISO, addDays, toISO } from "./format.js";
 
 export const SERVICES = [
   { id: "classic-full", name: "Classic Full Set", price: 165, duration: 120, category: "Full Set" },

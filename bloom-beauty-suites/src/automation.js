@@ -1,7 +1,7 @@
 // Automation engine — pure functions that turn raw data into the derived
 // signals and daily task list that make the app save the owner time.
 // Nothing here mutates state; the store calls these to decide what to show.
-import { daysAgo, todayISO, addDays } from "./format";
+import { daysAgo, todayISO, addDays } from "./format.js";
 
 const EXPIRY_WINDOW_DAYS = 30; // flag products expiring within a month
 const WAITLIST_FOLLOWUP_DAYS = 5; // nudge to follow up on stale waitlist entries

@@ -1,6 +1,6 @@
 // Automation engine — pure functions that turn raw data into the derived
 // signals and daily task list that make the app save the owner time.
-import { daysAgo, todayISO, monthKey, monthLabel } from "./format";
+import { daysAgo, todayISO, monthKey, monthLabel } from "./format.js";
 
 const APPLICANT_FOLLOWUP_DAYS = 3;
 

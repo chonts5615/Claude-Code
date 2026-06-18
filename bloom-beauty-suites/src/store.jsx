@@ -122,6 +122,19 @@ export function BloomProvider({ children }) {
           notify("Pick a service first");
           return null;
         }
+        // Reject overlapping appointments so a solo artist can't be double-booked.
+        const startMin = toMin(time);
+        const conflict = data.appointments.some(
+          (a) =>
+            a.date === date &&
+            (a.status === "scheduled" || a.status === "completed") &&
+            startMin < toMin(a.time) + a.duration &&
+            toMin(a.time) < startMin + svc.duration
+        );
+        if (conflict) {
+          notify("That slot is already booked");
+          return null;
+        }
         const created = {
           id: nextId(data.appointments),
           clientId,
@@ -212,8 +225,8 @@ export function BloomProvider({ children }) {
           if (!time) bookDate = addDays(bookDate, 1);
         }
         if (!time) {
-          bookDate = date;
-          time = "10:00";
+          notify("Calendar fully booked — please book manually");
+          return null;
         }
         const created = {
           id: nextId(data.appointments),

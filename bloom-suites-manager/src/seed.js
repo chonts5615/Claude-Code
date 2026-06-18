@@ -1,7 +1,7 @@
 // Sample data for a fresh install so the owner can explore a populated app.
 // Dates (leases, rent ledger, applicants, tickets) are generated RELATIVE to
 // today so the demo always looks current.
-import { todayISO, addDays, monthKey, addMonths } from "./format";
+import { todayISO, addDays, monthKey, addMonths } from "./format.js";
 
 export const PROFESSIONS = [
   "Lash Artist", "Nail Tech", "Hair Stylist", "Esthetician",
