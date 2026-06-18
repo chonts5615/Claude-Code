@@ -50,7 +50,7 @@ OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
 
 # Max attempts per orchestrated phase before moving on (degrade gracefully
 # rather than block forever if a phase can't fully complete).
-PHASE_ATTEMPTS = {"research": 3, "analyze": 2, "report": 2, "qa": 2}
+PHASE_ATTEMPTS = {"research": 3, "analyze": 2, "report": 3, "qa": 2}
 
 
 def load_prompt(filename: str) -> str:
@@ -119,6 +119,7 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
             tools=["Glob", "Read", "Bash", "Write"],
             prompt=data_analyst_prompt,
             model=model,
+            maxTurns=40,  # chart generation is multi-step (script + run + verify)
         ),
         "report-writer": AgentDefinition(
             description=(
@@ -133,6 +134,7 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
             tools=["Skill", "Write", "Glob", "Read", "Bash"],
             prompt=report_writer_prompt,
             model=model,
+            maxTurns=40,  # read inputs + build PDF + build script + markdown copy
         ),
         "qa-reviewer": AgentDefinition(
             description=(
@@ -286,7 +288,7 @@ def _analyze_prompt() -> str:
     )
 
 
-def _report_prompt(revise: bool = False) -> str:
+def _report_prompt(revise: bool = False, first: bool = True) -> str:
     if revise:
         return (
             "REVISION PHASE. The QA review at files/reports/qa_review.md requested changes. Spawn "
@@ -295,11 +297,20 @@ def _report_prompt(revise: bool = False) -> str:
             "replacing vague 'multiple sources' attributions with specific citations), and "
             "regenerate BOTH the PDF and files/reports/report.md."
         )
+    retry_note = (
+        ""
+        if first
+        else (
+            " A previous attempt did not produce the PDF; spawn a NEW report-writer now — do not "
+            "assume any earlier subagent is still running. Tell it to write the PDF FIRST."
+        )
+    )
     return (
         'REPORT PHASE. Spawn the "report-writer" subagent now to synthesize the research notes, '
         "the data summary in files/data/, and the charts in files/charts/ into a single cited PDF "
         "in files/reports/ with an appropriate title. Also have it write a plain-markdown copy of "
         "the same report (text only, no images) to files/reports/report.md so it can be reviewed."
+        + retry_note
     )
 
 
@@ -369,7 +380,7 @@ async def run_pipeline(
     # Phase 3: REPORT — gate on a PDF existing.
     await _drive_phase(
         client, tracker, transcript, name="report",
-        instruction_for_attempt=lambda a: _report_prompt(),
+        instruction_for_attempt=lambda a: _report_prompt(first=(a == 1)),
         is_done=lambda: _final_report_exists(files_dir),
         max_attempts=PHASE_ATTEMPTS["report"],
     )
