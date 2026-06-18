@@ -136,9 +136,18 @@ export function BloomProvider({ children }) {
         notify("Marked as moving out");
       },
       renewLease(id, days = 365) {
-        update((d) => ({
-          tenants: d.tenants.map((t) => (t.id === id ? { ...t, status: "active", leaseEnd: addDays(t.leaseEnd >= todayISO() ? t.leaseEnd : todayISO(), days) } : t)),
-        }));
+        update((d) => {
+          const window = d.settings.leaseRenewalWindowDays ?? 60;
+          return {
+            tenants: d.tenants.map((t) => {
+              if (t.id !== id) return t;
+              // Idempotent: only renew a lease that's actually up for renewal, so a
+              // double-tap can't stack into a multi-year extension.
+              if (t.status === "active" && t.leaseEnd > addDays(todayISO(), window)) return t;
+              return { ...t, status: "active", leaseEnd: addDays(t.leaseEnd >= todayISO() ? t.leaseEnd : todayISO(), days) };
+            }),
+          };
+        });
         notify("Lease renewed");
       },
       endTenancy(id) {

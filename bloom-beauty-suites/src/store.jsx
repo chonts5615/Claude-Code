@@ -239,9 +239,19 @@ export function BloomProvider({ children }) {
       rebookClient(clientId, { serviceId, fromApptId } = {}) {
         const client = data.clients.find((c) => c.id === clientId);
         if (!client) return null;
-        // If they already have an upcoming visit booked, don't add a second one.
+        // If they already have an upcoming visit booked, don't add a second one —
+        // but still mark the source visit rebooked so the metric reads correctly.
         if (data.appointments.some((a) => a.clientId === clientId && a.status === "scheduled" && a.date >= todayISO())) {
-          notify("Already has an upcoming visit");
+          const last = data.appointments
+            .filter((a) => a.clientId === clientId && a.status === "completed")
+            .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`))[0];
+          const srcId = fromApptId ?? last?.id;
+          if (srcId) {
+            setData((d) => ({ ...d, appointments: d.appointments.map((a) => (a.id === srcId ? { ...a, rebooked: true } : a)) }));
+            notify("Marked as rebooked");
+          } else {
+            notify("Already has an upcoming visit");
+          }
           return null;
         }
         const interval = client.avgInterval || 21;
@@ -291,13 +301,18 @@ export function BloomProvider({ children }) {
           rebooked: false,
           rebookedFrom: sourceId ?? null,
         };
-        setData((d) => ({
-          ...d,
-          appointments: [
-            ...d.appointments.map((a) => (a.id === sourceId ? { ...a, rebooked: true } : a)),
-            created,
-          ],
-        }));
+        setData((d) => {
+          // Re-check against the latest state so two rapid taps can't create
+          // duplicate future bookings (or duplicate ids).
+          if (d.appointments.some((a) => a.clientId === clientId && a.status === "scheduled" && a.date >= todayISO())) return d;
+          return {
+            ...d,
+            appointments: [
+              ...d.appointments.map((a) => (a.id === sourceId ? { ...a, rebooked: true } : a)),
+              { ...created, id: nextId(d.appointments) },
+            ],
+          };
+        });
         notify(`Rebooked for ${created.date}`);
         return created;
       },
@@ -344,9 +359,10 @@ export function BloomProvider({ children }) {
       receiveStock(id, qty) {
         // New stock arrived: clear the old expiry so the replaced product doesn't
         // keep firing a stale "expiring soon" task (no edit flow to re-date it).
+        // Only act while still on order, so a double-tap doesn't add stock twice.
         update((d) => ({
           inventory: d.inventory.map((i) =>
-            i.id === id ? { ...i, qty: i.qty + qty, onOrder: false, expires: null, lastOrdered: todayISO() } : i
+            i.id === id && i.onOrder ? { ...i, qty: i.qty + qty, onOrder: false, expires: null, lastOrdered: todayISO() } : i
           ),
         }));
         notify("Stock received");
