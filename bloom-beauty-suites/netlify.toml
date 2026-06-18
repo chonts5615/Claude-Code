@@ -1,0 +1,16 @@
+# One-click deploy to Netlify.
+# Option A (no code): run `npm run build`, then drag the resulting `dist/`
+#   folder onto https://app.netlify.com/drop — done.
+# Option B (connect this repo): Netlify reads this file. Because the app lives
+#   in a sub-folder of the repo, set the site's "Base directory" to this app's
+#   folder in the Netlify UI; the build command and publish path below are then
+#   relative to it.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Single-page app: serve index.html for any path so deep links / refreshes work.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
