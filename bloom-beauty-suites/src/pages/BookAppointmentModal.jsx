@@ -6,8 +6,10 @@ import { todayISO } from "../format";
 import { C } from "../theme";
 import { Modal, Field, Select, Input, Textarea, PrimaryButton } from "../ui";
 
+// Working-day start slots (09:00–17:30, 30-min steps). The actual options are
+// filtered per service so the visit ends by the 18:00 close.
 const TIMES = [];
-for (let h = 8; h <= 19; h++) {
+for (let h = 9; h < 18; h++) {
   for (const m of ["00", "30"]) TIMES.push(`${String(h).padStart(2, "0")}:${m}`);
 }
 
@@ -36,13 +38,23 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
   }, [open, presetClientId, presetDate, data.services]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const canBook = form.clientId && form.serviceId && form.date && form.time;
 
   // Detect a time clash with an existing appointment on that day (overlap by
   // service duration), so the solo owner doesn't accidentally double-book a slot.
   const toMin = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
   const dur = data.services.find((s) => s.id === form.serviceId)?.duration || 60;
+  // Only offer start times where the whole service fits before the 18:00 close.
+  const timeOptions = TIMES.filter((t) => toMin(t) + dur <= 18 * 60);
+  const canBook = form.clientId && form.serviceId && form.date && timeOptions.includes(form.time);
   const start = toMin(form.time);
+
+  // If switching to a longer service makes the chosen time run past close, snap
+  // to the latest slot that still fits.
+  useEffect(() => {
+    if (open && timeOptions.length && !timeOptions.includes(form.time)) {
+      setForm((f) => ({ ...f, time: timeOptions[timeOptions.length - 1] }));
+    }
+  }, [open, form.serviceId, form.time, dur]);
   const conflict = data.appointments.find(
     (a) =>
       a.date === form.date &&
@@ -80,7 +92,7 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
         </Field>
         <Field label="Time">
           <Select value={form.time} onChange={set("time")}>
-            {TIMES.map((t) => (
+            {timeOptions.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>

@@ -8,12 +8,14 @@ on:
       - 'bloom-suites-manager/**'
       - 'bloom-launcher/**'
       - '.github/workflows/bloom-apps.yml'
+      - '.github/workflows/deploy-pages.yml'
   pull_request:
     paths:
       - 'bloom-beauty-suites/**'
       - 'bloom-suites-manager/**'
       - 'bloom-launcher/**'
       - '.github/workflows/bloom-apps.yml'
+      - '.github/workflows/deploy-pages.yml'
 
 jobs:
   build-and-test:

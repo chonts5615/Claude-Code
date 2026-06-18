@@ -145,16 +145,22 @@ export function BloomProvider({ children }) {
           notify("Pick a service first");
           return null;
         }
-        // Reject overlapping appointments so a solo artist can't be double-booked.
         const startMin = toMin(time);
-        const conflict = data.appointments.some(
-          (a) =>
-            a.date === date &&
-            (a.status === "scheduled" || a.status === "completed") &&
-            startMin < toMin(a.time) + a.duration &&
-            toMin(a.time) < startMin + svc.duration
-        );
-        if (conflict) {
+        // Keep manual bookings inside the 09:00–18:00 working day the scheduler uses.
+        if (startMin < 9 * 60 || startMin + svc.duration > 18 * 60) {
+          notify("Outside working hours");
+          return null;
+        }
+        const overlaps = (appts) =>
+          appts.some(
+            (a) =>
+              a.date === date &&
+              (a.status === "scheduled" || a.status === "completed") &&
+              startMin < toMin(a.time) + a.duration &&
+              toMin(a.time) < startMin + svc.duration
+          );
+        // Early feedback against the current snapshot...
+        if (overlaps(data.appointments)) {
           notify("That slot is already booked");
           return null;
         }
@@ -172,7 +178,12 @@ export function BloomProvider({ children }) {
           notes,
           rebooked: false,
         };
-        setData((d) => ({ ...d, appointments: [...d.appointments, created] }));
+        setData((d) => {
+          // ...and re-check + re-id against the latest state, so two rapid taps
+          // can't slip past the same stale snapshot and double-book.
+          if (overlaps(d.appointments)) return d;
+          return { ...d, appointments: [...d.appointments, { ...created, id: nextId(d.appointments) }] };
+        });
         notify("Appointment booked");
         return created;
       },
