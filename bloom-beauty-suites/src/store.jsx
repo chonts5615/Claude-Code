@@ -331,6 +331,9 @@ export function BloomProvider({ children }) {
       // --- Services (the menu the owner prices and offers) ---
       addService(form) {
         const base = (form.name || "service").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "service";
+        // Clamp so negatives (truthy) can't poison appointment price/duration math.
+        const price = Math.max(0, Number(form.price) || 0);
+        const duration = Number(form.duration) > 0 ? Number(form.duration) : 60;
         update((d) => {
           let id = base;
           let n = 2;
@@ -338,7 +341,7 @@ export function BloomProvider({ children }) {
           return {
             services: [
               ...d.services,
-              { id, name: form.name.trim(), category: form.category || "Other", price: Number(form.price) || 0, duration: Number(form.duration) || 60 },
+              { id, name: form.name.trim(), category: form.category || "Other", price, duration },
             ],
           };
         });

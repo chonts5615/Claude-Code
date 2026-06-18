@@ -56,7 +56,7 @@ function SuiteDetail({ suite, onBack, onOpenTenant }) {
       <Card style={{ marginBottom: 16 }}>
         <SectionHeader title="Monthly Rent" />
         <Field label="Rent amount ($/month)">
-          <Input type="number" inputMode="decimal" value={suite.rent} onChange={(e) => actions.updateSuite(suite.id, { rent: Number(e.target.value) || 0 })} />
+          <Input type="number" inputMode="decimal" min={0} value={suite.rent} onChange={(e) => actions.updateSuite(suite.id, { rent: Math.max(0, Number(e.target.value) || 0) })} />
         </Field>
         <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Changes save automatically. Existing tenant rent is unchanged.</p>
       </Card>

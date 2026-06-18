@@ -198,7 +198,7 @@ function Services({ onBack }) {
   const openEdit = (s) => { setForm({ name: s.name, category: s.category, price: s.price, duration: s.duration }); setEditing(s); };
   const save = () => {
     if (editing === "new") actions.addService(form);
-    else actions.updateService(editing.id, { name: form.name.trim(), category: form.category, price: Number(form.price) || 0, duration: Number(form.duration) || 60 });
+    else actions.updateService(editing.id, { name: form.name.trim(), category: form.category, price: Math.max(0, Number(form.price) || 0), duration: Number(form.duration) > 0 ? Number(form.duration) : 60 });
     setEditing(null);
   };
 
@@ -231,8 +231,8 @@ function Services({ onBack }) {
           <Select value={form.category} onChange={set("category")}>{SVC_CATS.map((c) => <option key={c} value={c}>{c}</option>)}</Select>
         </Field>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="Price ($)"><Input type="number" inputMode="decimal" value={form.price} onChange={set("price")} /></Field>
-          <Field label="Duration (min)"><Input type="number" inputMode="numeric" value={form.duration} onChange={set("duration")} /></Field>
+          <Field label="Price ($)"><Input type="number" inputMode="decimal" min={0} value={form.price} onChange={set("price")} /></Field>
+          <Field label="Duration (min)"><Input type="number" inputMode="numeric" min={0} value={form.duration} onChange={set("duration")} /></Field>
         </div>
         <PrimaryButton disabled={!form.name} onClick={save}>{editing === "new" ? "Add Service" : "Save Changes"}</PrimaryButton>
         {editing && editing !== "new" && (
