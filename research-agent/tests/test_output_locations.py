@@ -27,6 +27,18 @@ def test_ensure_output_dirs_creates_tree(tmp_path):
         assert (files_dir / sub).is_dir()
 
 
+def test_build_options_raises_buffer_and_registers_qa(tmp_path):
+    from research_agent.agent import MAX_BUFFER_SIZE, build_options
+    from research_agent.utils.subagent_tracker import SubagentTracker
+
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    opts = build_options(files_dir, SubagentTracker(None, tmp_path), "haiku")
+    assert opts.max_buffer_size == MAX_BUFFER_SIZE
+    assert MAX_BUFFER_SIZE > 1024 * 1024  # bigger than the SDK default
+    assert "qa-reviewer" in opts.agents
+
+
 def test_with_output_locations_injects_absolute_paths(tmp_path):
     files_dir = tmp_path / "files"
     out = with_output_locations("ORIGINAL BODY", files_dir)

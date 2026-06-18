@@ -52,6 +52,11 @@ OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
 # rather than block forever if a phase can't fully complete).
 PHASE_ATTEMPTS = {"research": 3, "analyze": 2, "report": 3, "qa": 2}
 
+# The SDK's default stdout buffer is 1 MB; a single large tool result (e.g. an
+# agent accidentally reading a multi-MB PDF/PNG, or a big web result) overflows
+# it and fatally crashes the message reader. Raise it for resilience.
+MAX_BUFFER_SIZE = 20 * 1024 * 1024  # 20 MB
+
 
 def load_prompt(filename: str) -> str:
     """Load a prompt from the prompts directory."""
@@ -166,6 +171,7 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
         agents=agents,
         hooks=hooks,
         model=model,
+        max_buffer_size=MAX_BUFFER_SIZE,
     )
 
 

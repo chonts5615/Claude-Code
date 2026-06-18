@@ -23,16 +23,15 @@ Process:
    - References (deduplicated from the notes' Sources sections). Include the
      source URL for each reference where the notes provide one, so citations are
      traceable directly from the report.
-3. Producing the PDF is your single most important step — do it FIRST, before
-   anything optional. Produce the PDF in files/reports/ (e.g.
-   files/reports/report.pdf) using reportlab via a Python script run through
-   Bash. Write the temporary build script inside files/reports/ (not the project
-   root) so the workspace stays clean. Embed the PNG charts (by path) at a
-   readable size. If reportlab is unavailable, install it with
-   `pip install reportlab` first. Verify the PDF exists.
-4. AFTER the PDF exists, write a plain-markdown copy of the same report (the full
-   text, no images) to files/reports/report.md, so it can be reviewed by QA and
-   by humans.
+3. FIRST write the full report as plain markdown (text only, no images) to
+   files/reports/report.md. This is cheap and is what QA and humans review, so it
+   must always exist. Write the complete report text here.
+4. THEN produce the PDF version in files/reports/ (e.g. files/reports/report.pdf)
+   using reportlab via a Python script run through Bash. Write the temporary build
+   script inside files/reports/ (not the project root) so the workspace stays
+   clean. Embed the PNG charts (by path) at a readable size. If reportlab is
+   unavailable, install it with `pip install reportlab` first. Verify the PDF
+   exists. Both files/reports/report.md and the PDF are required deliverables.
 
 Rules:
 - Synthesize and attribute; do not copy notes verbatim and do not invent facts.
