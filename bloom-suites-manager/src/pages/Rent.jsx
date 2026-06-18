@@ -2,7 +2,7 @@
 // month in one tap.
 import { useMemo, useState } from "react";
 import { useBloom } from "../store";
-import { rentStatus, tenantById, monthTotals } from "../automation";
+import { rentStatus, tenantById, monthTotals, unbilledTenants } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
 import { fmt, monthKey, monthLabel, addMonths } from "../format";
@@ -18,7 +18,7 @@ export default function Rent() {
       .map((r) => ({ ...r, tenant: tenantById(data.tenants, r.tenantId), status: rentStatus(r, data.settings) }))
       .filter((r) => r.tenant)
       .sort((a, b) => (a.paidDate ? 1 : 0) - (b.paidDate ? 1 : 0) || a.tenant.name.localeCompare(b.tenant.name));
-    const activeUnbilled = data.tenants.filter((t) => t.status !== "past" && !totals.rows.some((r) => r.tenantId === t.id));
+    const activeUnbilled = unbilledTenants(data, mk);
     return { totals, rows, activeUnbilled };
   }, [data, mk]);
 

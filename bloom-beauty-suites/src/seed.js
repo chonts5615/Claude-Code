@@ -96,7 +96,10 @@ function buildAppointments(clients) {
   const appts = [];
   const outcomes = ["completed", "completed", "completed", "completed", "completed", "completed", "completed", "completed", "no-show", "late-cancel"];
   const serviceIds = ["classic-fill", "classic-fill", "classic-fill-3", "hybrid-fill", "volume-fill", "volume-fill", "volume-fill-3", "classic-full", "hybrid-full", "volume-full", "removal", "lash-lift"];
-  const active = clients.filter((c) => c.lastVisit >= addDays(todayISO(), -120));
+  // Only recently-active clients appear in the demo schedule, so generated
+  // visits stay consistent with each profile — lapsing/lost clients keep their
+  // older last-visit dates and aren't handed fresh appointments.
+  const active = clients.filter((c) => c.lastVisit >= addDays(todayISO(), -30));
   const base = new Date(todayISO() + "T12:00:00");
   // Most recent past Saturday — used as the right edge of history.
   const lastSat = new Date(base);
@@ -131,23 +134,25 @@ function buildAppointments(clients) {
       });
     }
   }
-  // Upcoming week (next 5 business days starting today).
+  // Upcoming week (next 5 business days starting today). A running time cursor
+  // advances by each service's duration so demo bookings never overlap.
   for (let d = 0; d < 7; d++) {
     const iso = addDays(todayISO(), d);
     const dow = new Date(iso + "T12:00:00").getDay();
     if (dow === 0 || dow === 6) continue;
     const count = 3 + Math.floor(Math.random() * 2);
+    let cursor = 9 * 60; // 9:00 AM
     for (let a = 0; a < count; a++) {
-      const hour = 9 + a * 2;
       const client = pick(active);
       const sid = pick(serviceIds);
       const svc = SERVICES.find((s) => s.id === sid);
+      if (cursor + svc.duration > 18 * 60) break; // keep within the working day
       appts.push({
         id: id++,
         clientId: client.id,
         clientName: client.name,
         date: iso,
-        time: `${String(hour).padStart(2, "0")}:00`,
+        time: `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`,
         serviceId: svc.id,
         serviceName: svc.name,
         price: svc.price,
@@ -156,6 +161,7 @@ function buildAppointments(clients) {
         notes: "",
         rebooked: false,
       });
+      cursor += Math.ceil(svc.duration / 30) * 30; // next free 30-min slot
     }
   }
   return appts;
@@ -176,13 +182,23 @@ export const DEFAULT_SETTINGS = {
 
 // Build a complete fresh dataset for a new install.
 export function buildSeedData() {
-  const clients = buildClients();
+  const seedClients = buildClients();
+  const appointments = buildAppointments(seedClients);
+  // Reconcile each profile's lastVisit with the generated history so the
+  // Action Center / health / due math never run on a stale date that's older
+  // than a completed visit already in the schedule.
+  const clients = seedClients.map((c) => {
+    const latest = appointments
+      .filter((a) => a.clientId === c.id && a.status === "completed")
+      .reduce((m, a) => (a.date > m ? a.date : m), c.lastVisit);
+    return latest > c.lastVisit ? { ...c, lastVisit: latest } : c;
+  });
   return {
     version: 1,
     seededAt: todayISO(),
     services: SERVICES,
     clients,
-    appointments: buildAppointments(clients),
+    appointments,
     inventory: buildInventory(),
     waitlist: buildWaitlist(),
     settings: DEFAULT_SETTINGS,

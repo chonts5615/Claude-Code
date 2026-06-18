@@ -50,6 +50,22 @@ export function monthTotals(state, mk = monthKey()) {
   return { collected, outstanding, billed: collected + outstanding, rows };
 }
 
+// Whether a tenant should be billed for month `mk`. Single source of truth used
+// by the Rent page, the store's billing action, and the Action Center, so they
+// never disagree about who's billable.
+export function eligibleToBill(tenant, mk) {
+  if (tenant.status === "past") return false;
+  if ((tenant.moveIn || tenant.leaseStart || "").substring(0, 7) > mk) return false; // before move-in
+  if (tenant.status === "notice" && (tenant.leaseEnd || "9999-12").substring(0, 7) < mk) return false; // after move-out
+  return true;
+}
+
+// Eligible tenants for `mk` who don't yet have a ledger row.
+export function unbilledTenants(state, mk = monthKey()) {
+  const billed = new Set(state.ledger.filter((r) => r.month === mk).map((r) => r.tenantId));
+  return state.tenants.filter((t) => eligibleToBill(t, mk) && !billed.has(t.id));
+}
+
 // --- The Action Center: the automated daily to-do list ---
 export function buildActionCenter(state, base = todayISO()) {
   const { tenants, suites, ledger, applicants, maintenance, settings } = state;
@@ -103,8 +119,17 @@ export function buildActionCenter(state, base = todayISO()) {
     .filter((a) => a.status === "new" && daysAgo(a.added, base) >= APPLICANT_FOLLOWUP_DAYS)
     .map((a) => ({ id: `lead-${a.id}`, kind: "applicant", applicant: a, waitingDays: daysAgo(a.added, base), priority: 50 }));
 
-  const groups = { rent, renewals, vacancies, maintenance: maint, leads };
-  const total = rent.length + renewals.length + vacancies.length + maint.length + leads.length;
+  // 6. Rent not yet billed for the current month (so a new month doesn't slip
+  // by unbilled just because the owner hasn't opened the Rent page).
+  const curMonth = monthKey(base);
+  const toBill = unbilledTenants(state, curMonth);
+  const billing = toBill.length
+    ? [{ id: `bill-${curMonth}`, kind: "billing", month: curMonth, count: toBill.length, priority: 95 }]
+    : [];
+
+  const groups = { billing, rent, renewals, vacancies, maintenance: maint, leads };
+  const total =
+    billing.length + rent.length + renewals.length + vacancies.length + maint.length + leads.length;
   return { groups, total };
 }
 

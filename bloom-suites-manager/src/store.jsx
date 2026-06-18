@@ -2,6 +2,7 @@
 // every mutation as a named action. Components never touch storage directly.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { buildSeedData, DEFAULT_SETTINGS } from "./seed";
+import { eligibleToBill } from "./automation";
 import { todayISO, monthKey, addDays } from "./format";
 
 const STORAGE_KEY = "bloom-suites.v1";
@@ -80,17 +81,7 @@ export function BloomProvider({ children }) {
         setData((d) => {
           const existing = new Set(d.ledger.filter((r) => r.month === mk).map((r) => r.tenantId));
           const newRows = d.tenants
-            .filter(
-              (t) =>
-                t.status !== "past" &&
-                !existing.has(t.id) &&
-                // Bill from move-in onward...
-                (t.moveIn || t.leaseStart || "").substring(0, 7) <= mk &&
-                // ...and, only for tenants on notice (an actual move-out), stop
-                // after their lease-end month. An active lapsed lease still
-                // occupies the suite, so it stays billable until renewed/ended.
-                (t.status !== "notice" || (t.leaseEnd || "9999-12").substring(0, 7) >= mk)
-            )
+            .filter((t) => eligibleToBill(t, mk) && !existing.has(t.id))
             .map((t, i) => ({ id: nextId(d.ledger) + i, tenantId: t.id, month: mk, amount: t.rent, dueDate: `${mk}-01`, paidDate: null }));
           added = newRows.length;
           return { ...d, ledger: [...d.ledger, ...newRows] };

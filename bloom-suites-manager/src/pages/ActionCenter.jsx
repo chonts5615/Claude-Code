@@ -9,6 +9,7 @@ import { Card, copyText, smsHref } from "../ui";
 import { fmt, monthLabel } from "../format";
 
 const META = {
+  billing: { icon: Icons.card, color: C.gold, bg: C.goldLight },
   rent: { icon: Icons.dollar, color: C.green, bg: C.greenLight },
   renewal: { icon: Icons.refresh, color: C.gold, bg: C.goldLight },
   vacancy: { icon: Icons.door, color: C.rose, bg: C.roseLight },
@@ -78,6 +79,14 @@ export default function ActionCenter({ onOpenTenant, goTo }) {
 
       {!collapsed && (
         <div>
+          {groups.billing.map((t) => (
+            <Row key={t.id} meta={META.billing}
+              title={`Bill rent for ${monthLabel(t.month)}`}
+              subtitle={`${t.count} tenant${t.count === 1 ? "" : "s"} not yet billed this month`}>
+              <ActionBtn primary onClick={() => actions.generateRentForMonth(t.month)}>Bill now</ActionBtn>
+            </Row>
+          ))}
+
           {groups.rent.map((t) => (
             <Row key={t.id} meta={META.rent} onOpen={() => onOpenTenant(t.tenant)}
               title={`Collect rent — ${t.tenant.name}`}
