@@ -15,7 +15,9 @@ Process:
    - One section per subtopic, weaving in findings and figures
    - Embedded charts placed near the text that references them
    - Key Takeaways / Conclusion
-   - References (deduplicated from the notes' Sources sections)
+   - References (deduplicated from the notes' Sources sections). Include the
+     source URL for each reference where the notes provide one, so citations are
+     traceable directly from the report.
 3. Produce the PDF in files/reports/ (e.g. files/reports/report.pdf) using
    reportlab via a Python script run through Bash. Write any temporary build
    script inside files/reports/ (not the project root) so the workspace stays
