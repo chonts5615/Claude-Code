@@ -68,10 +68,12 @@ export function buildActionCenter(state, base = todayISO()) {
     .sort((a, b) => b.priority - a.priority);
 
   // 2. Leases coming up for renewal (active tenants only — not those on notice).
+  // No lower bound: an active lease that's already lapsed keeps prompting until
+  // the owner renews or gives notice, so an occupied suite is never left adrift.
   const renewals = tenants
     .filter((t) => t.status === "active")
     .map((t) => ({ tenant: t, daysLeft: daysUntil(t.leaseEnd, base) }))
-    .filter((x) => x.daysLeft <= renewWindow && x.daysLeft >= -30)
+    .filter((x) => x.daysLeft <= renewWindow)
     .map((x) => ({ id: `renew-${x.tenant.id}`, kind: "renewal", tenant: x.tenant, daysLeft: x.daysLeft, priority: 80 + (x.daysLeft < 0 ? 20 : 0) }))
     .sort((a, b) => a.daysLeft - b.daysLeft);
 

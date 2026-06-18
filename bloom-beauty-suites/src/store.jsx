@@ -110,7 +110,13 @@ export function BloomProvider({ children }) {
         return created;
       },
       updateClient(id, patch) {
-        update((d) => ({ clients: d.clients.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
+        update((d) => ({
+          clients: d.clients.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+          // Keep the denormalized name on existing appointments in sync.
+          appointments: patch.name
+            ? d.appointments.map((a) => (a.clientId === id ? { ...a, clientName: patch.name } : a))
+            : d.appointments,
+        }));
       },
 
       // --- Appointments ---
@@ -196,6 +202,11 @@ export function BloomProvider({ children }) {
       rebookClient(clientId, { serviceId, fromApptId } = {}) {
         const client = data.clients.find((c) => c.id === clientId);
         if (!client) return null;
+        // If they already have an upcoming visit booked, don't add a second one.
+        if (data.appointments.some((a) => a.clientId === clientId && a.status === "scheduled" && a.date >= todayISO())) {
+          notify("Already has an upcoming visit");
+          return null;
+        }
         const interval = client.avgInterval || 21;
         // Next visit lands one cadence after the last one — but if that date has
         // already passed (client is due/overdue), book them in the next few days.

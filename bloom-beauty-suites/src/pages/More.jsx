@@ -252,7 +252,7 @@ function Settings({ onBack }) {
 
   const setField = (k) => (e) => actions.updateSettings({ [k]: e.target.value });
   const setExpense = (k) => (e) =>
-    actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Number(e.target.value) || 0 } });
+    actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Math.max(0, Number(e.target.value) || 0) } });
 
   const backup = () => actions.backupData();
   const restore = (e) => {
@@ -292,7 +292,7 @@ function Settings({ onBack }) {
             ["Insurance", "insurance"], ["Banking", "banking"], ["Other", "other"],
           ].map(([label, key]) => (
             <Field key={key} label={label}>
-              <Input type="number" inputMode="decimal" value={settings.monthlyExpenses[key]} onChange={setExpense(key)} />
+              <Input type="number" inputMode="decimal" min={0} value={settings.monthlyExpenses[key]} onChange={setExpense(key)} />
             </Field>
           ))}
         </div>

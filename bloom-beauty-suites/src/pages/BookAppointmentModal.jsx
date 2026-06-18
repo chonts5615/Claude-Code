@@ -91,15 +91,14 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
       </Field>
       {conflict && (
         <div style={{ background: C.amberLight, border: `1px solid ${C.amber}`, borderRadius: 10, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: C.charcoal }}>
-          ⚠ This overlaps <strong>{conflict.clientName}</strong> at {conflict.time}. You'll be asked to confirm.
+          ⚠ This overlaps <strong>{conflict.clientName}</strong> at {conflict.time}. Pick a different time.
         </div>
       )}
       <PrimaryButton
-        disabled={!canBook}
+        disabled={!canBook || !!conflict}
         onClick={() => {
-          if (conflict && !window.confirm(`This time overlaps ${conflict.clientName} at ${conflict.time}. Book anyway?`)) return;
-          actions.bookAppointment({ ...form, clientId: Number(form.clientId) });
-          onClose();
+          const created = actions.bookAppointment({ ...form, clientId: Number(form.clientId) });
+          if (created) onClose();
         }}
       >
         Book Appointment

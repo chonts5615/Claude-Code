@@ -130,8 +130,8 @@ function Settings({ onBack }) {
   const { settings } = data;
   const fileRef = useRef(null);
   const setField = (k) => (e) => actions.updateSettings({ [k]: e.target.value });
-  const setNum = (k) => (e) => actions.updateSettings({ [k]: Number(e.target.value) || 0 });
-  const setExpense = (k) => (e) => actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Number(e.target.value) || 0 } });
+  const setNum = (k) => (e) => actions.updateSettings({ [k]: Math.max(0, Number(e.target.value) || 0) });
+  const setExpense = (k) => (e) => actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Math.max(0, Number(e.target.value) || 0) } });
 
   const backup = () => actions.backupData();
   const restore = (e) => {
@@ -160,8 +160,8 @@ function Settings({ onBack }) {
       <Card style={{ marginBottom: 16 }}>
         <SectionHeader title="Rules" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="Rent late after (days)"><Input type="number" inputMode="numeric" value={settings.lateGraceDays} onChange={setNum("lateGraceDays")} /></Field>
-          <Field label="Renewal window (days)"><Input type="number" inputMode="numeric" value={settings.leaseRenewalWindowDays} onChange={setNum("leaseRenewalWindowDays")} /></Field>
+          <Field label="Rent late after (days)"><Input type="number" inputMode="numeric" min={0} value={settings.lateGraceDays} onChange={setNum("lateGraceDays")} /></Field>
+          <Field label="Renewal window (days)"><Input type="number" inputMode="numeric" min={0} value={settings.leaseRenewalWindowDays} onChange={setNum("leaseRenewalWindowDays")} /></Field>
         </div>
         <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Controls when rent is flagged late and when lease renewals appear in your to-dos.</p>
       </Card>
@@ -170,7 +170,7 @@ function Settings({ onBack }) {
         <SectionHeader title="Monthly Expenses" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[["Mortgage/Lease", "mortgage"], ["Utilities", "utilities"], ["Insurance", "insurance"], ["Cleaning", "cleaning"], ["Internet", "internet"], ["Other", "other"]].map(([label, key]) => (
-            <Field key={key} label={label}><Input type="number" inputMode="decimal" value={settings.monthlyExpenses[key]} onChange={setExpense(key)} /></Field>
+            <Field key={key} label={label}><Input type="number" inputMode="decimal" min={0} value={settings.monthlyExpenses[key]} onChange={setExpense(key)} /></Field>
           ))}
         </div>
         <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Tracked so you can compare rent collected against your costs.</p>
