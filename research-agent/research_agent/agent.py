@@ -20,7 +20,9 @@ Run interactively (REPL) or as a one-shot:
 
 import argparse
 import asyncio
+import json
 import os
+import re
 import shutil
 from pathlib import Path
 
@@ -46,9 +48,9 @@ PROMPTS_DIR = Path(__file__).parent / "prompts"
 # Subdirectories created under the output directory.
 OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
 
-# In one-shot mode, keep nudging the agent until the final PDF exists, up to this
-# many turns (the first query counts as turn 1).
-MAX_COMPLETION_TURNS = 5
+# Max attempts per orchestrated phase before moving on (degrade gracefully
+# rather than block forever if a phase can't fully complete).
+PHASE_ATTEMPTS = {"research": 3, "analyze": 2, "report": 2, "qa": 2}
 
 
 def load_prompt(filename: str) -> str:
@@ -90,6 +92,7 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
     researcher_prompt = with_output_locations(load_prompt("researcher.txt"), files_dir)
     data_analyst_prompt = with_output_locations(load_prompt("data_analyst.txt"), files_dir)
     report_writer_prompt = with_output_locations(load_prompt("report_writer.txt"), files_dir)
+    qa_reviewer_prompt = with_output_locations(load_prompt("qa_reviewer.txt"), files_dir)
 
     agents = {
         "researcher": AgentDefinition(
@@ -131,6 +134,19 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
             prompt=report_writer_prompt,
             model=model,
         ),
+        "qa-reviewer": AgentDefinition(
+            description=(
+                "Use this agent AFTER the report-writer to critically review the drafted "
+                "report against the research notes. The qa-reviewer reads the notes, the data "
+                "summary, and files/reports/report.md, then writes a critical review to "
+                "files/reports/qa_review.md flagging coverage gaps, outdated statistics, vague "
+                "citations, and inconsistencies, ending with a PASS/REVISE verdict. Does not "
+                "do web research or rewrite the report."
+            ),
+            tools=["Glob", "Read", "Write"],
+            prompt=qa_reviewer_prompt,
+            model=model,
+        ),
     }
 
     hooks = {
@@ -158,15 +174,38 @@ def has_credentials() -> bool:
 
 async def _run_turn(
     client: ClaudeSDKClient, prompt: str, tracker: SubagentTracker, transcript: TranscriptWriter
-) -> None:
-    """Send one prompt and stream the response into the transcript."""
+) -> str:
+    """Send one prompt, stream the response into the transcript, return its text."""
     transcript.write_to_file(f"\nYou: {prompt}\n")
     await client.query(prompt=prompt)
     transcript.write("\nAgent: ", end="")
+    text_parts: list[str] = []
     async for msg in client.receive_response():
         if type(msg).__name__ == "AssistantMessage":
             process_assistant_message(msg, tracker, transcript)
+            for block in msg.content:
+                if type(block).__name__ == "TextBlock":
+                    text_parts.append(block.text)
     transcript.write("\n")
+    return "".join(text_parts)
+
+
+# ---------------------------------------------------------------------------- #
+# Deterministic phase orchestration
+# ---------------------------------------------------------------------------- #
+def _present_notes(files_dir: Path) -> set[str]:
+    return {p.name for p in (files_dir / "research_notes").glob("*.md")}
+
+
+def _missing_notes(files_dir: Path, plan: list[dict]) -> list[dict]:
+    present = _present_notes(files_dir)
+    return [s for s in plan if s["filename"] not in present]
+
+
+def _analysis_done(files_dir: Path) -> bool:
+    return bool(list((files_dir / "charts").glob("*.png"))) or bool(
+        list((files_dir / "data").glob("*.md"))
+    )
 
 
 def _final_report_exists(files_dir: Path) -> bool:
@@ -174,22 +213,181 @@ def _final_report_exists(files_dir: Path) -> bool:
     return any((files_dir / "reports").glob("*.pdf"))
 
 
-def _continuation_prompt(files_dir: Path) -> str:
-    """Build a status-aware nudge so the agent finishes the remaining phases."""
-    notes = sorted(
-        p.name for p in (files_dir / "research_notes").glob("*") if p.is_file() and p.suffix
-    )
-    charts = len(list((files_dir / "charts").glob("*.png")))
+def _qa_review_path(files_dir: Path) -> Path:
+    return files_dir / "reports" / "qa_review.md"
+
+
+def _qa_verdict(files_dir: Path) -> str:
+    """Return PASS / REVISE / UNKNOWN parsed from the QA review file."""
+    path = _qa_review_path(files_dir)
+    if not path.exists():
+        return "UNKNOWN"
+    text = path.read_text(encoding="utf-8", errors="ignore").upper()
+    if "VERDICT: REVISE" in text:
+        return "REVISE"
+    if "VERDICT: PASS" in text:
+        return "PASS"
+    return "UNKNOWN"
+
+
+def _parse_plan(text: str) -> list[dict]:
+    """Extract a subtopic plan (list of {title, filename, brief}) from JSON text."""
+    match = re.search(r"\[.*\]", text, re.DOTALL)
+    if not match:
+        return []
+    try:
+        raw = json.loads(match.group(0))
+    except json.JSONDecodeError:
+        return []
+    plan: list[dict] = []
+    for i, item in enumerate(raw, 1):
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title") or f"Subtopic {i}").strip()
+        filename = str(item.get("filename") or f"subtopic_{i}.md").strip()
+        filename = filename.replace("/", "_").lstrip("_")
+        if not filename.endswith(".md"):
+            filename += ".md"
+        brief = str(item.get("brief") or title).strip()
+        plan.append({"title": title, "filename": filename, "brief": brief})
+    return plan[:4]  # cap at 4 subtopics
+
+
+def _plan_prompt(query: str) -> str:
     return (
-        "Continue to completion now, without asking any questions. Current state of files/:\n"
-        f"- research notes present: {notes or 'NONE'}\n"
-        f"- charts present: {charts}\n"
-        "- final report PDF: NONE\n"
-        "Finish the pipeline: make sure every research subtopic has a notes file in "
-        "files/research_notes/ (spawn researchers for any that are missing), then run the "
-        "data-analyst to write charts into files/charts/, then run the report-writer to produce "
-        "the final cited PDF in files/reports/. Do not end your turn until that PDF exists."
+        "PLANNING PHASE. Do NOT spawn any subagents or call any tools. Decompose the research "
+        "request below into 2-4 focused, non-overlapping subtopics. Reply with ONLY a JSON array "
+        "(no prose, no code fence) of objects with keys \"title\", \"filename\" (snake_case, "
+        "ending in .md) and \"brief\" (one sentence describing what that subtopic must cover).\n\n"
+        f"Request:\n{query}"
     )
+
+
+def _research_prompt(query: str, targets: list[dict], first: bool) -> str:
+    header = (
+        "RESEARCH PHASE." if first else "RESEARCH PHASE (continuing — these notes are missing)."
+    )
+    lines = "\n".join(f'- {s["filename"]}: {s["title"]} — {s["brief"]}' for s in targets)
+    return (
+        f"{header} Spawn one \"researcher\" subagent per item below, all in parallel in this "
+        "turn. Each researcher MUST write its notes file to files/research_notes/ using exactly "
+        "the given filename. Do not run the data-analyst or report-writer yet.\n\n"
+        f"Subtopics to research now:\n{lines}\n\n"
+        f"Overall research goal for context:\n{query}"
+    )
+
+
+def _analyze_prompt() -> str:
+    return (
+        "ANALYSIS PHASE. The research notes are in files/research_notes/. Spawn the "
+        '"data-analyst" subagent now to read every note (any extension), extract the key '
+        "quantitative findings, render charts as PNGs into files/charts/, and write a data "
+        "summary into files/data/. Do not run the report-writer yet."
+    )
+
+
+def _report_prompt(revise: bool = False) -> str:
+    if revise:
+        return (
+            "REVISION PHASE. The QA review at files/reports/qa_review.md requested changes. Spawn "
+            'the "report-writer" subagent now to read files/reports/qa_review.md and the research '
+            "notes, address every issue raised (especially updating outdated statistics and "
+            "replacing vague 'multiple sources' attributions with specific citations), and "
+            "regenerate BOTH the PDF and files/reports/report.md."
+        )
+    return (
+        'REPORT PHASE. Spawn the "report-writer" subagent now to synthesize the research notes, '
+        "the data summary in files/data/, and the charts in files/charts/ into a single cited PDF "
+        "in files/reports/ with an appropriate title. Also have it write a plain-markdown copy of "
+        "the same report (text only, no images) to files/reports/report.md so it can be reviewed."
+    )
+
+
+def _qa_prompt() -> str:
+    return (
+        'QA PHASE. Spawn the "qa-reviewer" subagent now. It must read every research note in '
+        "files/research_notes/, the data summary in files/data/, and the report at "
+        "files/reports/report.md, then write a critical review to files/reports/qa_review.md "
+        "ending with a line 'QA VERDICT: PASS' or 'QA VERDICT: REVISE'."
+    )
+
+
+async def _drive_phase(
+    client: ClaudeSDKClient,
+    tracker: SubagentTracker,
+    transcript: TranscriptWriter,
+    *,
+    name: str,
+    instruction_for_attempt,
+    is_done,
+    max_attempts: int,
+) -> bool:
+    """Run a phase until its filesystem gate passes or attempts are exhausted."""
+    for attempt in range(1, max_attempts + 1):
+        if is_done():
+            return True
+        print(f"\n[phase: {name}] attempt {attempt}/{max_attempts}\n")
+        await _run_turn(client, instruction_for_attempt(attempt), tracker, transcript)
+    done = is_done()
+    print(f"[phase: {name}] {'complete' if done else 'INCOMPLETE — continuing anyway'}.\n")
+    return done
+
+
+async def run_pipeline(
+    client: ClaudeSDKClient,
+    query: str,
+    files_dir: Path,
+    tracker: SubagentTracker,
+    transcript: TranscriptWriter,
+) -> None:
+    """Drive the research pipeline deterministically, gating each phase on disk state."""
+    # Phase 0: PLAN — the code (not the lead's judgement) owns the sequence.
+    plan_text = await _run_turn(client, _plan_prompt(query), tracker, transcript)
+    plan = _parse_plan(plan_text) or [
+        {"title": "Research findings", "filename": "findings.md", "brief": query[:200]}
+    ]
+    print(f"\n[plan] {len(plan)} subtopics: {[s['filename'] for s in plan]}\n")
+
+    # Phase 1: RESEARCH — gate on all planned notes existing.
+    await _drive_phase(
+        client, tracker, transcript, name="research",
+        instruction_for_attempt=lambda a: _research_prompt(
+            query, _missing_notes(files_dir, plan), first=(a == 1)
+        ),
+        is_done=lambda: not _missing_notes(files_dir, plan),
+        max_attempts=PHASE_ATTEMPTS["research"],
+    )
+
+    # Phase 2: ANALYZE — gate on charts or a data summary existing.
+    await _drive_phase(
+        client, tracker, transcript, name="analyze",
+        instruction_for_attempt=lambda a: _analyze_prompt(),
+        is_done=lambda: _analysis_done(files_dir),
+        max_attempts=PHASE_ATTEMPTS["analyze"],
+    )
+
+    # Phase 3: REPORT — gate on a PDF existing.
+    await _drive_phase(
+        client, tracker, transcript, name="report",
+        instruction_for_attempt=lambda a: _report_prompt(),
+        is_done=lambda: _final_report_exists(files_dir),
+        max_attempts=PHASE_ATTEMPTS["report"],
+    )
+
+    # Phase 4: QA — gate on a review file existing.
+    if _final_report_exists(files_dir):
+        await _drive_phase(
+            client, tracker, transcript, name="qa",
+            instruction_for_attempt=lambda a: _qa_prompt(),
+            is_done=lambda: _qa_review_path(files_dir).exists(),
+            max_attempts=PHASE_ATTEMPTS["qa"],
+        )
+        # Phase 5: one revision pass if QA flagged material issues.
+        if _qa_verdict(files_dir) == "REVISE":
+            print("\n[qa] verdict REVISE — running one revision pass.\n")
+            await _run_turn(client, _report_prompt(revise=True), tracker, transcript)
+        else:
+            print(f"\n[qa] verdict: {_qa_verdict(files_dir)}.\n")
 
 
 async def run_research(query: str | None = None, model: str = "haiku") -> None:
@@ -222,19 +420,11 @@ async def run_research(query: str | None = None, model: str = "haiku") -> None:
     try:
         async with ClaudeSDKClient(options=options) as client:
             if query is not None:
-                await _run_turn(client, query, tracker, transcript)
-                # Completion loop: the lead agent sometimes stops after only part
-                # of the pipeline. Keep nudging until the final PDF is produced.
-                turn = 1
-                while not _final_report_exists(files_dir) and turn < MAX_COMPLETION_TURNS:
-                    turn += 1
-                    print(f"\n[completion check] no report yet — continuing (turn {turn})\n")
-                    await _run_turn(client, _continuation_prompt(files_dir), tracker, transcript)
+                await run_pipeline(client, query, files_dir, tracker, transcript)
                 if _final_report_exists(files_dir):
-                    print("\n[completion check] final report present.\n")
+                    print("\n[pipeline] final report present.\n")
                 else:
-                    print("\n[completion check] gave up after "
-                          f"{MAX_COMPLETION_TURNS} turns without a report.\n")
+                    print("\n[pipeline] finished without a report PDF.\n")
             else:
                 while True:
                     try:

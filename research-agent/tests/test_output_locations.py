@@ -10,8 +10,11 @@ pytest.importorskip("claude_agent_sdk")
 
 from research_agent.agent import (  # noqa: E402
     OUTPUT_SUBDIRS,
-    _continuation_prompt,
+    _analysis_done,
     _final_report_exists,
+    _missing_notes,
+    _parse_plan,
+    _qa_verdict,
     ensure_output_dirs,
     with_output_locations,
 )
@@ -42,13 +45,46 @@ def test_final_report_exists(tmp_path):
     assert _final_report_exists(files_dir) is True
 
 
-def test_continuation_prompt_reflects_state(tmp_path):
+def test_parse_plan_extracts_and_normalizes():
+    text = (
+        "Here is the plan:\n"
+        '[{"title": "Vendors", "filename": "vendors", "brief": "the market"},\n'
+        ' {"title": "Methods", "filename": "/bad/methods.md", "brief": "psychometrics"}]\n'
+        "thanks"
+    )
+    plan = _parse_plan(text)
+    assert [s["filename"] for s in plan] == ["vendors.md", "bad_methods.md"]
+    assert plan[0]["title"] == "Vendors"
+
+
+def test_parse_plan_handles_garbage():
+    assert _parse_plan("no json here") == []
+
+
+def test_missing_notes_tracks_written_files(tmp_path):
     files_dir = tmp_path / "files"
     ensure_output_dirs(files_dir)
-    # Nothing yet.
-    assert "NONE" in _continuation_prompt(files_dir)
-    # Add a note; it should be listed and .gitkeep ignored.
-    (files_dir / "research_notes" / "sub1.md").write_text("x")
-    prompt = _continuation_prompt(files_dir)
-    assert "sub1.md" in prompt
-    assert ".gitkeep" not in prompt
+    plan = [{"title": "A", "filename": "a.md", "brief": ""},
+            {"title": "B", "filename": "b.md", "brief": ""}]
+    assert {s["filename"] for s in _missing_notes(files_dir, plan)} == {"a.md", "b.md"}
+    (files_dir / "research_notes" / "a.md").write_text("x")
+    assert [s["filename"] for s in _missing_notes(files_dir, plan)] == ["b.md"]
+
+
+def test_analysis_done_detects_charts_or_data(tmp_path):
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    assert _analysis_done(files_dir) is False
+    (files_dir / "charts" / "c1.png").write_bytes(b"\x89PNG")
+    assert _analysis_done(files_dir) is True
+
+
+def test_qa_verdict_parsing(tmp_path):
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    assert _qa_verdict(files_dir) == "UNKNOWN"
+    qa = files_dir / "reports" / "qa_review.md"
+    qa.write_text("## Summary\nlooks fine\n\nQA VERDICT: PASS\n")
+    assert _qa_verdict(files_dir) == "PASS"
+    qa.write_text("issues found\nQA VERDICT: REVISE")
+    assert _qa_verdict(files_dir) == "REVISE"
