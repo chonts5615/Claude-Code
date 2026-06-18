@@ -20,7 +20,8 @@ const toMin = (t) => {
 function firstFreeTime(appointments, date, duration) {
   const sameDay = appointments.filter((a) => a.date === date && (a.status === "scheduled" || a.status === "completed"));
   const overlaps = (start) => sameDay.some((a) => start < toMin(a.time) + a.duration && toMin(a.time) < start + duration);
-  for (let mins = 9 * 60; mins <= 18 * 60; mins += 30) {
+  // Only offer a start time the whole service fits before the 18:00 close.
+  for (let mins = 9 * 60; mins + duration <= 18 * 60; mins += 30) {
     if (!overlaps(mins)) return `${String(Math.floor(mins / 60)).padStart(2, "0")}:${mins % 60 === 0 ? "00" : "30"}`;
   }
   return null;

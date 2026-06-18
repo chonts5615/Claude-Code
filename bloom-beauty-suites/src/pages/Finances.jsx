@@ -33,12 +33,20 @@ export default function Finances() {
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([k, v]) => ({ month: monthName(parseInt(k.split("-")[1], 10) - 1), revenue: v }));
 
-    const perService = data.services
-      .filter((s) => s.category !== "Other")
-      .map((s) => {
-        const list = completed.filter((a) => a.serviceId === s.id);
-        return { ...s, count: list.length, rev: revenueOf(list) };
-      });
+    // Build from completed appointments (not just the current menu) so a service
+    // the owner later removed still shows the revenue it earned. Rows whose
+    // current service is an add-on ("Other") are hidden, matching the prior view.
+    const perfMap = {};
+    completed.forEach((a) => {
+      if (!perfMap[a.serviceId]) {
+        const svc = data.services.find((s) => s.id === a.serviceId);
+        if (svc && svc.category === "Other") return; // skip add-ons still on the menu
+        perfMap[a.serviceId] = { id: a.serviceId, name: svc ? svc.name : a.serviceName, listPrice: svc ? svc.price : null, removed: !svc, count: 0, rev: 0 };
+      }
+      const row = perfMap[a.serviceId];
+      if (row) { row.count += 1; row.rev += a.price; }
+    });
+    const perService = Object.values(perfMap).sort((a, b) => b.rev - a.rev);
 
     return { weekRev, estRev, estCogs, estProfit, margin, totalExp, exp, trend, perService };
   }, [data, settings]);
@@ -113,15 +121,19 @@ export default function Finances() {
 
       <Card>
         <SectionHeader title="Service Performance" />
-        {f.perService.map((s) => (
-          <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${C.grayBorder}` }}>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.charcoal }}>{s.name}</div>
-              <div style={{ fontSize: 11, color: C.gray }}>{s.count} bookings · {fmt(s.price)} list</div>
+        {f.perService.length === 0 ? (
+          <p style={{ fontSize: 13, color: C.grayLight, textAlign: "center", padding: 12 }}>No completed services yet</p>
+        ) : (
+          f.perService.map((s) => (
+            <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${C.grayBorder}` }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.charcoal }}>{s.name}{s.removed ? " (removed)" : ""}</div>
+                <div style={{ fontSize: 11, color: C.gray }}>{s.count} bookings{s.listPrice != null ? ` · ${fmt(s.listPrice)} list` : ""}</div>
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{fmt(s.rev)}</div>
             </div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{fmt(s.rev)}</div>
-          </div>
-        ))}
+          ))
+        )}
       </Card>
     </div>
   );

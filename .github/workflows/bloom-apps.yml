@@ -6,11 +6,13 @@ on:
     paths:
       - 'bloom-beauty-suites/**'
       - 'bloom-suites-manager/**'
+      - 'bloom-launcher/**'
       - '.github/workflows/bloom-apps.yml'
   pull_request:
     paths:
       - 'bloom-beauty-suites/**'
       - 'bloom-suites-manager/**'
+      - 'bloom-launcher/**'
       - '.github/workflows/bloom-apps.yml'
 
 jobs:
@@ -44,3 +46,24 @@ jobs:
         run: |
           npx esbuild scripts/smoke.mjs --bundle --platform=node --outfile="${RUNNER_TEMP}/smoke.cjs"
           node "${RUNNER_TEMP}/smoke.cjs"
+
+  assemble-site:
+    name: assemble-site (launcher)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Exercises the same script the Pages deploy uses, so a launcher or
+      # build-script change can't merge without building the full entry site.
+      - name: Build the combined launcher site
+        run: bash bloom-launcher/build-site.sh
+
+      - name: Verify the assembled site
+        run: |
+          test -f bloom-launcher/site/index.html
+          test -f bloom-launcher/site/app/index.html
+          test -f bloom-launcher/site/manager/index.html
