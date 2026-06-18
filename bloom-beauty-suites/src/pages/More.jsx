@@ -91,11 +91,11 @@ function Inventory({ onBack }) {
           <Select value={form.category} onChange={set("category")}>{INV_CATS.map((c) => <option key={c} value={c}>{c}</option>)}</Select>
         </Field>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="Quantity on hand"><Input type="number" inputMode="numeric" value={form.qty} onChange={set("qty")} /></Field>
-          <Field label="Reorder at"><Input type="number" inputMode="numeric" value={form.reorder} onChange={set("reorder")} /></Field>
+          <Field label="Quantity on hand"><Input type="number" inputMode="numeric" min={0} value={form.qty} onChange={set("qty")} /></Field>
+          <Field label="Reorder at"><Input type="number" inputMode="numeric" min={0} value={form.reorder} onChange={set("reorder")} /></Field>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="Cost ($)"><Input type="number" inputMode="decimal" value={form.cost} onChange={set("cost")} /></Field>
+          <Field label="Cost ($)"><Input type="number" inputMode="decimal" min={0} value={form.cost} onChange={set("cost")} /></Field>
           <Field label="Supplier"><Input value={form.supplier} onChange={set("supplier")} /></Field>
         </div>
         <Field label="Expiry date (optional)"><Input type="date" value={form.expires} onChange={set("expires")} /></Field>

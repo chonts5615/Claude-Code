@@ -117,7 +117,16 @@ export function BloomProvider({ children }) {
         update((d) => ({ tenants: d.tenants.map((t) => (t.id === id ? { ...t, ...patch } : t)) }));
       },
       giveNotice(id) {
-        update((d) => ({ tenants: d.tenants.map((t) => (t.id === id ? { ...t, status: "notice" } : t)) }));
+        // If the lease has already lapsed, set the move-out to end of this month
+        // so the tenant stays billable for the time they're still occupying.
+        const cur = monthKey();
+        const lastDay = new Date(Number(cur.slice(0, 4)), Number(cur.slice(5, 7)), 0).getDate();
+        const moveOut = `${cur}-${String(lastDay).padStart(2, "0")}`;
+        update((d) => ({
+          tenants: d.tenants.map((t) =>
+            t.id === id ? { ...t, status: "notice", leaseEnd: t.leaseEnd >= todayISO() ? t.leaseEnd : moveOut } : t
+          ),
+        }));
         notify("Marked as moving out");
       },
       renewLease(id, days = 365) {
@@ -130,6 +139,9 @@ export function BloomProvider({ children }) {
         update((d) => ({
           tenants: d.tenants.map((t) => (t.id === id ? { ...t, status: "past" } : t)),
           suites: d.suites.map((s) => (s.tenantId === id ? { ...s, tenantId: null } : s)),
+          // Drop any unpaid rent dated after move-out so the app never asks the
+          // owner to collect future rent from someone who has left.
+          ledger: d.ledger.filter((r) => !(r.tenantId === id && !r.paidDate && r.dueDate > todayISO())),
         }));
         notify("Suite is now vacant");
       },
