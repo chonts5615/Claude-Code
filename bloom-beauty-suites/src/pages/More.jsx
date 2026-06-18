@@ -71,7 +71,7 @@ function Inventory({ onBack }) {
                 {(i.qty <= i.reorder || i.onOrder) && (
                   <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                     {i.onOrder ? (
-                      <button onClick={() => actions.receiveStock(i.id, i.reorder * 2)} style={{ flex: 1, padding: 8, borderRadius: 8, border: "none", background: C.green, color: C.white, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                      <button onClick={() => actions.receiveStock(i.id, Math.max(1, i.reorder * 2))} style={{ flex: 1, padding: 8, borderRadius: 8, border: "none", background: C.green, color: C.white, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                         ✓ Received — add stock
                       </button>
                     ) : (
@@ -101,7 +101,7 @@ function Inventory({ onBack }) {
           <Field label="Supplier"><Input value={form.supplier} onChange={set("supplier")} /></Field>
         </div>
         <Field label="Expiry date (optional)"><Input type="date" value={form.expires} onChange={set("expires")} /></Field>
-        <PrimaryButton disabled={!form.name} onClick={() => { actions.addInventoryItem(form); setAdding(false); }}>Add Item</PrimaryButton>
+        <PrimaryButton disabled={!form.name.trim()} onClick={() => { actions.addInventoryItem(form); setAdding(false); }}>Add Item</PrimaryButton>
       </Modal>
     </div>
   );
@@ -236,7 +236,7 @@ function Services({ onBack }) {
           <Field label="Price ($)"><Input type="number" inputMode="decimal" min={0} value={form.price} onChange={set("price")} /></Field>
           <Field label="Duration (min)"><Input type="number" inputMode="numeric" min={0} value={form.duration} onChange={set("duration")} /></Field>
         </div>
-        <PrimaryButton disabled={!form.name} onClick={save}>{editing === "new" ? "Add Service" : "Save Changes"}</PrimaryButton>
+        <PrimaryButton disabled={!form.name.trim()} onClick={save}>{editing === "new" ? "Add Service" : "Save Changes"}</PrimaryButton>
         {editing && editing !== "new" && (
           <button onClick={() => { if (confirm(`Remove "${editing.name}" from your menu?`)) { actions.deleteService(editing.id); setEditing(null); } }} style={{ width: "100%", marginTop: 10, padding: 12, borderRadius: 10, border: `1px solid ${C.red}`, background: C.redLight, color: C.red, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Remove Service</button>
         )}
