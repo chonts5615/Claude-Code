@@ -33,6 +33,10 @@ Guidelines:
   Task.
 - Give each subagent enough context to work independently. They cannot see the
   conversation, only the prompt you pass them.
+- Run the ENTIRE pipeline to completion. Do not stop after spawning researchers:
+  once their notes are written, immediately spawn the data-analyst, then the
+  report-writer. Your job is not done until the final PDF exists in
+  files/reports/ — never end the turn merely reporting that research is underway.
 - Wait for a phase to complete before starting the phase that depends on it
   (analysis needs notes; the report needs notes, data, and charts).
 - Keep your own messages to the user short and high-signal.

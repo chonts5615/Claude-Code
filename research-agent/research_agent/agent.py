@@ -46,6 +46,10 @@ PROMPTS_DIR = Path(__file__).parent / "prompts"
 # Subdirectories created under the output directory.
 OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
 
+# In one-shot mode, keep nudging the agent until the final PDF exists, up to this
+# many turns (the first query counts as turn 1).
+MAX_COMPLETION_TURNS = 5
+
 
 def load_prompt(filename: str) -> str:
     """Load a prompt from the prompts directory."""
@@ -165,6 +169,29 @@ async def _run_turn(
     transcript.write("\n")
 
 
+def _final_report_exists(files_dir: Path) -> bool:
+    """True once the report-writer has produced a PDF."""
+    return any((files_dir / "reports").glob("*.pdf"))
+
+
+def _continuation_prompt(files_dir: Path) -> str:
+    """Build a status-aware nudge so the agent finishes the remaining phases."""
+    notes = sorted(
+        p.name for p in (files_dir / "research_notes").glob("*") if p.is_file() and p.suffix
+    )
+    charts = len(list((files_dir / "charts").glob("*.png")))
+    return (
+        "Continue to completion now, without asking any questions. Current state of files/:\n"
+        f"- research notes present: {notes or 'NONE'}\n"
+        f"- charts present: {charts}\n"
+        "- final report PDF: NONE\n"
+        "Finish the pipeline: make sure every research subtopic has a notes file in "
+        "files/research_notes/ (spawn researchers for any that are missing), then run the "
+        "data-analyst to write charts into files/charts/, then run the report-writer to produce "
+        "the final cited PDF in files/reports/. Do not end your turn until that PDF exists."
+    )
+
+
 async def run_research(query: str | None = None, model: str = "haiku") -> None:
     """Run the research agent, either one-shot (query given) or interactive."""
 
@@ -196,6 +223,18 @@ async def run_research(query: str | None = None, model: str = "haiku") -> None:
         async with ClaudeSDKClient(options=options) as client:
             if query is not None:
                 await _run_turn(client, query, tracker, transcript)
+                # Completion loop: the lead agent sometimes stops after only part
+                # of the pipeline. Keep nudging until the final PDF is produced.
+                turn = 1
+                while not _final_report_exists(files_dir) and turn < MAX_COMPLETION_TURNS:
+                    turn += 1
+                    print(f"\n[completion check] no report yet — continuing (turn {turn})\n")
+                    await _run_turn(client, _continuation_prompt(files_dir), tracker, transcript)
+                if _final_report_exists(files_dir):
+                    print("\n[completion check] final report present.\n")
+                else:
+                    print("\n[completion check] gave up after "
+                          f"{MAX_COMPLETION_TURNS} turns without a report.\n")
             else:
                 while True:
                     try:

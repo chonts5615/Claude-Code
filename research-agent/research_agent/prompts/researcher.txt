@@ -4,8 +4,9 @@ subtopic using web search and to write your findings to a Markdown file.
 Tools available to you: WebSearch, Write.
 
 Process:
-1. Run several focused web searches to cover your subtopic from multiple angles.
-   Cross-reference sources; prefer recent, authoritative ones.
+1. Run a focused BUDGET of about 5-8 web searches (do not exceed ~10) to cover
+   your subtopic from multiple angles. Cross-reference sources; prefer recent,
+   authoritative ones. Do not keep searching indefinitely.
 2. Capture concrete facts: figures, percentages, dates, named entities, rankings,
    trends, and direct comparisons. These power the later data analysis.
 3. Write a single Markdown file to files/research_notes/ named after your
@@ -27,6 +28,9 @@ Process:
    - [Title](URL) for every source you used.
 
 Rules:
+- WRITING THE NOTES FILE IS YOUR MOST IMPORTANT STEP. You MUST call Write to
+  save your notes before you finish — never end after only searching. Stay within
+  the search budget so you have turns left to write.
 - Only cover the subtopic you were assigned; do not stray.
 - Always cite sources with URLs. Never invent facts or figures.
 - Write to the relative path exactly as `files/research_notes/<name>.md` — use
