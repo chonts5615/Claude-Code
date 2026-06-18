@@ -66,7 +66,9 @@ function Inventory({ onBack }) {
                     <button onClick={() => actions.adjustInventory(i.id, 1)} style={qtyBtn}>+</button>
                   </div>
                 </div>
-                {i.qty <= i.reorder && (
+                {/* Show order/receive controls when low OR already on order, so an
+                    item reordered for expiry (qty still above reorder) can be received. */}
+                {(i.qty <= i.reorder || i.onOrder) && (
                   <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                     {i.onOrder ? (
                       <button onClick={() => actions.receiveStock(i.id, i.reorder * 2)} style={{ flex: 1, padding: 8, borderRadius: 8, border: "none", background: C.green, color: C.white, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
