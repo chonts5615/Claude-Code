@@ -29,6 +29,8 @@ export default function BookAppointmentModal({ open, onClose, presetClientId, pr
         // Default to a service that's actually on the current menu.
         serviceId: data.services.some((s) => s.id === f.serviceId) ? f.serviceId : data.services[0]?.id || "",
         date: presetDate || todayISO(),
+        // Don't carry last booking's notes into the next appointment.
+        notes: "",
       }));
     }
   }, [open, presetClientId, presetDate, data.services]);

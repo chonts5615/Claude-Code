@@ -1,7 +1,7 @@
 // Central data store: loads/saves to localStorage automatically and exposes
 // every mutation as a named action. Components never touch storage directly.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { buildSeedData, DEFAULT_SETTINGS } from "./seed";
+import { buildSeedData, DEFAULT_SETTINGS, SERVICES } from "./seed";
 import { todayISO, addDays } from "./format";
 
 const STORAGE_KEY = "bloom.v1";
@@ -32,7 +32,7 @@ function loadData() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.clients) && Array.isArray(parsed.appointments)) {
-        return parsed;
+        return normalize(parsed);
       }
     }
   } catch {
@@ -45,6 +45,22 @@ function loadData() {
     /* storage may be unavailable; app still works in-memory */
   }
   return seed;
+}
+
+// Fill any missing arrays/settings so older or partial saved data (e.g. from an
+// earlier prototype) can't crash the app on first render. Same shape that a
+// restore produces.
+function normalize(parsed) {
+  const s = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : {};
+  return {
+    version: parsed.version ?? 1,
+    services: Array.isArray(parsed.services) ? parsed.services : SERVICES,
+    clients: Array.isArray(parsed.clients) ? parsed.clients : [],
+    appointments: Array.isArray(parsed.appointments) ? parsed.appointments : [],
+    inventory: Array.isArray(parsed.inventory) ? parsed.inventory : [],
+    waitlist: Array.isArray(parsed.waitlist) ? parsed.waitlist : [],
+    settings: { ...DEFAULT_SETTINGS, ...s, monthlyExpenses: { ...DEFAULT_SETTINGS.monthlyExpenses, ...(s.monthlyExpenses || {}) } },
+  };
 }
 
 // Average gap (days) between a client's completed visits — used to keep each
@@ -192,7 +208,16 @@ export function BloomProvider({ children }) {
       },
 
       deleteAppointment(id) {
-        update((d) => ({ appointments: d.appointments.filter((a) => a.id !== id) }));
+        update((d) => {
+          const appt = d.appointments.find((a) => a.id === id);
+          let appointments = d.appointments.filter((a) => a.id !== id);
+          // If this was a rebooking, un-mark the source visit so the rebook-rate
+          // metric doesn't keep counting a visit whose follow-up was canceled.
+          if (appt?.rebookedFrom) {
+            appointments = appointments.map((a) => (a.id === appt.rebookedFrom ? { ...a, rebooked: false } : a));
+          }
+          return { appointments };
+        });
         notify("Appointment removed");
       },
 
@@ -252,6 +277,7 @@ export function BloomProvider({ children }) {
           status: "scheduled",
           notes: "",
           rebooked: false,
+          rebookedFrom: sourceId ?? null,
         };
         setData((d) => ({
           ...d,
@@ -304,9 +330,11 @@ export function BloomProvider({ children }) {
         notify("Marked as ordered");
       },
       receiveStock(id, qty) {
+        // New stock arrived: clear the old expiry so the replaced product doesn't
+        // keep firing a stale "expiring soon" task (no edit flow to re-date it).
         update((d) => ({
           inventory: d.inventory.map((i) =>
-            i.id === id ? { ...i, qty: i.qty + qty, onOrder: false, lastOrdered: todayISO() } : i
+            i.id === id ? { ...i, qty: i.qty + qty, onOrder: false, expires: null, lastOrdered: todayISO() } : i
           ),
         }));
         notify("Stock received");
@@ -395,11 +423,7 @@ export function BloomProvider({ children }) {
         const parsed = JSON.parse(json);
         const ok = parsed && ["clients", "appointments", "services", "inventory", "waitlist"].every((k) => Array.isArray(parsed[k]));
         if (!ok) throw new Error("That file doesn't look like a complete Bloom backup.");
-        // Merge defaults so an older/partial backup (e.g. empty settings) can't
-        // leave required fields undefined and crash the app on render.
-        const src = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : {};
-        const settings = { ...DEFAULT_SETTINGS, ...src, monthlyExpenses: { ...DEFAULT_SETTINGS.monthlyExpenses, ...(src.monthlyExpenses || {}) } };
-        setData({ ...parsed, settings });
+        setData(normalize(parsed));
         notify("Backup restored");
       },
       resetToSample() {

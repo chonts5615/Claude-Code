@@ -14,7 +14,7 @@ function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.suites) && Array.isArray(parsed.tenants)) return parsed;
+      if (parsed && Array.isArray(parsed.suites) && Array.isArray(parsed.tenants)) return normalize(parsed);
     }
   } catch {
     /* fall through to seed */
@@ -26,6 +26,21 @@ function loadData() {
     /* storage may be unavailable; app still works in-memory */
   }
   return seed;
+}
+
+// Fill any missing arrays/settings so older or partial saved data can't crash
+// the app on first render. Same shape that a restore produces.
+function normalize(parsed) {
+  const s = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : {};
+  return {
+    version: parsed.version ?? 1,
+    suites: Array.isArray(parsed.suites) ? parsed.suites : [],
+    tenants: Array.isArray(parsed.tenants) ? parsed.tenants : [],
+    ledger: Array.isArray(parsed.ledger) ? parsed.ledger : [],
+    applicants: Array.isArray(parsed.applicants) ? parsed.applicants : [],
+    maintenance: Array.isArray(parsed.maintenance) ? parsed.maintenance : [],
+    settings: { ...DEFAULT_SETTINGS, ...s, monthlyExpenses: { ...DEFAULT_SETTINGS.monthlyExpenses, ...(s.monthlyExpenses || {}) } },
+  };
 }
 
 export function BloomProvider({ children }) {
@@ -229,11 +244,7 @@ export function BloomProvider({ children }) {
         const parsed = JSON.parse(json);
         const ok = parsed && ["suites", "tenants", "ledger", "applicants", "maintenance"].every((k) => Array.isArray(parsed[k]));
         if (!ok) throw new Error("That file doesn't look like a complete Bloom Suites backup.");
-        // Merge defaults so an older/partial backup (e.g. empty settings) can't
-        // leave required fields undefined and crash the app on render.
-        const src = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : {};
-        const settings = { ...DEFAULT_SETTINGS, ...src, monthlyExpenses: { ...DEFAULT_SETTINGS.monthlyExpenses, ...(src.monthlyExpenses || {}) } };
-        setData({ ...parsed, settings });
+        setData(normalize(parsed));
         notify("Backup restored");
       },
       resetToSample() {
