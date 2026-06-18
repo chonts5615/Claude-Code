@@ -108,14 +108,20 @@ export function BloomProvider({ children }) {
           moveIn: todayISO(),
           notes: form.notes || "",
         };
-        setData((d) => ({
-          ...d,
-          tenants: [...d.tenants, created],
-          suites: d.suites.map((s) => (s.id === Number(form.suiteId) ? { ...s, tenantId: created.id } : s)),
-          // Bill the current month, due on the move-in date so a mid-month new
-          // tenant isn't flagged late/overdue on day one.
-          ledger: [...d.ledger, { id: nextId(d.ledger), tenantId: created.id, month: monthKey(), amount: created.rent, dueDate: todayISO(), paidDate: null }],
-        }));
+        setData((d) => {
+          // Re-id against the latest state so a double-tap can't create two
+          // tenants (and their ledger rows) sharing one id.
+          const id = nextId(d.tenants);
+          const tenant = { ...created, id };
+          return {
+            ...d,
+            tenants: [...d.tenants, tenant],
+            suites: d.suites.map((s) => (s.id === Number(form.suiteId) ? { ...s, tenantId: id } : s)),
+            // Bill the current month, due on the move-in date so a mid-month new
+            // tenant isn't flagged late/overdue on day one.
+            ledger: [...d.ledger, { id: nextId(d.ledger), tenantId: id, month: monthKey(), amount: created.rent, dueDate: todayISO(), paidDate: null }],
+          };
+        });
         notify(`${created.name.split(" ")[0]} added`);
         return created;
       },
@@ -123,14 +129,15 @@ export function BloomProvider({ children }) {
         update((d) => ({ tenants: d.tenants.map((t) => (t.id === id ? { ...t, ...patch } : t)) }));
       },
       giveNotice(id) {
-        // If the lease has already lapsed, set the move-out to end of this month
-        // so the tenant stays billable for the time they're still occupying.
+        // Giving notice means moving out at the end of the current month — set
+        // that as the move-out date so billing stops and the suite frees up then,
+        // regardless of any later original lease-end date.
         const cur = monthKey();
         const lastDay = new Date(Number(cur.slice(0, 4)), Number(cur.slice(5, 7)), 0).getDate();
         const moveOut = `${cur}-${String(lastDay).padStart(2, "0")}`;
         update((d) => ({
           tenants: d.tenants.map((t) =>
-            t.id === id ? { ...t, status: "notice", leaseEnd: t.leaseEnd >= todayISO() ? t.leaseEnd : moveOut } : t
+            t.id === id ? { ...t, status: "notice", leaseEnd: moveOut } : t
           ),
         }));
         notify("Marked as moving out");

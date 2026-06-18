@@ -122,7 +122,9 @@ export function BloomProvider({ children }) {
           ltv: 0,
           avgInterval: 21,
         };
-        setData((d) => ({ ...d, clients: [...d.clients, created] }));
+        // Re-id against the latest state so a double-tap can't create two clients
+        // with the same id (which would make clientId lookups ambiguous).
+        setData((d) => ({ ...d, clients: [...d.clients, { ...created, id: nextId(d.clients) }] }));
         notify(`${created.name.split(" ")[0]} added`);
         return created;
       },
@@ -246,8 +248,18 @@ export function BloomProvider({ children }) {
             .filter((a) => a.clientId === clientId && a.status === "completed")
             .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`))[0];
           const srcId = fromApptId ?? last?.id;
+          const upcoming = data.appointments.find((a) => a.clientId === clientId && a.status === "scheduled" && a.date >= todayISO());
           if (srcId) {
-            setData((d) => ({ ...d, appointments: d.appointments.map((a) => (a.id === srcId ? { ...a, rebooked: true } : a)) }));
+            setData((d) => ({
+              ...d,
+              appointments: d.appointments.map((a) => {
+                if (a.id === srcId) return { ...a, rebooked: true };
+                // Link the existing future booking to the source so canceling it
+                // later clears the rebooked flag.
+                if (a.id === upcoming?.id && a.rebookedFrom == null) return { ...a, rebookedFrom: srcId };
+                return a;
+              }),
+            }));
             notify("Marked as rebooked");
           } else {
             notify("Already has an upcoming visit");
