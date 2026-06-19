@@ -12,6 +12,16 @@ from html import escape
 from pathlib import Path
 from typing import Any
 
+# Charts come from our own matplotlib runs, so disable Pillow's decompression-bomb
+# guard — a high-DPI chart can exceed the default pixel limit and otherwise crashes
+# the PDF build with DecompressionBombError.
+try:  # pragma: no cover - depends on Pillow being importable
+    from PIL import Image as _PILImage
+
+    _PILImage.MAX_IMAGE_PIXELS = None
+except Exception:  # pragma: no cover
+    pass
+
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
@@ -187,15 +197,17 @@ def _append_figures(flow: list, charts_dir: Path, st: dict) -> None:
         return
     flow.append(PageBreak())
     flow.append(Paragraph("Figures", st["h1"]))
+    max_w, max_h = 6.3 * inch, 7.5 * inch
     for i, png in enumerate(charts, 1):
         try:
             img = Image(str(png))
         except Exception:
             continue
-        max_w = 6.3 * inch
-        if img.drawWidth > max_w:
-            img.drawHeight *= max_w / img.drawWidth
-            img.drawWidth = max_w
+        w, h = img.drawWidth, img.drawHeight
+        if not w or not h or h / w > 6 or w / h > 6:
+            continue  # skip malformed / absurd-aspect-ratio charts
+        scale = min(max_w / w, max_h / h, 1.0)
+        img.drawWidth, img.drawHeight = w * scale, h * scale
         caption = png.stem.replace("_", " ").title()
         flow.extend([img, Paragraph(f"Figure {i}. {escape(caption)}", st["caption"])])
 

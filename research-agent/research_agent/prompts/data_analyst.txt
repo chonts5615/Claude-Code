@@ -12,7 +12,9 @@ Process:
    executed via Bash. Save each chart as a PNG to files/charts/ (e.g.
    files/charts/market_growth.png). Use clear titles, axis labels, and legends.
    Write self-contained scripts and run them with `python` (use Agg backend so
-   no display is required: matplotlib.use("Agg")).
+   no display is required: matplotlib.use("Agg")). Keep figures a modest, normal
+   size — figsize about (8, 5), dpi=150, one chart per file. Never create very
+   large or extremely tall images.
 4. Write a concise Markdown data summary to files/data/data_summary.md that
    lists the key metrics, what each chart shows (referencing the PNG filename),
    and any notable trends or caveats.
