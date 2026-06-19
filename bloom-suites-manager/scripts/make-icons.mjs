@@ -10,10 +10,11 @@ const outDir = join(here, "..", "public");
 mkdirSync(outDir, { recursive: true });
 
 const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-const ROSE = hex("#e8a0b4");
-const ROSE2 = hex("#d4849c");
-const WHITE = [255, 255, 255];
-const GOLD = hex("#c9a96e");
+// Brand mark: charcoal bloom on a soft blush field with a dusty-mauve center.
+const ROSE = hex("#f3e6ee"); // background top
+const ROSE2 = hex("#ead7e3"); // background bottom
+const WHITE = hex("#2d2d2d"); // petals (charcoal)
+const GOLD = hex("#9a6e84"); // center (mauve)
 
 // Petals + center, expressed in a 64-unit design space (matches favicon.svg).
 const petals = [

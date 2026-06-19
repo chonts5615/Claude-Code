@@ -36,13 +36,12 @@ export default function App() {
   const clearSub = useCallback(() => setMoreSub(null), []);
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative" }}>
-      <div style={{ background: `linear-gradient(135deg, ${C.gold} 0%, #b8945a 100%)`, padding: "14px 18px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "max(14px, env(safe-area-inset-top))" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: C.white, letterSpacing: -0.5 }}>bloom</div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.9)", fontWeight: 400 }}>suites manager</div>
-        </div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.9)" }}>{data.settings.location}</div>
+    <div style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: C.bg, minHeight: "100vh", maxWidth: 480, margin: "0 auto", position: "relative" }}>
+      {/* Editorial wordmark header, matched to the brand site (operator app) */}
+      <div style={{ background: C.white, borderBottom: `1px solid ${C.grayBorder}`, padding: "16px 18px 13px", paddingTop: "max(16px, env(safe-area-inset-top))", textAlign: "center", position: "relative" }}>
+        <div style={{ fontFamily: C.serif, fontSize: 23, fontWeight: 600, color: C.charcoal, letterSpacing: 5, lineHeight: 1 }}>BLOOM</div>
+        <div style={{ fontSize: 9, color: C.gold, letterSpacing: 4, marginTop: 3, fontWeight: 600 }}>SUITES&nbsp;&nbsp;MANAGER</div>
+        <div style={{ position: "absolute", right: 16, bottom: 13, fontSize: 10, color: C.grayLight, letterSpacing: 0.3 }}>{data.settings.location}</div>
       </div>
 
       <div style={{ paddingBottom: 70 }}>
