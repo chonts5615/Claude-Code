@@ -2,7 +2,7 @@
 // (business info, expenses, rules, and data backup/restore).
 import { useEffect, useRef, useState } from "react";
 import { useBloom } from "../store";
-import { applicantMessage, tenantById, suiteById } from "../automation";
+import { applicantMessage, tenantById, suiteById, suiteStatus } from "../automation";
 import { PROFESSIONS } from "../seed";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
@@ -20,6 +20,10 @@ function Applicants({ onBack }) {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: "", profession: "Lash Artist", phone: "", email: "", interest: "", notes: "" });
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const [converting, setConverting] = useState(null); // applicant being made a tenant
+  const [convSuite, setConvSuite] = useState("");
+  const vacant = data.suites.filter((s) => suiteStatus(s, data.tenants) === "vacant");
+  const openConvert = (a) => { setConverting(a); setConvSuite(vacant[0] ? String(vacant[0].id) : ""); };
 
   return (
     <div style={{ padding: "16px 16px 100px" }}>
@@ -47,11 +51,28 @@ function Applicants({ onBack }) {
                 Mark {APPLICANT_NEXT[a.status]}
               </button>
             )}
+            <button onClick={() => openConvert(a)} style={miniBtn(true)}>Make tenant</button>
             <button onClick={async () => { const ok = await copyText(applicantMessage(a, data.settings)); notify(ok ? "Message copied" : "Couldn't copy"); }} style={miniBtn(false)}>Copy text</button>
             <button onClick={() => actions.removeApplicant(a.id)} style={{ ...miniBtn(false), borderColor: C.grayBorder, color: C.gray }}>Remove</button>
           </div>
         </Card>
       ))}
+
+      <Modal open={!!converting} onClose={() => setConverting(null)} title={`Make ${converting?.name || ""} a tenant`}>
+        {vacant.length === 0 ? (
+          <p style={{ fontSize: 13, color: C.red, padding: "4px 0 12px" }}>No vacant suites available right now.</p>
+        ) : (
+          <>
+            <Field label="Assign suite">
+              <Select value={convSuite} onChange={(e) => setConvSuite(e.target.value)}>
+                {vacant.map((s) => <option key={s.id} value={s.id}>{s.name} — {fmt(s.rent)}/mo</option>)}
+              </Select>
+            </Field>
+            <p style={{ fontSize: 11, color: C.grayLight, margin: "0 0 14px" }}>Starts a 1-year lease today and bills the first month. The applicant moves out of the pipeline.</p>
+            <PrimaryButton disabled={!convSuite} onClick={() => { actions.convertApplicantToTenant(converting.id, convSuite); setConverting(null); }}>Create Tenant</PrimaryButton>
+          </>
+        )}
+      </Modal>
 
       <Modal open={adding} onClose={() => setAdding(false)} title="Add Applicant">
         <Field label="Name"><Input value={form.name} onChange={set("name")} /></Field>
@@ -163,7 +184,8 @@ function Settings({ onBack }) {
           <Field label="Rent late after (days)"><Input type="number" inputMode="numeric" min={0} value={settings.lateGraceDays} onChange={setNum("lateGraceDays")} /></Field>
           <Field label="Renewal window (days)"><Input type="number" inputMode="numeric" min={0} value={settings.leaseRenewalWindowDays} onChange={setNum("leaseRenewalWindowDays")} /></Field>
         </div>
-        <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Controls when rent is flagged late and when lease renewals appear in your to-dos.</p>
+        <Field label="Late fee ($)"><Input type="number" inputMode="decimal" min={0} value={settings.lateFeeAmount} onChange={setNum("lateFeeAmount")} /></Field>
+        <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Controls when rent is flagged late, the late fee you can add, and when lease renewals appear in your to-dos.</p>
       </Card>
 
       <Card style={{ marginBottom: 16 }}>

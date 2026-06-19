@@ -75,6 +75,17 @@ export function BloomProvider({ children }) {
       markRentUnpaid(rowId) {
         update((d) => ({ ledger: d.ledger.map((r) => (r.id === rowId ? { ...r, paidDate: null } : r)) }));
       },
+      // Add a one-time late fee to an unpaid row (idempotent).
+      applyLateFee(rowId) {
+        update((d) => ({
+          ledger: d.ledger.map((r) =>
+            r.id === rowId && !r.paidDate && !r.lateFeeApplied
+              ? { ...r, amount: r.amount + (d.settings.lateFeeAmount || 0), lateFee: d.settings.lateFeeAmount || 0, lateFeeApplied: true }
+              : r
+          ),
+        }));
+        notify("Late fee added");
+      },
       // Create rent rows for any active/notice tenant not yet billed for a month.
       generateRentForMonth(mk = monthKey()) {
         let added = 0;
@@ -220,6 +231,43 @@ export function BloomProvider({ children }) {
       },
       removeApplicant(id) {
         update((d) => ({ applicants: d.applicants.filter((a) => a.id !== id) }));
+      },
+      // Approve an applicant into a tenant: create the tenancy, assign the suite,
+      // bill the current month, and remove them from the pipeline (all re-id'd
+      // inside the updater so a double-tap can't duplicate).
+      convertApplicantToTenant(applicantId, suiteId) {
+        let created = null;
+        setData((d) => {
+          const applicant = d.applicants.find((a) => a.id === applicantId);
+          const suite = d.suites.find((s) => s.id === Number(suiteId));
+          if (!applicant || !suite || suite.tenantId) return d;
+          const id = nextId(d.tenants);
+          created = {
+            id,
+            name: applicant.name,
+            business: "",
+            profession: applicant.profession,
+            phone: applicant.phone,
+            email: applicant.email,
+            suite: suite.name,
+            rent: suite.rent,
+            deposit: suite.rent,
+            status: "active",
+            leaseStart: todayISO(),
+            leaseEnd: addDays(todayISO(), 365),
+            moveIn: todayISO(),
+            notes: applicant.notes || "",
+          };
+          return {
+            ...d,
+            tenants: [...d.tenants, created],
+            suites: d.suites.map((s) => (s.id === Number(suiteId) ? { ...s, tenantId: id } : s)),
+            ledger: [...d.ledger, { id: nextId(d.ledger), tenantId: id, month: monthKey(), amount: suite.rent, dueDate: todayISO(), paidDate: null }],
+            applicants: d.applicants.filter((a) => a.id !== applicantId),
+          };
+        });
+        if (created) notify(`${created.name.split(" ")[0]} is now a tenant`);
+        return created;
       },
 
       // --- Settings ---

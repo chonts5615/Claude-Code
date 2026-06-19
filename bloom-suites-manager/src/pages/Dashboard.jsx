@@ -28,7 +28,10 @@ export default function Dashboard({ onOpenTenant, goTo }) {
     const collectRate = totals.billed ? Math.round((totals.collected / totals.billed) * 100) : 0;
     const expenses = Object.values(data.settings.monthlyExpenses).reduce((s, v) => s + v, 0);
     const net = totals.collected - expenses;
-    return { occ, totals, roll, trend, cur, collectRate, expenses, net };
+    const year = cur.slice(0, 4);
+    const collectedYTD = data.ledger.filter((r) => r.paidDate && r.month.startsWith(year)).reduce((s, r) => s + r.amount, 0);
+    const projectedAnnual = roll * 12;
+    return { occ, totals, roll, trend, cur, collectRate, expenses, net, collectedYTD, projectedAnnual, year };
   }, [data]);
 
   return (
@@ -99,6 +102,21 @@ export default function Dashboard({ onOpenTenant, goTo }) {
           <span style={{ fontWeight: 700, color: m.net >= 0 ? C.green : C.red }}>{fmt(m.net)}</span>
         </div>
         <p style={{ fontSize: 11, color: C.grayLight, margin: "6px 0 0" }}>Rent collected minus your monthly expenses (set in Settings).</p>
+      </Card>
+
+      <Card style={{ marginTop: 16 }}>
+        <SectionHeader title={`This Year · ${m.year}`} />
+        <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ flex: 1, textAlign: "center", padding: 12, background: C.greenLight, borderRadius: 12 }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: C.green }}>{fmt(m.collectedYTD)}</div>
+            <div style={{ fontSize: 11, color: C.green }}>Collected YTD</div>
+          </div>
+          <div style={{ flex: 1, textAlign: "center", padding: 12, background: C.goldLight, borderRadius: 12 }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: C.gold }}>{fmt(m.projectedAnnual)}</div>
+            <div style={{ fontSize: 11, color: C.gold }}>Projected annual</div>
+          </div>
+        </div>
+        <p style={{ fontSize: 11, color: C.grayLight, margin: "8px 0 0" }}>Projected annual = current rent roll × 12 at full occupancy.</p>
       </Card>
     </div>
   );

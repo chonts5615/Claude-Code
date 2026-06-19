@@ -2,7 +2,7 @@
 import { buildSeedData } from "../src/seed.js";
 import {
   clientStatus, daysUntilDue, buildActionCenter, completedAppointments,
-  rebookMessage, lowStockItems, expiringItems,
+  rebookMessage, lowStockItems, expiringItems, noShowCount, depositRecommended,
 } from "../src/automation.js";
 import { todayISO } from "../src/format.js";
 
@@ -62,6 +62,13 @@ assert(!!overdue, "found an overdue client");
 // Message template includes the owner + client first name
 const msg = rebookMessage(data.clients[0], data.settings);
 assert(msg.includes(data.settings.ownerName) && msg.includes(data.clients[0].name.split(" ")[0]), "rebook message personalized");
+
+// New effectiveness features: groups exist; no-show/deposit logic behaves
+["confirm", "deposit", "reviews", "loyalty"].forEach((g) =>
+  assert(Array.isArray(ac.groups[g]), `action center has ${g} group`));
+const someClient = data.clients[0];
+assert(typeof noShowCount(someClient.id, data.appointments) === "number", "noShowCount returns a number");
+assert(depositRecommended({ ...someClient, requireDeposit: true }, data.appointments, data.settings) === true, "requireDeposit flag forces a deposit");
 
 console.log("\nCompleted visits:", completedAppointments(data).length);
 console.log(process.exitCode ? "\nSMOKE TEST FAILED" : "\nSMOKE TEST PASSED");

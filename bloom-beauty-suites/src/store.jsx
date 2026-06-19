@@ -121,6 +121,9 @@ export function BloomProvider({ children }) {
           visits: 0,
           ltv: 0,
           avgInterval: 21,
+          requireDeposit: false,
+          loyaltyRewardedAt: 0,
+          consentAckAt: form.consentAck ? todayISO() : null,
         };
         // Re-id against the latest state so a double-tap can't create two clients
         // with the same id (which would make clientId lookups ambiguous).
@@ -219,6 +222,22 @@ export function BloomProvider({ children }) {
         update((d) => ({
           appointments: d.appointments.map((a) => (a.id === id ? { ...a, status } : a)),
         }));
+      },
+
+      // Flag an appointment as confirmed / deposit collected / review asked.
+      setApptFlag(id, flag) {
+        update((d) => ({
+          appointments: d.appointments.map((a) => (a.id === id ? { ...a, [flag]: true } : a)),
+        }));
+        notify(flag === "confirmed" ? "Confirmed" : flag === "depositCollected" ? "Deposit logged" : "Review requested");
+      },
+
+      // Record that the current loyalty milestone was rewarded.
+      rewardLoyalty(clientId) {
+        update((d) => ({
+          clients: d.clients.map((c) => (c.id === clientId ? { ...c, loyaltyRewardedAt: c.visits } : c)),
+        }));
+        notify("Reward logged");
       },
 
       deleteAppointment(id) {
