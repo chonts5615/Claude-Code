@@ -27,7 +27,7 @@ def test_ensure_output_dirs_creates_tree(tmp_path):
         assert (files_dir / sub).is_dir()
 
 
-def test_build_options_raises_buffer_and_registers_qa(tmp_path):
+def test_build_options_raises_buffer(tmp_path):
     from research_agent.agent import MAX_BUFFER_SIZE, build_options
     from research_agent.utils.subagent_tracker import SubagentTracker
 
@@ -36,7 +36,6 @@ def test_build_options_raises_buffer_and_registers_qa(tmp_path):
     opts = build_options(files_dir, SubagentTracker(None, tmp_path), "haiku")
     assert opts.max_buffer_size == MAX_BUFFER_SIZE
     assert MAX_BUFFER_SIZE > 1024 * 1024  # bigger than the SDK default
-    assert "qa-reviewer" in opts.agents
 
 
 def test_heavy_model_never_below_sonnet():
@@ -47,16 +46,16 @@ def test_heavy_model_never_below_sonnet():
     assert heavy_model("opus") == "opus"
 
 
-def test_heavy_agents_use_sonnet_and_skill_docs_exist(tmp_path):
+def test_delegated_subagents_and_skill_docs_exist(tmp_path):
     from research_agent.agent import DEFAULT_BRAND_CONFIG, PROJECT_DIR, build_options
     from research_agent.utils.subagent_tracker import SubagentTracker
 
     files_dir = tmp_path / "files"
     ensure_output_dirs(files_dir)
     opts = build_options(files_dir, SubagentTracker(None, tmp_path), "haiku")
-    # the heavy synthesis/QA agents must not run below sonnet
-    assert opts.agents["report-writer"].model == "sonnet"
-    assert opts.agents["qa-reviewer"].model == "sonnet"
+    # Only research + analysis are delegated to subagents; report/QA run as
+    # controlled queries, not subagents.
+    assert set(opts.agents) == {"researcher", "data-analyst"}
     # the skill specs exist as docs (their behavior is embedded in code/prompts)
     for name in ("report-branding", "report-format-qc", "io-psych-exec-review"):
         assert (PROJECT_DIR / ".claude" / "skills" / name / "SKILL.md").exists()

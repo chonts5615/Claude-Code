@@ -33,6 +33,7 @@ from claude_agent_sdk import (
     ClaudeAgentOptions,
     ClaudeSDKClient,
     HookMatcher,
+    query,
 )
 
 from research_agent.render import render_report_pdf
@@ -107,10 +108,11 @@ def with_output_locations(prompt: str, files_dir: Path) -> str:
 
 def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> ClaudeAgentOptions:
     """Construct the SDK options: subagents, hooks, working dir, and model."""
+    # The report-writer and qa-reviewer are not subagents: report generation and
+    # QA run as controlled queries (see _generate_report / _run_qa), so only the
+    # research and analysis steps are delegated through the lead agent here.
     researcher_prompt = with_output_locations(load_prompt("researcher.txt"), files_dir)
     data_analyst_prompt = with_output_locations(load_prompt("data_analyst.txt"), files_dir)
-    report_writer_prompt = with_output_locations(load_prompt("report_writer.txt"), files_dir)
-    qa_reviewer_prompt = with_output_locations(load_prompt("qa_reviewer.txt"), files_dir)
 
     agents = {
         "researcher": AgentDefinition(
@@ -138,34 +140,6 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
             prompt=data_analyst_prompt,
             model=model,
             maxTurns=40,  # chart generation is multi-step (script + run + verify)
-        ),
-        "report-writer": AgentDefinition(
-            description=(
-                "Use this agent when you need to write a formal research report. The "
-                "report-writer reads research findings from files/research_notes/, data analysis "
-                "from files/data/, and the chart list from files/charts/, then synthesizes them "
-                "into a clear, well-cited report written as MARKDOWN to files/reports/report.md. "
-                "The branded PDF is rendered from that markdown automatically, so this agent does "
-                "not build PDFs. Does NOT conduct web searches."
-            ),
-            tools=["Write", "Glob", "Read"],
-            prompt=report_writer_prompt,
-            model=heavy_model(model),
-            maxTurns=25,
-        ),
-        "qa-reviewer": AgentDefinition(
-            description=(
-                "Use this agent AFTER the report-writer to critically review the drafted "
-                "report against the research notes. The qa-reviewer reads the notes, the data "
-                "summary, and files/reports/report.md, then writes a critical review to "
-                "files/reports/qa_review.md flagging coverage gaps, outdated statistics, vague "
-                "citations, formatting problems, and rigor/decision-usefulness issues, ending "
-                "with a PASS/REVISE verdict. Does not do web research or rewrite the report."
-            ),
-            tools=["Glob", "Read", "Write"],
-            prompt=qa_reviewer_prompt,
-            model=heavy_model(model),
-            maxTurns=30,
         ),
     }
 
@@ -326,42 +300,95 @@ def _analyze_prompt() -> str:
     )
 
 
-def _report_prompt(revise: bool = False, first: bool = True) -> str:
+def _read_dir_text(directory: Path, label: str) -> str:
+    """Concatenate the text files in a directory for prompt embedding."""
+    parts = []
+    for p in sorted(directory.glob("*")):
+        if p.is_file() and p.suffix in (".md", ".txt"):
+            parts.append(f"### {label}: {p.name}\n{p.read_text(encoding='utf-8', errors='ignore')}")
+    return "\n\n".join(parts)
+
+
+async def _collect_query_text(prompt: str, system_prompt: str, model: str) -> str:
+    """Run a one-shot, tool-less query and return its full text response.
+
+    Report writing and QA review each produce a single document. Subagents
+    compose that text but unreliably call Write, so we capture the model's text
+    here and write the file ourselves — deterministic and crash-proof.
+    """
+    options = ClaudeAgentOptions(
+        system_prompt=system_prompt,
+        model=heavy_model(model),
+        permission_mode="bypassPermissions",
+        max_buffer_size=MAX_BUFFER_SIZE,
+    )
+    parts: list[str] = []
+    async for msg in query(prompt=prompt, options=options):
+        if type(msg).__name__ == "AssistantMessage":
+            for block in msg.content:
+                if type(block).__name__ == "TextBlock":
+                    parts.append(block.text)
+    return "".join(parts).strip()
+
+
+def _strip_to_markdown(text: str) -> str:
+    """Drop any preamble before the first markdown heading / fenced block."""
+    fence = re.search(r"```(?:markdown|md)?\n(.*?)```", text, re.DOTALL)
+    if fence:
+        return fence.group(1).strip()
+    idx = text.find("# ")
+    return text[idx:].strip() if idx > 0 else text
+
+
+async def _generate_report(files_dir: Path, model: str, revise: bool = False) -> None:
+    """Generate (or revise) files/reports/report.md via a controlled query."""
+    notes = _read_dir_text(files_dir / "research_notes", "NOTE")
+    data = _read_dir_text(files_dir / "data", "DATA")
+    charts = ", ".join(p.name for p in sorted((files_dir / "charts").glob("*.png")))
+    system = load_prompt("report_writer.txt")
+
     if revise:
-        return (
-            "REVISION PHASE. The QA review at files/reports/qa_review.md requested changes. Spawn "
-            'the "report-writer" subagent now to read files/reports/qa_review.md and the research '
-            "notes and rewrite files/reports/report.md, addressing every issue raised (especially "
-            "updating outdated statistics, replacing vague 'multiple sources' attributions with "
-            "specific citations, and any rigor or decision-usefulness gaps). The branded PDF is "
-            "rendered from report.md automatically."
+        qa = _report_md_path(files_dir).with_name("qa_review.md")
+        qa_text = qa.read_text(encoding="utf-8", errors="ignore") if qa.exists() else ""
+        current = _report_md_path(files_dir).read_text(encoding="utf-8", errors="ignore")
+        prompt = (
+            "Revise the research report to address every point in the QA review. Output ONLY the "
+            "full revised report as markdown, starting with '# '.\n\n"
+            f"## QA REVIEW\n{qa_text}\n\n## CURRENT REPORT\n{current}\n\n## RESEARCH NOTES\n{notes}"
         )
-    retry_note = (
-        ""
-        if first
-        else (
-            " A previous attempt did not write files/reports/report.md; spawn a NEW report-writer "
-            "now — do not assume an earlier subagent is still running — and make sure it Writes "
-            "the file."
+    else:
+        prompt = (
+            "Write the full research report now, synthesizing the research notes and data below. "
+            "Output ONLY the report as markdown, starting with '# <title>'. Do not include any "
+            f"commentary before or after. Charts available (appended as figures automatically): "
+            f"{charts or 'none'}.\n\n## RESEARCH NOTES\n{notes}\n\n## DATA SUMMARY\n{data}"
         )
-    )
-    return (
-        'REPORT PHASE. Spawn the "report-writer" subagent now to synthesize the research notes, '
-        "the data summary in files/data/, and the chart list in files/charts/ into a single, "
-        "well-cited report written as MARKDOWN to files/reports/report.md. Do not build a PDF — "
-        "the branded PDF is rendered from report.md automatically." + retry_note
-    )
+
+    text = await _collect_query_text(prompt, system, model)
+    report = _strip_to_markdown(text)
+    if report:
+        _report_md_path(files_dir).write_text(report, encoding="utf-8")
+        print(f"[report] wrote report.md ({len(report)} chars){' (revised)' if revise else ''}")
+    else:
+        print("[report] model returned no usable markdown.")
 
 
-def _qa_prompt() -> str:
-    return (
-        'QA PHASE. Spawn the "qa-reviewer" subagent now. It must read every research note in '
-        "files/research_notes/, the data summary in files/data/, and the report at "
-        "files/reports/report.md (never the binary PDF), and apply the \"report-format-qc\" and "
-        '"io-psych-exec-review" skills, then write a critical review to files/reports/qa_review.md '
-        "with sections for content, formatting/branding, and expert (I-O + executive) review, "
-        "ending with a line 'QA VERDICT: PASS' or 'QA VERDICT: REVISE'."
+async def _run_qa(files_dir: Path, model: str) -> None:
+    """Run the QA review via a controlled query and write qa_review.md."""
+    notes = _read_dir_text(files_dir / "research_notes", "NOTE")
+    data = _read_dir_text(files_dir / "data", "DATA")
+    report = _report_md_path(files_dir).read_text(encoding="utf-8", errors="ignore")
+    system = load_prompt("qa_reviewer.txt")
+    prompt = (
+        "Critically review the report below against its research notes, following your "
+        "instructions exactly, and output ONLY the qa_review.md content ending with the verdict "
+        f"line.\n\n## REPORT (report.md)\n{report}\n\n## RESEARCH NOTES\n{notes}\n\n"
+        f"## DATA SUMMARY\n{data}"
     )
+    text = await _collect_query_text(prompt, system, model)
+    if text:
+        _report_md_path(files_dir).with_name("qa_review.md").write_text(text, encoding="utf-8")
+        print(f"[qa] wrote qa_review.md ({len(text)} chars)")
 
 
 async def _drive_phase(
@@ -387,17 +414,18 @@ async def _drive_phase(
 
 async def run_pipeline(
     client: ClaudeSDKClient,
-    query: str,
+    request: str,
     files_dir: Path,
     tracker: SubagentTracker,
     transcript: TranscriptWriter,
     brand_config_path: str = "",
+    model: str = "haiku",
 ) -> None:
     """Drive the research pipeline deterministically, gating each phase on disk state."""
     # Phase 0: PLAN — the code (not the lead's judgement) owns the sequence.
-    plan_text = await _run_turn(client, _plan_prompt(query), tracker, transcript)
+    plan_text = await _run_turn(client, _plan_prompt(request), tracker, transcript)
     plan = _parse_plan(plan_text) or [
-        {"title": "Research findings", "filename": "findings.md", "brief": query[:200]}
+        {"title": "Research findings", "filename": "findings.md", "brief": request[:200]}
     ]
     print(f"\n[plan] {len(plan)} subtopics: {[s['filename'] for s in plan]}\n")
 
@@ -405,7 +433,7 @@ async def run_pipeline(
     await _drive_phase(
         client, tracker, transcript, name="research",
         instruction_for_attempt=lambda a: _research_prompt(
-            query, _missing_notes(files_dir, plan), first=(a == 1)
+            request, _missing_notes(files_dir, plan), first=(a == 1)
         ),
         is_done=lambda: not _missing_notes(files_dir, plan),
         max_attempts=PHASE_ATTEMPTS["research"],
@@ -419,30 +447,21 @@ async def run_pipeline(
         max_attempts=PHASE_ATTEMPTS["analyze"],
     )
 
-    # Phase 3: REPORT — the agent writes markdown only (reliable); gate on it.
-    await _drive_phase(
-        client, tracker, transcript, name="report",
-        instruction_for_attempt=lambda a: _report_prompt(first=(a == 1)),
-        is_done=lambda: _report_md_path(files_dir).exists(),
-        max_attempts=PHASE_ATTEMPTS["report"],
-    )
-
-    # Render the branded PDF deterministically from the markdown (no agent flakiness).
+    # Phase 3: REPORT — generated via a controlled query whose text we write
+    # ourselves (subagents compose text but unreliably call Write), then the PDF
+    # is rendered deterministically in code.
+    print("\n[phase: report] generating report markdown\n")
+    await _generate_report(files_dir, model)
     _render_pdf(files_dir, brand_config_path)
 
-    # Phase 4: QA — runs whenever there's a report (markdown preferred) to review.
-    if _report_md_path(files_dir).exists() or _final_report_exists(files_dir):
-        await _drive_phase(
-            client, tracker, transcript, name="qa",
-            instruction_for_attempt=lambda a: _qa_prompt(),
-            is_done=lambda: _qa_review_path(files_dir).exists(),
-            max_attempts=PHASE_ATTEMPTS["qa"],
-        )
-        # Phase 5: one revision pass if QA flagged material issues.
+    # Phase 4: QA — also a controlled query; a REVISE verdict drives one revision.
+    if _report_md_path(files_dir).exists():
+        print("\n[phase: qa] reviewing report\n")
+        await _run_qa(files_dir, model)
         if _qa_verdict(files_dir) == "REVISE":
             print("\n[qa] verdict REVISE — running one revision pass.\n")
-            await _run_turn(client, _report_prompt(revise=True), tracker, transcript)
-            _render_pdf(files_dir, brand_config_path)  # re-render the revised report
+            await _generate_report(files_dir, model, revise=True)
+            _render_pdf(files_dir, brand_config_path)
         else:
             print(f"\n[qa] verdict: {_qa_verdict(files_dir)}.\n")
 
@@ -481,7 +500,7 @@ async def run_research(
         async with ClaudeSDKClient(options=options) as client:
             if query is not None:
                 await run_pipeline(
-                    client, query, files_dir, tracker, transcript, brand_config_path
+                    client, query, files_dir, tracker, transcript, brand_config_path, model
                 )
                 if _final_report_exists(files_dir):
                     print("\n[pipeline] final report present.\n")

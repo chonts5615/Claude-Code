@@ -14,13 +14,19 @@ demo, written from scratch.
 The Lead Agent's only tool is `Task`. It delegates every step to three
 specialized subagents defined via `AgentDefinition`:
 
-| Agent | Tools | Purpose |
-|-------|-------|---------|
-| **Lead Agent** | `Task` | Spawns subagents for each phase the orchestrator drives |
-| **researcher** | `WebSearch`, `Write` | Web research → Markdown notes in `files/research_notes/` |
-| **data-analyst** | `Glob`, `Read`, `Bash`, `Write` | Extracts metrics, renders charts to `files/charts/`, summary to `files/data/` |
-| **report-writer** | `Write`, `Glob`, `Read` | Synthesizes the report as Markdown → `files/reports/report.md` |
-| **qa-reviewer** | `Glob`, `Read`, `Write` | Critically reviews the report → `files/reports/qa_review.md` (PASS/REVISE) |
+| Step | Mechanism | Purpose |
+|------|-----------|---------|
+| **Lead Agent** | `Task` | Spawns the research/analysis subagents for the phases the orchestrator drives |
+| **researcher** (subagent) | `WebSearch`, `Write` | Web research → Markdown notes in `files/research_notes/` |
+| **data-analyst** (subagent) | `Glob`, `Read`, `Bash`, `Write` | Extracts metrics, renders charts to `files/charts/`, summary to `files/data/` |
+| **report generation** | controlled `query()` | Synthesizes the report as Markdown → `files/reports/report.md` (text captured in code) |
+| **PDF render** | code (`render.py`) | Deterministically renders the branded PDF from `report.md` + charts |
+| **QA review** | controlled `query()` | Critically reviews the report → `files/reports/qa_review.md` (PASS/REVISE) |
+
+Report generation and QA run as **controlled, tool-less `query()` calls whose
+text is captured and written to disk in code** — subagents reliably compose text
+but inconsistently call the `Write` tool, so the file-creation is owned by the
+orchestrator. Web research and chart analysis remain parallel subagents.
 
 ### Deterministic orchestration
 
