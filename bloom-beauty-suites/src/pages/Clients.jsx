@@ -2,7 +2,7 @@
 // rebooking shortcuts, plus add/edit intake forms.
 import { useMemo, useState } from "react";
 import { useBloom } from "../store";
-import { clientStatus, daysUntilDue, rebookMessage } from "../automation";
+import { clientStatus, daysUntilDue, rebookMessage, noShowCount, depositRecommended } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
 import { fmt, daysAgo } from "../format";
@@ -16,8 +16,9 @@ const CURLS = ["J", "B", "C", "D", "L"];
 const STYLES = ["Natural", "Cat Eye", "Doll Eye", "Wispy", "Hybrid", "Volume", "Mega Volume"];
 const EMPTY = { name: "", phone: "", email: "", curl: "C", style: "Natural", length: "", diameter: "", allergies: "None", notes: "" };
 
-function ClientForm({ initial, title, submitLabel, onCancel, onSubmit }) {
-  const [form, setForm] = useState(initial);
+function ClientForm({ initial, title, submitLabel, requireConsent, onCancel, onSubmit }) {
+  // Existing clients already acknowledged consent; pre-check so edits aren't blocked.
+  const [form, setForm] = useState({ ...initial, consentAck: !!(initial.consentAck || initial.consentAckAt) });
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   return (
     <div style={{ padding: "16px 16px 100px" }}>
@@ -49,12 +50,16 @@ function ClientForm({ initial, title, submitLabel, onCancel, onSubmit }) {
         <Field label="Notes">
           <Textarea rows={3} value={form.notes} onChange={set("notes")} placeholder="Contact lenses, eye conditions, preferences…" />
         </Field>
-        <div style={{ background: C.roseLight, borderRadius: 12, padding: 14, marginBottom: 16 }}>
+        <div style={{ background: C.roseLight, borderRadius: 12, padding: 14, marginBottom: 12 }}>
           <p style={{ fontSize: 12, color: C.charcoal, margin: 0 }}>
             <strong>Consent:</strong> By proceeding, client acknowledges they have been informed of lash extension risks including potential allergic reaction, irritation, and the importance of following aftercare instructions. Client confirms no recent eye surgery, active eye infections, or contraindicated medications.
           </p>
         </div>
-        <PrimaryButton disabled={!form.name || !form.phone} onClick={() => onSubmit(form)}>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 16, cursor: "pointer" }}>
+          <input type="checkbox" checked={!!form.consentAck} onChange={(e) => setForm((f) => ({ ...f, consentAck: e.target.checked }))} style={{ marginTop: 2, width: 18, height: 18, accentColor: C.rose }} />
+          <span style={{ fontSize: 13, color: C.charcoal }}>Client has reviewed and acknowledged the consent above.</span>
+        </label>
+        <PrimaryButton disabled={!form.name || !form.phone || (requireConsent && !form.consentAck)} onClick={() => onSubmit(form)}>
           {submitLabel}
         </PrimaryButton>
       </Card>
@@ -153,6 +158,38 @@ function ClientDetail({ client, onBack, onEdit }) {
         </div>
       </Card>
 
+      <Card style={{ marginBottom: 12 }}>
+        <SectionHeader title="Loyalty & Policy" />
+        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+          <div style={{ flex: 1, textAlign: "center", padding: 10, background: C.blush, borderRadius: 10 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: noShowCount(client.id, data.appointments) > 0 ? C.amber : C.charcoal }}>{noShowCount(client.id, data.appointments)}</div>
+            <div style={{ fontSize: 11, color: C.gray }}>No-shows</div>
+          </div>
+          <div style={{ flex: 1, textAlign: "center", padding: 10, background: C.blush, borderRadius: 10 }}>
+            {(() => {
+              const every = data.settings.loyaltyEvery || 0;
+              const toNext = every > 0 ? (every - (client.visits % every)) % every : null;
+              return (
+                <>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: C.gold }}>{every > 0 ? (toNext === 0 && client.visits > 0 ? "★" : toNext) : "—"}</div>
+                  <div style={{ fontSize: 11, color: C.gray }}>{every > 0 ? (toNext === 0 && client.visits > 0 ? "Reward ready" : "Visits to reward") : "Loyalty off"}</div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+        <button
+          onClick={() => actions.updateClient(client.id, { requireDeposit: !client.requireDeposit })}
+          style={{ width: "100%", padding: 11, borderRadius: 10, border: `1px solid ${client.requireDeposit ? C.amber : C.grayBorder}`, background: client.requireDeposit ? C.amberLight : C.white, color: client.requireDeposit ? C.amber : C.charcoal, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+        >
+          {client.requireDeposit ? "✓ Deposit required for this client" : "Require a deposit for this client"}
+        </button>
+        {!client.requireDeposit && depositRecommended(client, data.appointments, data.settings) && (
+          <p style={{ fontSize: 11, color: C.amber, margin: "8px 0 0" }}>⚠ Suggested — this client has reached your no-show limit.</p>
+        )}
+        {client.consentAckAt && <p style={{ fontSize: 11, color: C.grayLight, margin: "8px 0 0" }}>Consent acknowledged {client.consentAckAt}</p>}
+      </Card>
+
       <Card>
         <SectionHeader title="Appointment History" />
         {appts.length === 0 ? (
@@ -212,6 +249,7 @@ export default function Clients({ selectedClientId, setSelectedClientId }) {
         initial={EMPTY}
         title="New Client Intake"
         submitLabel="Add Client"
+        requireConsent
         onCancel={() => setMode(null)}
         onSubmit={(form) => {
           const created = actions.addClient(form);

@@ -253,6 +253,7 @@ function Settings({ onBack }) {
   const fileRef = useRef(null);
 
   const setField = (k) => (e) => actions.updateSettings({ [k]: e.target.value });
+  const setNum = (k) => (e) => actions.updateSettings({ [k]: Math.max(0, Number(e.target.value) || 0) });
   const setExpense = (k) => (e) =>
     actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Math.max(0, Number(e.target.value) || 0) } });
 
@@ -284,6 +285,17 @@ function Settings({ onBack }) {
         <Field label="Location"><Input value={settings.location} onChange={setField("location")} /></Field>
         <Field label="Address"><Input value={settings.address} onChange={setField("address")} /></Field>
         <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Changes save automatically.</p>
+      </Card>
+
+      <Card style={{ marginBottom: 16 }}>
+        <SectionHeader title="Client Policies" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Deposit amount ($)"><Input type="number" inputMode="decimal" min={0} value={settings.depositAmount} onChange={setNum("depositAmount")} /></Field>
+          <Field label="No-shows before deposit"><Input type="number" inputMode="numeric" min={0} value={settings.noShowThreshold} onChange={setNum("noShowThreshold")} /></Field>
+        </div>
+        <Field label="Loyalty reward every N visits (0 = off)"><Input type="number" inputMode="numeric" min={0} value={settings.loyaltyEvery} onChange={setNum("loyaltyEvery")} /></Field>
+        <Field label="Review link (Google / Instagram)"><Input value={settings.reviewLink} onChange={setField("reviewLink")} placeholder="https://g.page/r/…" /></Field>
+        <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Drives the deposit, loyalty, and review to-dos. Texts include your review link.</p>
       </Card>
 
       <Card style={{ marginBottom: 16 }}>

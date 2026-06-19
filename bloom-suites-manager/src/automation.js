@@ -140,6 +140,12 @@ export function rentReminder(tenant, row, settings) {
   return `Hi ${firstName(tenant.name)}, it's ${owner} at ${biz}. Friendly reminder that ${monthLabel(row.month)} rent ($${row.amount}) for ${tenant.suite} is due. Let me know if you have any questions — thank you!`;
 }
 
+export function receiptMessage(tenant, row, settings) {
+  const biz = settings?.businessName || "the studio";
+  const fee = row.lateFee ? ` (incl. $${row.lateFee} late fee)` : "";
+  return `${biz} — Rent receipt\n${tenant.name}, ${tenant.suite}\n${monthLabel(row.month)} rent: $${row.amount}${fee}\nPaid: ${row.paidDate}\nThank you!`;
+}
+
 export function renewalMessage(tenant, settings) {
   const owner = settings?.ownerName || "your suite manager";
   const biz = settings?.businessName || "the studio";

@@ -176,6 +176,10 @@ export const DEFAULT_SETTINGS = {
   cogsRate: 0.065, // share of revenue spent on product per service
   taxReserveRate: 0.37, // SE + federal + state set-aside
   lapseGraceDays: 10, // days past usual cadence before a client is "due"
+  depositAmount: 25, // suggested deposit for deposit-required clients
+  noShowThreshold: 2, // no-shows before the app suggests requiring a deposit
+  reviewLink: "", // owner's Google/Instagram review link (used in review asks)
+  loyaltyEvery: 10, // reward the client every Nth visit (0 = off)
   welcomeDismissed: false, // first-run welcome banner
   lastBackup: null, // ISO date of the last data backup (for the reminder)
 };

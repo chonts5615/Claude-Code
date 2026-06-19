@@ -2,7 +2,7 @@
 import { buildSeedData } from "../src/seed.js";
 import {
   occupancy, rentRoll, monthTotals, buildActionCenter, rentStatus,
-  suiteStatus, rentReminder, renewalMessage,
+  suiteStatus, rentReminder, renewalMessage, receiptMessage,
 } from "../src/automation.js";
 import { monthKey } from "../src/format.js";
 
@@ -55,5 +55,10 @@ const t = data.tenants[0];
 const row = data.ledger.find((r) => r.tenantId === t.id && !r.paidDate) || data.ledger.find((r) => r.tenantId === t.id);
 assert(rentReminder(t, row, data.settings).includes(t.name.split(" ")[0]), "rent reminder personalized");
 assert(renewalMessage(t, data.settings).includes(data.settings.businessName), "renewal message includes business name");
+
+// New features: rent receipt + late-fee setting
+const paidRow = data.ledger.find((r) => r.paidDate);
+assert(receiptMessage(t, paidRow, data.settings).includes(data.settings.businessName), "receipt includes business name");
+assert(typeof data.settings.lateFeeAmount === "number", "late fee amount is configured");
 
 console.log(process.exitCode ? "\nSMOKE TEST FAILED" : "\nSMOKE TEST PASSED");

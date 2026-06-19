@@ -7,6 +7,10 @@ import {
   rebookMessage,
   winbackMessage,
   waitlistMessage,
+  confirmMessage,
+  depositMessage,
+  reviewMessage,
+  loyaltyMessage,
 } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
@@ -14,11 +18,15 @@ import { Card, SectionHeader, copyText, smsHref } from "../ui";
 import { fmtD } from "../format";
 
 const TASK_META = {
+  confirm: { icon: Icons.check, color: C.rose, bg: C.roseLight },
+  deposit: { icon: Icons.dollar, color: C.amber, bg: C.amberLight },
   rebook: { icon: Icons.bell, color: C.rose, bg: C.roseLight },
   winback: { icon: Icons.heart || Icons.bell, color: C.gold, bg: C.goldLight },
   reorder: { icon: Icons.box, color: C.amber, bg: C.amberLight },
   expiring: { icon: Icons.clock, color: C.red, bg: C.redLight },
   waitlist: { icon: Icons.list, color: C.rose, bg: C.roseLight },
+  review: { icon: Icons.star, color: C.gold, bg: C.goldLight },
+  loyalty: { icon: Icons.star, color: C.gold, bg: C.goldLight },
 };
 
 const ActionBtn = ({ children, onClick, primary }) => (
@@ -106,6 +114,32 @@ export default function ActionCenter({ onOpenClient }) {
 
       {!collapsed && (
         <div>
+          {groups.confirm.map((t) => (
+            <TaskRow
+              key={t.id}
+              meta={TASK_META.confirm}
+              onOpen={() => onOpenClient(t.client)}
+              title={`Confirm ${t.client.name}`}
+              subtitle={`Tomorrow ${t.appt.time} · ${t.appt.serviceName}`}
+            >
+              <ActionBtn primary onClick={() => actions.setApptFlag(t.appt.id, "confirmed")}>Confirmed</ActionBtn>
+              <TextBtn phone={t.client.phone} body={confirmMessage(t.client, t.appt, data.settings)} />
+            </TaskRow>
+          ))}
+
+          {groups.deposit.map((t) => (
+            <TaskRow
+              key={t.id}
+              meta={TASK_META.deposit}
+              onOpen={() => onOpenClient(t.client)}
+              title={`Take a deposit — ${t.client.name}`}
+              subtitle={`${t.noShows > 0 ? `${t.noShows} past no-show${t.noShows === 1 ? "" : "s"} · ` : ""}${t.appt.date} ${t.appt.time}`}
+            >
+              <ActionBtn primary onClick={() => actions.setApptFlag(t.appt.id, "depositCollected")}>Collected</ActionBtn>
+              <TextBtn phone={t.client.phone} body={depositMessage(t.client, data.settings)} />
+            </TaskRow>
+          ))}
+
           {groups.rebook.map((t) => (
             <TaskRow
               key={t.id}
@@ -186,6 +220,33 @@ export default function ActionCenter({ onOpenClient }) {
                   Mark contacted
                 </ActionBtn>
               )}
+            </TaskRow>
+          ))}
+
+          {groups.reviews.map((t) => (
+            <TaskRow
+              key={t.id}
+              meta={TASK_META.review}
+              onOpen={() => onOpenClient(t.client)}
+              title={`Ask ${t.client.name} for a review`}
+              subtitle={`Visited ${t.appt.date} · ${t.appt.serviceName}`}
+            >
+              <ActionBtn primary onClick={() => actions.setApptFlag(t.appt.id, "reviewRequested")}>Asked</ActionBtn>
+              <TextBtn phone={t.client.phone} body={reviewMessage(t.client, data.settings)} />
+              <ActionBtn onClick={() => copy(reviewMessage(t.client, data.settings))}>Copy</ActionBtn>
+            </TaskRow>
+          ))}
+
+          {groups.loyalty.map((t) => (
+            <TaskRow
+              key={t.id}
+              meta={TASK_META.loyalty}
+              onOpen={() => onOpenClient(t.client)}
+              title={`Reward ${t.client.name}`}
+              subtitle={`Loyalty milestone — visit #${t.milestone}`}
+            >
+              <ActionBtn primary onClick={() => actions.rewardLoyalty(t.client.id)}>Rewarded</ActionBtn>
+              <TextBtn phone={t.client.phone} body={loyaltyMessage(t.client, data.settings)} />
             </TaskRow>
           ))}
         </div>

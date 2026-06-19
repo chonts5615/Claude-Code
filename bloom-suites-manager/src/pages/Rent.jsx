@@ -2,14 +2,16 @@
 // month in one tap.
 import { useMemo, useState } from "react";
 import { useBloom } from "../store";
-import { rentStatus, tenantById, monthTotals, unbilledTenants } from "../automation";
+import { rentStatus, tenantById, monthTotals, unbilledTenants, receiptMessage } from "../automation";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
 import { fmt, monthKey, monthLabel, addMonths } from "../format";
-import { Card, SectionHeader, StatusBadge } from "../ui";
+import { Card, SectionHeader, StatusBadge, copyText } from "../ui";
+
+const miniBtn = (color) => ({ padding: "6px 12px", borderRadius: 8, border: `1px solid ${color}`, background: C.white, color, fontSize: 12, fontWeight: 600, cursor: "pointer" });
 
 export default function Rent() {
-  const { data, actions } = useBloom();
+  const { data, actions, notify } = useBloom();
   const [mk, setMk] = useState(monthKey());
 
   const view = useMemo(() => {
@@ -59,21 +61,34 @@ export default function Rent() {
           <p style={{ fontSize: 13, color: C.grayLight, textAlign: "center", padding: 16 }}>No rent billed for this month yet</p>
         ) : (
           view.rows.map((r) => (
-            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: `1px solid ${C.grayBorder}` }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{r.tenant.name}</div>
-                <div style={{ fontSize: 12, color: C.gray }}>{r.tenant.suite} · {fmt(r.amount)}</div>
-              </div>
-              {r.paidDate ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <StatusBadge status="paid" />
-                  <button onClick={() => actions.markRentUnpaid(r.id)} style={{ background: "none", border: "none", color: C.grayLight, fontSize: 11, cursor: "pointer", textDecoration: "underline" }}>undo</button>
+            <div key={r.id} style={{ padding: "10px 0", borderBottom: `1px solid ${C.grayBorder}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{r.tenant.name}</div>
+                  <div style={{ fontSize: 12, color: C.gray }}>{r.tenant.suite} · {fmt(r.amount)}{r.lateFee ? ` · incl. ${fmt(r.lateFee)} late fee` : ""}</div>
                 </div>
-              ) : (
-                <button onClick={() => actions.markRentPaid(r.id)} style={{ padding: "8px 14px", borderRadius: 9, border: "none", background: r.status === "late" ? C.red : C.rose, color: C.white, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                  {r.status === "late" ? "Late · Mark Paid" : "Mark Paid"}
-                </button>
-              )}
+                {r.paidDate ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <StatusBadge status="paid" />
+                    <button onClick={() => actions.markRentUnpaid(r.id)} style={{ background: "none", border: "none", color: C.grayLight, fontSize: 11, cursor: "pointer", textDecoration: "underline" }}>undo</button>
+                  </div>
+                ) : (
+                  <button onClick={() => actions.markRentPaid(r.id)} style={{ padding: "8px 14px", borderRadius: 9, border: "none", background: r.status === "late" ? C.red : C.rose, color: C.white, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    {r.status === "late" ? "Late · Mark Paid" : "Mark Paid"}
+                  </button>
+                )}
+              </div>
+              {/* Secondary: add a late fee while overdue, or copy a receipt once paid */}
+              {(r.status === "late" && !r.lateFeeApplied) || r.paidDate ? (
+                <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                  {r.status === "late" && !r.lateFeeApplied && (
+                    <button onClick={() => actions.applyLateFee(r.id)} style={miniBtn(C.red)}>+ Late fee</button>
+                  )}
+                  {r.paidDate && (
+                    <button onClick={async () => { const ok = await copyText(receiptMessage(r.tenant, r, data.settings)); notify(ok ? "Receipt copied" : "Couldn't copy"); }} style={miniBtn(C.gray)}>Copy receipt</button>
+                  )}
+                </div>
+              ) : null}
             </div>
           ))
         )}

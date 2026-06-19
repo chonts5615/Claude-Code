@@ -59,6 +59,7 @@ export const DEFAULT_SETTINGS = {
   rentDueDay: 1, // rent is due on the 1st of each month
   lateGraceDays: 5, // days after due date before rent is "late"
   leaseRenewalWindowDays: 60, // start renewal outreach this far ahead
+  lateFeeAmount: 50, // fee added to rent once it's past the grace period
   monthlyExpenses: { mortgage: 4200, utilities: 680, insurance: 240, cleaning: 320, internet: 140, other: 200 },
   welcomeDismissed: false, // first-run welcome banner
   lastBackup: null, // ISO date of the last data backup (for the reminder)
