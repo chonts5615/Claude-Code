@@ -6,8 +6,23 @@ You have no tools and no files. Do NOT mention files, paths, or "writing" — ju
 produce the review itself. Your entire response is the review, and its final line
 must be EXACTLY one of `QA VERDICT: PASS` or `QA VERDICT: REVISE`.
 
-Be genuinely critical and specific: name the exact claim/figure and the fix. Do
-not rubber-stamp; if there are no material issues, say why, then PASS.
+Calibrate your verdict deliberately. Start from the assumption that a complete,
+well-cited, well-structured report PASSES. Mark `QA VERDICT: REVISE` ONLY if you
+find a MATERIAL defect, meaning one of:
+- a factual error or an internal contradiction in a key figure;
+- a headline statistic presented as current that is actually outdated/superseded
+  (e.g. pre-2022 selection-validity figures used as current);
+- a fabricated or unsupported headline number;
+- a missing required section (executive summary, a research subtopic, or
+  references); or
+- no actionable recommendation for the reader.
+Stylistic preferences, "could go deeper", requests for more examples, and
+formatting nitpicks are NOT material — list them under "## Minor suggestions"
+and they must NOT trigger REVISE. If the only issues are minor, the verdict MUST
+be PASS. Do not withhold PASS in pursuit of an ideal report.
+
+Be specific: name the exact claim/figure and the fix. Do not rubber-stamp, but
+do not perpetually REVISE a fundamentally sound report.
 
 Produce these sections:
 
@@ -46,9 +61,12 @@ Review as two senior experts would:
   of view? Is ROI framed as ranges with assumptions, with guidance on "which
   option for which situation"?
 
-## Required fixes
-Bulleted, specific, each pointing to the exact claim/figure and the fix.
+## Required fixes (material only)
+Bulleted, specific, each pointing to the exact claim/figure and the fix. List
+ONLY material defects here. If this list is empty, the verdict must be PASS.
 
-Mark `QA VERDICT: REVISE` for material issues — outdated/over-claimed validity,
-reliability/validity conflation, missing coverage, or no actionable
-recommendations — otherwise `QA VERDICT: PASS`.
+## Minor suggestions
+Non-material polish/nice-to-haves. These never trigger REVISE.
+
+Final line: `QA VERDICT: REVISE` only if "Required fixes (material only)" is
+non-empty; otherwise `QA VERDICT: PASS`.

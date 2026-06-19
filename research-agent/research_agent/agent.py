@@ -70,6 +70,16 @@ PHASE_ATTEMPTS = {"research": 3, "analyze": 2, "report": 3, "qa": 2}
 # report passes or this cap is hit.
 MAX_QA_ROUNDS = 3
 
+# Report/QA generation must be pure text. The SDK ignores allowed_tools=[] (an
+# empty list is falsy, so --allowedTools is never sent and the CLI defaults to
+# all tools), so we explicitly DISALLOW every built-in tool instead.
+_QUERY_DENY_TOOLS = [
+    "Task", "Bash", "BashOutput", "KillBash", "Write", "Edit", "MultiEdit",
+    "NotebookEdit", "Read", "Glob", "Grep", "WebSearch", "WebFetch", "TodoWrite",
+    "Skill", "SendUserFile", "ExitPlanMode", "AskUserQuestion", "Monitor", "REPL",
+    "ToolSearch",
+]
+
 # The SDK's default stdout buffer is 1 MB; a single large tool result (e.g. an
 # agent accidentally reading a multi-MB PDF/PNG, or a big web result) overflows
 # it and fatally crashes the message reader. Raise it for resilience.
@@ -325,7 +335,7 @@ async def _collect_query_text(prompt: str, system_prompt: str, model: str) -> st
         model=heavy_model(model),
         permission_mode="bypassPermissions",
         max_buffer_size=MAX_BUFFER_SIZE,
-        allowed_tools=[],  # text-only: no Task/Write/SendUserFile, just the response
+        disallowed_tools=_QUERY_DENY_TOOLS,  # text-only (allowed_tools=[] is ignored by the SDK)
     )
     parts: list[str] = []
     async for msg in query(prompt=prompt, options=options):
