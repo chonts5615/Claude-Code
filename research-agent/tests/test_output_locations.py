@@ -149,6 +149,31 @@ def test_strip_to_markdown_keeps_full_report_with_inner_fence():
     assert _strip_to_markdown("```markdown\n" + report + "\n```").startswith("# Title")
 
 
+def test_cleanup_outputs_removes_strays(tmp_path):
+    from research_agent.agent import cleanup_outputs
+
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    reports = files_dir / "reports"
+    # canonical
+    (reports / "report.md").write_text("x")
+    (reports / "report.pdf").write_bytes(b"%PDF")
+    (reports / "qa_review.md").write_text("QA VERDICT: PASS")
+    # strays
+    (reports / "Multi_Method_Report.pdf").write_bytes(b"%PDF")
+    (reports / "build_pdf.py").write_text("print(1)")
+    (files_dir / "charts" / "01_chart.py").write_text("print(1)")
+    (files_dir / "charts" / "01_chart.png").write_bytes(b"\x89PNG")
+
+    cleanup_outputs(files_dir)
+
+    assert {p.name for p in reports.iterdir() if p.is_file()} == {
+        "report.md", "report.pdf", "qa_review.md",
+    }
+    assert not list(files_dir.rglob("*.py"))  # stray scripts gone
+    assert (files_dir / "charts" / "01_chart.png").exists()  # real output kept
+
+
 def test_max_qa_rounds_is_a_positive_cap():
     from research_agent.agent import MAX_QA_ROUNDS
 

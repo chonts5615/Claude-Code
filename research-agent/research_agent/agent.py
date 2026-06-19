@@ -227,6 +227,33 @@ def _report_md_path(files_dir: Path) -> Path:
     return files_dir / "reports" / "report.md"
 
 
+# The only files that belong in files/reports/ after a run.
+_CANONICAL_REPORTS = {"report.md", "report.pdf", "qa_review.md", ".gitkeep"}
+
+
+def cleanup_outputs(files_dir: Path) -> None:
+    """Remove stray files agents may have created, keeping the canonical outputs.
+
+    Best-effort tool suppression on the report/QA queries reduces but does not
+    fully prevent a spawned helper from writing stray files (e.g. a title-named
+    PDF or a build script), so we deterministically sweep them here.
+    """
+    reports = files_dir / "reports"
+    if reports.is_dir():
+        for p in reports.iterdir():
+            if p.is_file() and p.name not in _CANONICAL_REPORTS:
+                try:
+                    p.unlink()
+                except OSError:
+                    pass
+    # Remove stray build/chart scripts anywhere under files/ (PNGs/notes remain).
+    for p in files_dir.rglob("*.py"):
+        try:
+            p.unlink()
+        except OSError:
+            pass
+
+
 def _render_pdf(files_dir: Path, brand_config_path: str) -> None:
     """Render the branded PDF from report.md deterministically (in code)."""
     md = _report_md_path(files_dir)
@@ -496,6 +523,9 @@ async def run_pipeline(
             print("\n[qa] REVISE — regenerating the report to address the review.\n")
             await _generate_report(files_dir, model, revise=True)
             _render_pdf(files_dir, brand_config_path)
+
+    # Sweep any stray files a spawned helper may have left behind.
+    cleanup_outputs(files_dir)
 
 
 async def run_research(
