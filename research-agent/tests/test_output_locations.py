@@ -57,6 +57,23 @@ def test_final_report_exists(tmp_path):
     assert _final_report_exists(files_dir) is True
 
 
+def test_report_done_requires_markdown_and_pdf(tmp_path):
+    from research_agent.agent import _report_done, _report_missing
+
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    assert _report_done(files_dir) is False
+    assert "files/reports/report.md" in _report_missing(files_dir)
+
+    (files_dir / "reports" / "report.pdf").write_bytes(b"%PDF-1.4")
+    assert _report_done(files_dir) is False  # md still missing
+    assert _report_missing(files_dir) == ["files/reports/report.md"]
+
+    (files_dir / "reports" / "report.md").write_text("# report")
+    assert _report_done(files_dir) is True
+    assert _report_missing(files_dir) == []
+
+
 def test_parse_plan_extracts_and_normalizes():
     text = (
         "Here is the plan:\n"

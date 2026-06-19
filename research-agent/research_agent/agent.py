@@ -221,6 +221,24 @@ def _final_report_exists(files_dir: Path) -> bool:
     return any((files_dir / "reports").glob("*.pdf"))
 
 
+def _report_md_path(files_dir: Path) -> Path:
+    return files_dir / "reports" / "report.md"
+
+
+def _report_done(files_dir: Path) -> bool:
+    """The report phase needs BOTH the markdown (for QA) and the PDF deliverable."""
+    return _report_md_path(files_dir).exists() and _final_report_exists(files_dir)
+
+
+def _report_missing(files_dir: Path) -> list[str]:
+    missing = []
+    if not _report_md_path(files_dir).exists():
+        missing.append("files/reports/report.md")
+    if not _final_report_exists(files_dir):
+        missing.append("the PDF in files/reports/")
+    return missing
+
+
 def _qa_review_path(files_dir: Path) -> Path:
     return files_dir / "reports" / "qa_review.md"
 
@@ -294,7 +312,7 @@ def _analyze_prompt() -> str:
     )
 
 
-def _report_prompt(revise: bool = False, first: bool = True) -> str:
+def _report_prompt(revise: bool = False, first: bool = True, missing: list[str] | None = None) -> str:
     if revise:
         return (
             "REVISION PHASE. The QA review at files/reports/qa_review.md requested changes. Spawn "
@@ -303,14 +321,15 @@ def _report_prompt(revise: bool = False, first: bool = True) -> str:
             "replacing vague 'multiple sources' attributions with specific citations), and "
             "regenerate BOTH the PDF and files/reports/report.md."
         )
-    retry_note = (
-        ""
-        if first
-        else (
-            " A previous attempt did not produce the PDF; spawn a NEW report-writer now — do not "
-            "assume any earlier subagent is still running. Tell it to write the PDF FIRST."
+    if first:
+        retry_note = ""
+    else:
+        what = ", ".join(missing) if missing else "the required outputs"
+        retry_note = (
+            f" A previous attempt did not produce {what}; spawn a NEW report-writer now — do not "
+            "assume any earlier subagent is still running. It MUST write files/reports/report.md "
+            "(the full report text) AND the PDF."
         )
-    )
     return (
         'REPORT PHASE. Spawn the "report-writer" subagent now to synthesize the research notes, '
         "the data summary in files/data/, and the charts in files/charts/ into a single cited PDF "
@@ -383,16 +402,18 @@ async def run_pipeline(
         max_attempts=PHASE_ATTEMPTS["analyze"],
     )
 
-    # Phase 3: REPORT — gate on a PDF existing.
+    # Phase 3: REPORT — gate on BOTH the markdown (QA reviews it) and the PDF.
     await _drive_phase(
         client, tracker, transcript, name="report",
-        instruction_for_attempt=lambda a: _report_prompt(first=(a == 1)),
-        is_done=lambda: _final_report_exists(files_dir),
+        instruction_for_attempt=lambda a: _report_prompt(
+            first=(a == 1), missing=_report_missing(files_dir)
+        ),
+        is_done=lambda: _report_done(files_dir),
         max_attempts=PHASE_ATTEMPTS["report"],
     )
 
-    # Phase 4: QA — gate on a review file existing.
-    if _final_report_exists(files_dir):
+    # Phase 4: QA — runs whenever there's a report (markdown preferred) to review.
+    if _report_md_path(files_dir).exists() or _final_report_exists(files_dir):
         await _drive_phase(
             client, tracker, transcript, name="qa",
             instruction_for_attempt=lambda a: _qa_prompt(),

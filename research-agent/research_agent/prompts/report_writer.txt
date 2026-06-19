@@ -34,6 +34,9 @@ Process:
    exists. Both files/reports/report.md and the PDF are required deliverables.
 
 Rules:
+- BOTH files/reports/report.md AND the PDF are required. Before you finish,
+  confirm both exist; if report.md is missing, write it now. QA reviews
+  report.md, so it cannot be skipped.
 - Synthesize and attribute; do not copy notes verbatim and do not invent facts.
 - Preserve citations — every claim should be traceable to a source.
 - Use relative paths exactly: read `files/research_notes/`, `files/data/`, and
