@@ -321,6 +321,7 @@ async def _collect_query_text(prompt: str, system_prompt: str, model: str) -> st
         model=heavy_model(model),
         permission_mode="bypassPermissions",
         max_buffer_size=MAX_BUFFER_SIZE,
+        allowed_tools=[],  # text-only: no Task/Write/SendUserFile, just the response
     )
     parts: list[str] = []
     async for msg in query(prompt=prompt, options=options):
