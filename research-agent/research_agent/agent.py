@@ -74,7 +74,8 @@ MAX_QA_ROUNDS = 3
 # empty list is falsy, so --allowedTools is never sent and the CLI defaults to
 # all tools), so we explicitly DISALLOW every built-in tool instead.
 _QUERY_DENY_TOOLS = [
-    "Task", "Bash", "BashOutput", "KillBash", "Write", "Edit", "MultiEdit",
+    "Task", "Agent",  # both names the SDK has used for the subagent-spawn tool
+    "Bash", "BashOutput", "KillBash", "Write", "Edit", "MultiEdit",
     "NotebookEdit", "Read", "Glob", "Grep", "WebSearch", "WebFetch", "TodoWrite",
     "Skill", "SendUserFile", "ExitPlanMode", "AskUserQuestion", "Monitor", "REPL",
     "ToolSearch",
