@@ -337,12 +337,22 @@ async def _collect_query_text(prompt: str, system_prompt: str, model: str) -> st
 
 
 def _strip_to_markdown(text: str) -> str:
-    """Drop any preamble before the first markdown heading / fenced block."""
-    fence = re.search(r"```(?:markdown|md)?\n(.*?)```", text, re.DOTALL)
-    if fence:
-        return fence.group(1).strip()
-    idx = text.find("# ")
-    return text[idx:].strip() if idx > 0 else text
+    """Return the report body, unwrapping only an outer code fence.
+
+    The model may wrap its whole response in one ```markdown fence, or none at
+    all. We must NOT grab an inner code fence (e.g. a fenced calculation), so we
+    only unwrap when the entire response is a single fenced block; otherwise we
+    drop any preamble before the first markdown heading.
+    """
+    t = text.strip()
+    if t.startswith("```") and t.endswith("```"):
+        first_nl = t.find("\n")
+        if first_nl != -1:
+            inner = t[first_nl + 1 : -3].strip()
+            if inner:
+                return inner
+    idx = t.find("# ")
+    return t[idx:].strip() if idx > 0 else t
 
 
 async def _generate_report(files_dir: Path, model: str, revise: bool = False) -> None:

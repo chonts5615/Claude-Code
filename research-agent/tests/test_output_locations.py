@@ -133,6 +133,22 @@ def test_analysis_done_detects_charts_or_data(tmp_path):
     assert _analysis_done(files_dir) is True
 
 
+def test_strip_to_markdown_keeps_full_report_with_inner_fence():
+    from research_agent.agent import _strip_to_markdown
+
+    # A report containing an inner ``` calculation block must NOT be truncated to
+    # that block (the original bug).
+    report = (
+        "# Title\n\n## Executive Summary\nThe recommendation.\n\n"
+        "```\nROI = 90000 / 30000 = 300%\n```\n\n## Conclusion\nDone.\n"
+    )
+    out = _strip_to_markdown("Here is the report:\n\n" + report)
+    assert out.startswith("# Title")
+    assert "## Conclusion" in out  # not truncated at the inner fence
+    # A fully fenced response is unwrapped.
+    assert _strip_to_markdown("```markdown\n" + report + "\n```").startswith("# Title")
+
+
 def test_max_qa_rounds_is_a_positive_cap():
     from research_agent.agent import MAX_QA_ROUNDS
 
