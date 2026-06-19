@@ -35,6 +35,7 @@ from claude_agent_sdk import (
     HookMatcher,
 )
 
+from research_agent.render import render_report_pdf
 from research_agent.utils.message_handler import process_assistant_message
 from research_agent.utils.subagent_tracker import SubagentTracker
 from research_agent.utils.transcript import TranscriptWriter, setup_session
@@ -140,19 +141,17 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
         ),
         "report-writer": AgentDefinition(
             description=(
-                "Use this agent when you need to create a formal research report document. "
-                "The report-writer reads research findings from files/research_notes/, data "
-                "analysis from files/data/, and charts from files/charts/, then synthesizes "
-                "them into clear, concise, professionally formatted PDF reports in "
-                "files/reports/ using reportlab. Ideal for creating structured documents with "
-                "proper citations, data, and embedded visuals. Does NOT conduct web searches - "
-                "only reads existing research notes and creates PDF reports."
+                "Use this agent when you need to write a formal research report. The "
+                "report-writer reads research findings from files/research_notes/, data analysis "
+                "from files/data/, and the chart list from files/charts/, then synthesizes them "
+                "into a clear, well-cited report written as MARKDOWN to files/reports/report.md. "
+                "The branded PDF is rendered from that markdown automatically, so this agent does "
+                "not build PDFs. Does NOT conduct web searches."
             ),
-            tools=["Write", "Glob", "Read", "Bash"],
+            tools=["Write", "Glob", "Read"],
             prompt=report_writer_prompt,
             model=heavy_model(model),
-            skills=["report-branding"],
-            maxTurns=40,  # read inputs + write markdown + build PDF + verify
+            maxTurns=25,
         ),
         "qa-reviewer": AgentDefinition(
             description=(
@@ -160,13 +159,12 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
                 "report against the research notes. The qa-reviewer reads the notes, the data "
                 "summary, and files/reports/report.md, then writes a critical review to "
                 "files/reports/qa_review.md flagging coverage gaps, outdated statistics, vague "
-                "citations, formatting/branding problems, and rigor/decision-usefulness issues, "
-                "ending with a PASS/REVISE verdict. Does not do web research or rewrite the report."
+                "citations, formatting problems, and rigor/decision-usefulness issues, ending "
+                "with a PASS/REVISE verdict. Does not do web research or rewrite the report."
             ),
             tools=["Glob", "Read", "Write"],
             prompt=qa_reviewer_prompt,
             model=heavy_model(model),
-            skills=["report-format-qc", "io-psych-exec-review"],
             maxTurns=30,
         ),
     }
@@ -180,9 +178,7 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
         permission_mode="bypassPermissions",
         cwd=str(files_dir.parent),  # Pin the working dir so relative file paths
         # (files/...) resolve to the same place for every agent and subagent.
-        setting_sources=["project"],  # Load skills/commands from project .claude directory
-        add_dirs=[str(PROJECT_DIR)],  # so .claude/skills/ is discoverable from any cwd
-        skills="all",  # enable the bundled report-branding / -format-qc / io-psych skills
+        setting_sources=["project"],  # Load slash commands from project .claude directory
         system_prompt=load_prompt("lead_agent.txt"),
         allowed_tools=["Task"],
         agents=agents,
@@ -242,18 +238,19 @@ def _report_md_path(files_dir: Path) -> Path:
     return files_dir / "reports" / "report.md"
 
 
-def _report_done(files_dir: Path) -> bool:
-    """The report phase needs BOTH the markdown (for QA) and the PDF deliverable."""
-    return _report_md_path(files_dir).exists() and _final_report_exists(files_dir)
-
-
-def _report_missing(files_dir: Path) -> list[str]:
-    missing = []
-    if not _report_md_path(files_dir).exists():
-        missing.append("files/reports/report.md")
-    if not _final_report_exists(files_dir):
-        missing.append("the PDF in files/reports/")
-    return missing
+def _render_pdf(files_dir: Path, brand_config_path: str) -> None:
+    """Render the branded PDF from report.md deterministically (in code)."""
+    md = _report_md_path(files_dir)
+    if not md.exists():
+        print("[render] no report.md — skipping PDF render.")
+        return
+    try:
+        out = render_report_pdf(
+            md, files_dir / "charts", files_dir / "reports" / "report.pdf", brand_config_path
+        )
+        print(f"[render] branded PDF written: {out}")
+    except Exception as exc:  # rendering must never crash the pipeline
+        print(f"[render] PDF render failed: {type(exc).__name__}: {exc}")
 
 
 def _qa_review_path(files_dir: Path) -> Path:
@@ -329,43 +326,30 @@ def _analyze_prompt() -> str:
     )
 
 
-def _report_prompt(
-    revise: bool = False,
-    first: bool = True,
-    missing: list[str] | None = None,
-    brand_config_path: str = "",
-) -> str:
-    branding = (
-        ' Apply the "report-branding" skill to style the PDF using the brand config at '
-        f"{brand_config_path} (it falls back to a neutral default if absent)."
-        if brand_config_path
-        else ' Apply the "report-branding" skill to style the PDF.'
-    )
+def _report_prompt(revise: bool = False, first: bool = True) -> str:
     if revise:
         return (
             "REVISION PHASE. The QA review at files/reports/qa_review.md requested changes. Spawn "
             'the "report-writer" subagent now to read files/reports/qa_review.md and the research '
-            "notes, address every issue raised (especially updating outdated statistics, replacing "
-            "vague 'multiple sources' attributions with specific citations, and any formatting / "
-            "branding / rigor issues), and regenerate BOTH the PDF and files/reports/report.md."
-            + branding
+            "notes and rewrite files/reports/report.md, addressing every issue raised (especially "
+            "updating outdated statistics, replacing vague 'multiple sources' attributions with "
+            "specific citations, and any rigor or decision-usefulness gaps). The branded PDF is "
+            "rendered from report.md automatically."
         )
-    if first:
-        retry_note = ""
-    else:
-        what = ", ".join(missing) if missing else "the required outputs"
-        retry_note = (
-            f" A previous attempt did not produce {what}; spawn a NEW report-writer now — do not "
-            "assume any earlier subagent is still running. It MUST write files/reports/report.md "
-            "(the full report text) AND the PDF."
+    retry_note = (
+        ""
+        if first
+        else (
+            " A previous attempt did not write files/reports/report.md; spawn a NEW report-writer "
+            "now — do not assume an earlier subagent is still running — and make sure it Writes "
+            "the file."
         )
+    )
     return (
         'REPORT PHASE. Spawn the "report-writer" subagent now to synthesize the research notes, '
-        "the data summary in files/data/, and the charts in files/charts/ into a single cited PDF "
-        "in files/reports/ with an appropriate title. Also have it write a plain-markdown copy of "
-        "the same report (text only, no images) to files/reports/report.md so it can be reviewed."
-        + branding
-        + retry_note
+        "the data summary in files/data/, and the chart list in files/charts/ into a single, "
+        "well-cited report written as MARKDOWN to files/reports/report.md. Do not build a PDF — "
+        "the branded PDF is rendered from report.md automatically." + retry_note
     )
 
 
@@ -435,15 +419,16 @@ async def run_pipeline(
         max_attempts=PHASE_ATTEMPTS["analyze"],
     )
 
-    # Phase 3: REPORT — gate on BOTH the markdown (QA reviews it) and the PDF.
+    # Phase 3: REPORT — the agent writes markdown only (reliable); gate on it.
     await _drive_phase(
         client, tracker, transcript, name="report",
-        instruction_for_attempt=lambda a: _report_prompt(
-            first=(a == 1), missing=_report_missing(files_dir), brand_config_path=brand_config_path
-        ),
-        is_done=lambda: _report_done(files_dir),
+        instruction_for_attempt=lambda a: _report_prompt(first=(a == 1)),
+        is_done=lambda: _report_md_path(files_dir).exists(),
         max_attempts=PHASE_ATTEMPTS["report"],
     )
+
+    # Render the branded PDF deterministically from the markdown (no agent flakiness).
+    _render_pdf(files_dir, brand_config_path)
 
     # Phase 4: QA — runs whenever there's a report (markdown preferred) to review.
     if _report_md_path(files_dir).exists() or _final_report_exists(files_dir):
@@ -456,10 +441,8 @@ async def run_pipeline(
         # Phase 5: one revision pass if QA flagged material issues.
         if _qa_verdict(files_dir) == "REVISE":
             print("\n[qa] verdict REVISE — running one revision pass.\n")
-            await _run_turn(
-                client, _report_prompt(revise=True, brand_config_path=brand_config_path),
-                tracker, transcript,
-            )
+            await _run_turn(client, _report_prompt(revise=True), tracker, transcript)
+            _render_pdf(files_dir, brand_config_path)  # re-render the revised report
         else:
             print(f"\n[qa] verdict: {_qa_verdict(files_dir)}.\n")
 

@@ -16,17 +16,39 @@ specialized subagents defined via `AgentDefinition`:
 
 | Agent | Tools | Purpose |
 |-------|-------|---------|
-| **Lead Agent** | `Task` | Plans subtopics and coordinates the workflow |
+| **Lead Agent** | `Task` | Spawns subagents for each phase the orchestrator drives |
 | **researcher** | `WebSearch`, `Write` | Web research → Markdown notes in `files/research_notes/` |
 | **data-analyst** | `Glob`, `Read`, `Bash`, `Write` | Extracts metrics, renders charts to `files/charts/`, summary to `files/data/` |
-| **report-writer** | `Skill`, `Write`, `Glob`, `Read`, `Bash` | Synthesizes a PDF report into `files/reports/` |
+| **report-writer** | `Write`, `Glob`, `Read` | Synthesizes the report as Markdown → `files/reports/report.md` |
+| **qa-reviewer** | `Glob`, `Read`, `Write` | Critically reviews the report → `files/reports/qa_review.md` (PASS/REVISE) |
 
-Typical workflow:
+### Deterministic orchestration
 
-1. The Lead Agent splits the request into 2–4 subtopics.
-2. It spawns one **researcher** per subtopic, **in parallel**, each writing notes.
-3. It spawns a **data-analyst** to extract numbers and build charts.
-4. It spawns a **report-writer** to produce the final PDF with embedded visuals.
+A code-driven state machine (`run_pipeline`) — not the lead agent's judgement —
+sequences the work and gates each phase on a filesystem check, retrying only the
+missing piece:
+
+1. **Plan** — the lead emits a JSON subtopic list, which the code parses.
+2. **Research** — one researcher per subtopic, in parallel; gate: all notes exist.
+3. **Analyze** — the data-analyst builds charts + a data summary.
+4. **Report** — the report-writer writes `report.md`; the **branded PDF is then
+   rendered deterministically in code** (`research_agent/render.py`) from the
+   markdown + charts + brand config (no agent-driven PDF building).
+5. **QA** — the qa-reviewer critiques the report and emits PASS/REVISE; a REVISE
+   triggers one revision pass (and a re-render).
+
+The report-writer and qa-reviewer run on at least **sonnet** (`heavy_model`); the
+researchers and analyst use the lighter default model.
+
+### Quality skills
+
+Three skill specs under `.claude/skills/` are embedded in the pipeline:
+
+- **report-branding** — the brand spec applied by the PDF renderer (configurable
+  via `config/brand.json` / `--brand-config`; neutral default).
+- **report-format-qc** — formatting/consistency checks, embedded in QA.
+- **io-psych-exec-review** — QA review through an I-O psychology
+  research-practitioner and a principal executive consultant lens.
 
 ### Subagent tracking & logging
 

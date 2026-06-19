@@ -47,20 +47,17 @@ def test_heavy_model_never_below_sonnet():
     assert heavy_model("opus") == "opus"
 
 
-def test_skills_attached_and_discoverable(tmp_path):
+def test_heavy_agents_use_sonnet_and_skill_docs_exist(tmp_path):
     from research_agent.agent import DEFAULT_BRAND_CONFIG, PROJECT_DIR, build_options
     from research_agent.utils.subagent_tracker import SubagentTracker
 
     files_dir = tmp_path / "files"
     ensure_output_dirs(files_dir)
     opts = build_options(files_dir, SubagentTracker(None, tmp_path), "haiku")
-    assert opts.agents["report-writer"].skills == ["report-branding"]
-    assert "io-psych-exec-review" in opts.agents["qa-reviewer"].skills
-    assert "report-format-qc" in opts.agents["qa-reviewer"].skills
-    # the heavy agents must not run below sonnet
+    # the heavy synthesis/QA agents must not run below sonnet
     assert opts.agents["report-writer"].model == "sonnet"
     assert opts.agents["qa-reviewer"].model == "sonnet"
-    # skills live under the project .claude and the default brand config exists
+    # the skill specs exist as docs (their behavior is embedded in code/prompts)
     for name in ("report-branding", "report-format-qc", "io-psych-exec-review"):
         assert (PROJECT_DIR / ".claude" / "skills" / name / "SKILL.md").exists()
     assert DEFAULT_BRAND_CONFIG.exists()
@@ -84,21 +81,23 @@ def test_final_report_exists(tmp_path):
     assert _final_report_exists(files_dir) is True
 
 
-def test_report_done_requires_markdown_and_pdf(tmp_path):
-    from research_agent.agent import _report_done, _report_missing
+def test_render_pdf_from_markdown(tmp_path):
+    from research_agent.render import render_report_pdf
 
     files_dir = tmp_path / "files"
     ensure_output_dirs(files_dir)
-    assert _report_done(files_dir) is False
-    assert "files/reports/report.md" in _report_missing(files_dir)
-
-    (files_dir / "reports" / "report.pdf").write_bytes(b"%PDF-1.4")
-    assert _report_done(files_dir) is False  # md still missing
-    assert _report_missing(files_dir) == ["files/reports/report.md"]
-
-    (files_dir / "reports" / "report.md").write_text("# report")
-    assert _report_done(files_dir) is True
-    assert _report_missing(files_dir) == []
+    (files_dir / "research_notes" / "n.md").write_text("x")
+    (files_dir / "reports" / "report.md").write_text(
+        "# Test Report\n\n## Summary\nA **bold** finding: r = 0.42.\n\n- bullet one\n- bullet two\n"
+    )
+    out = render_report_pdf(
+        files_dir / "reports" / "report.md",
+        files_dir / "charts",
+        files_dir / "reports" / "report.pdf",
+        None,
+    )
+    assert out.exists() and out.stat().st_size > 1000
+    assert _final_report_exists(files_dir) is True
 
 
 def test_parse_plan_extracts_and_normalizes():
