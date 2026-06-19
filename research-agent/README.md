@@ -40,8 +40,8 @@ missing piece:
 4. **Report** — the report-writer writes `report.md`; the **branded PDF is then
    rendered deterministically in code** (`research_agent/render.py`) from the
    markdown + charts + brand config (no agent-driven PDF building).
-5. **QA** — the qa-reviewer critiques the report and emits PASS/REVISE; a REVISE
-   triggers one revision pass (and a re-render).
+5. **QA** — a critique emits PASS/REVISE; a REVISE regenerates the report and
+   re-renders, then re-reviews, looping until it passes or `MAX_QA_ROUNDS` (3).
 
 The report-writer and qa-reviewer run on at least **sonnet** (`heavy_model`); the
 researchers and analyst use the lighter default model.

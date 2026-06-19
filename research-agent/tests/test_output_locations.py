@@ -133,6 +133,12 @@ def test_analysis_done_detects_charts_or_data(tmp_path):
     assert _analysis_done(files_dir) is True
 
 
+def test_max_qa_rounds_is_a_positive_cap():
+    from research_agent.agent import MAX_QA_ROUNDS
+
+    assert isinstance(MAX_QA_ROUNDS, int) and MAX_QA_ROUNDS >= 1
+
+
 def test_qa_verdict_parsing(tmp_path):
     files_dir = tmp_path / "files"
     ensure_output_dirs(files_dir)

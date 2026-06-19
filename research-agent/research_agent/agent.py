@@ -66,6 +66,10 @@ OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
 # rather than block forever if a phase can't fully complete).
 PHASE_ATTEMPTS = {"research": 3, "analyze": 2, "report": 3, "qa": 2}
 
+# Max QA review rounds: review -> (REVISE) regenerate -> re-review, until the
+# report passes or this cap is hit.
+MAX_QA_ROUNDS = 3
+
 # The SDK's default stdout buffer is 1 MB; a single large tool result (e.g. an
 # agent accidentally reading a multi-MB PDF/PNG, or a big web result) overflows
 # it and fatally crashes the message reader. Raise it for resilience.
@@ -455,16 +459,22 @@ async def run_pipeline(
     await _generate_report(files_dir, model)
     _render_pdf(files_dir, brand_config_path)
 
-    # Phase 4: QA — also a controlled query; a REVISE verdict drives one revision.
+    # Phase 4: QA — review, and on REVISE regenerate + re-render, then re-review,
+    # looping until the report passes or MAX_QA_ROUNDS is reached.
     if _report_md_path(files_dir).exists():
-        print("\n[phase: qa] reviewing report\n")
-        await _run_qa(files_dir, model)
-        if _qa_verdict(files_dir) == "REVISE":
-            print("\n[qa] verdict REVISE — running one revision pass.\n")
+        for round_n in range(1, MAX_QA_ROUNDS + 1):
+            print(f"\n[phase: qa] reviewing report (round {round_n}/{MAX_QA_ROUNDS})\n")
+            await _run_qa(files_dir, model)
+            verdict = _qa_verdict(files_dir)
+            print(f"\n[qa] round {round_n} verdict: {verdict}\n")
+            if verdict != "REVISE":
+                break
+            if round_n == MAX_QA_ROUNDS:
+                print("\n[qa] still REVISE after max rounds — keeping the last revision.\n")
+                break
+            print("\n[qa] REVISE — regenerating the report to address the review.\n")
             await _generate_report(files_dir, model, revise=True)
             _render_pdf(files_dir, brand_config_path)
-        else:
-            print(f"\n[qa] verdict: {_qa_verdict(files_dir)}.\n")
 
 
 async def run_research(
