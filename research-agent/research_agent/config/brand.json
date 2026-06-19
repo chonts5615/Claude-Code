@@ -1,0 +1,14 @@
+{
+  "brand_name": "",
+  "tagline": "",
+  "primary_color": "#1F2937",
+  "secondary_color": "#4B5563",
+  "accent_color": "#2563EB",
+  "background_tint": "#F5F7FA",
+  "heading_font": "Helvetica-Bold",
+  "body_font": "Helvetica",
+  "logo_path": "",
+  "footer_text": "Confidential",
+  "cover_page": true,
+  "page_numbers": true
+}

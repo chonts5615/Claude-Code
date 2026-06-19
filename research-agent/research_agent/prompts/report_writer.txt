@@ -32,6 +32,11 @@ Process:
    clean. Embed the PNG charts (by path) at a readable size. If reportlab is
    unavailable, install it with `pip install reportlab` first. Verify the PDF
    exists. Both files/reports/report.md and the PDF are required deliverables.
+5. Apply the "report-branding" skill to style the PDF (cover page, color palette,
+   fonts, and a footer with page numbers) using the brand config the lead points
+   you to. If the skill is unavailable, apply branding directly: read that brand
+   config JSON (use a neutral default if it is missing) and use its colors/fonts
+   for the title, headings, tables, and footer.
 
 Rules:
 - BOTH files/reports/report.md AND the PDF are required. Before you finish,

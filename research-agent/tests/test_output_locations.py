@@ -39,6 +39,33 @@ def test_build_options_raises_buffer_and_registers_qa(tmp_path):
     assert "qa-reviewer" in opts.agents
 
 
+def test_heavy_model_never_below_sonnet():
+    from research_agent.agent import heavy_model
+
+    assert heavy_model("haiku") == "sonnet"
+    assert heavy_model("sonnet") == "sonnet"
+    assert heavy_model("opus") == "opus"
+
+
+def test_skills_attached_and_discoverable(tmp_path):
+    from research_agent.agent import DEFAULT_BRAND_CONFIG, PROJECT_DIR, build_options
+    from research_agent.utils.subagent_tracker import SubagentTracker
+
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    opts = build_options(files_dir, SubagentTracker(None, tmp_path), "haiku")
+    assert opts.agents["report-writer"].skills == ["report-branding"]
+    assert "io-psych-exec-review" in opts.agents["qa-reviewer"].skills
+    assert "report-format-qc" in opts.agents["qa-reviewer"].skills
+    # the heavy agents must not run below sonnet
+    assert opts.agents["report-writer"].model == "sonnet"
+    assert opts.agents["qa-reviewer"].model == "sonnet"
+    # skills live under the project .claude and the default brand config exists
+    for name in ("report-branding", "report-format-qc", "io-psych-exec-review"):
+        assert (PROJECT_DIR / ".claude" / "skills" / name / "SKILL.md").exists()
+    assert DEFAULT_BRAND_CONFIG.exists()
+
+
 def test_with_output_locations_injects_absolute_paths(tmp_path):
     files_dir = tmp_path / "files"
     out = with_output_locations("ORIGINAL BODY", files_dir)

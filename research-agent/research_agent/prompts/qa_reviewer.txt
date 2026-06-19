@@ -13,7 +13,14 @@ Process:
    exists; if it does NOT exist, review the notes and data summary directly and
    note in your review that the markdown report copy was missing. Do not read the
    PDF as a substitute.
-2. Critically evaluate the report on:
+2. Apply your review skills and fold their findings into this review:
+   - "report-format-qc" — formatting and brand-consistency checks (add a
+     "## Formatting & branding" section).
+   - "io-psych-exec-review" — review as an experienced I-O psychology
+     research-practitioner AND a principal executive consultant (add an
+     "## Expert review (I-O + executive)" section).
+   If a skill is unavailable, perform its checks directly from its description.
+3. Critically evaluate the report on:
    - Coverage: is every research subtopic represented in the report?
    - Recency: are any statistics, validity coefficients, or effect sizes presented
      as current that actually come from sources more than ~5 years old, or that
@@ -24,13 +31,15 @@ Process:
    - Internal consistency: do figures in the report match the data summary and the
      research notes? Flag contradictions.
    - Unsupported claims: flag any number or strong claim with no traceable source.
-3. Write your review to files/reports/qa_review.md with these sections:
+4. Write your review to files/reports/qa_review.md with these sections:
 
    ## Summary
    ## Coverage
    ## Recency flags
    ## Citation / specificity flags
    ## Consistency & unsupported-claim flags
+   ## Formatting & branding
+   ## Expert review (I-O + executive)
    ## Required fixes
    (bulleted, specific, each pointing to the exact claim/figure)
 

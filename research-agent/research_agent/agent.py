@@ -42,8 +42,20 @@ from research_agent.utils.transcript import TranscriptWriter, setup_session
 # Load environment variables
 load_dotenv()
 
-# Paths to prompt files
+# Paths to prompt files and bundled config / skills.
 PROMPTS_DIR = Path(__file__).parent / "prompts"
+PROJECT_DIR = Path(__file__).resolve().parent.parent  # research-agent/ (holds .claude/)
+DEFAULT_BRAND_CONFIG = Path(__file__).resolve().parent / "config" / "brand.json"
+
+
+def heavy_model(model: str) -> str:
+    """A more capable model for the multi-step report/QA agents.
+
+    The researchers and analyst run fine on a fast model, but synthesising the
+    report (read -> compose -> build PDF -> verify) and the expert QA review need
+    more capability, so never run those below sonnet.
+    """
+    return model if model in ("opus", "sonnet") else "sonnet"
 
 # Subdirectories created under the output directory.
 OUTPUT_SUBDIRS = ("research_notes", "data", "charts", "reports")
@@ -136,10 +148,11 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
                 "proper citations, data, and embedded visuals. Does NOT conduct web searches - "
                 "only reads existing research notes and creates PDF reports."
             ),
-            tools=["Skill", "Write", "Glob", "Read", "Bash"],
+            tools=["Write", "Glob", "Read", "Bash"],
             prompt=report_writer_prompt,
-            model=model,
-            maxTurns=40,  # read inputs + build PDF + build script + markdown copy
+            model=heavy_model(model),
+            skills=["report-branding"],
+            maxTurns=40,  # read inputs + write markdown + build PDF + verify
         ),
         "qa-reviewer": AgentDefinition(
             description=(
@@ -147,12 +160,14 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
                 "report against the research notes. The qa-reviewer reads the notes, the data "
                 "summary, and files/reports/report.md, then writes a critical review to "
                 "files/reports/qa_review.md flagging coverage gaps, outdated statistics, vague "
-                "citations, and inconsistencies, ending with a PASS/REVISE verdict. Does not "
-                "do web research or rewrite the report."
+                "citations, formatting/branding problems, and rigor/decision-usefulness issues, "
+                "ending with a PASS/REVISE verdict. Does not do web research or rewrite the report."
             ),
             tools=["Glob", "Read", "Write"],
             prompt=qa_reviewer_prompt,
-            model=model,
+            model=heavy_model(model),
+            skills=["report-format-qc", "io-psych-exec-review"],
+            maxTurns=30,
         ),
     }
 
@@ -166,6 +181,8 @@ def build_options(files_dir: Path, tracker: SubagentTracker, model: str) -> Clau
         cwd=str(files_dir.parent),  # Pin the working dir so relative file paths
         # (files/...) resolve to the same place for every agent and subagent.
         setting_sources=["project"],  # Load skills/commands from project .claude directory
+        add_dirs=[str(PROJECT_DIR)],  # so .claude/skills/ is discoverable from any cwd
+        skills="all",  # enable the bundled report-branding / -format-qc / io-psych skills
         system_prompt=load_prompt("lead_agent.txt"),
         allowed_tools=["Task"],
         agents=agents,
@@ -312,14 +329,26 @@ def _analyze_prompt() -> str:
     )
 
 
-def _report_prompt(revise: bool = False, first: bool = True, missing: list[str] | None = None) -> str:
+def _report_prompt(
+    revise: bool = False,
+    first: bool = True,
+    missing: list[str] | None = None,
+    brand_config_path: str = "",
+) -> str:
+    branding = (
+        ' Apply the "report-branding" skill to style the PDF using the brand config at '
+        f"{brand_config_path} (it falls back to a neutral default if absent)."
+        if brand_config_path
+        else ' Apply the "report-branding" skill to style the PDF.'
+    )
     if revise:
         return (
             "REVISION PHASE. The QA review at files/reports/qa_review.md requested changes. Spawn "
             'the "report-writer" subagent now to read files/reports/qa_review.md and the research '
-            "notes, address every issue raised (especially updating outdated statistics and "
-            "replacing vague 'multiple sources' attributions with specific citations), and "
-            "regenerate BOTH the PDF and files/reports/report.md."
+            "notes, address every issue raised (especially updating outdated statistics, replacing "
+            "vague 'multiple sources' attributions with specific citations, and any formatting / "
+            "branding / rigor issues), and regenerate BOTH the PDF and files/reports/report.md."
+            + branding
         )
     if first:
         retry_note = ""
@@ -335,6 +364,7 @@ def _report_prompt(revise: bool = False, first: bool = True, missing: list[str] 
         "the data summary in files/data/, and the charts in files/charts/ into a single cited PDF "
         "in files/reports/ with an appropriate title. Also have it write a plain-markdown copy of "
         "the same report (text only, no images) to files/reports/report.md so it can be reviewed."
+        + branding
         + retry_note
     )
 
@@ -343,7 +373,9 @@ def _qa_prompt() -> str:
     return (
         'QA PHASE. Spawn the "qa-reviewer" subagent now. It must read every research note in '
         "files/research_notes/, the data summary in files/data/, and the report at "
-        "files/reports/report.md, then write a critical review to files/reports/qa_review.md "
+        "files/reports/report.md (never the binary PDF), and apply the \"report-format-qc\" and "
+        '"io-psych-exec-review" skills, then write a critical review to files/reports/qa_review.md '
+        "with sections for content, formatting/branding, and expert (I-O + executive) review, "
         "ending with a line 'QA VERDICT: PASS' or 'QA VERDICT: REVISE'."
     )
 
@@ -375,6 +407,7 @@ async def run_pipeline(
     files_dir: Path,
     tracker: SubagentTracker,
     transcript: TranscriptWriter,
+    brand_config_path: str = "",
 ) -> None:
     """Drive the research pipeline deterministically, gating each phase on disk state."""
     # Phase 0: PLAN — the code (not the lead's judgement) owns the sequence.
@@ -406,7 +439,7 @@ async def run_pipeline(
     await _drive_phase(
         client, tracker, transcript, name="report",
         instruction_for_attempt=lambda a: _report_prompt(
-            first=(a == 1), missing=_report_missing(files_dir)
+            first=(a == 1), missing=_report_missing(files_dir), brand_config_path=brand_config_path
         ),
         is_done=lambda: _report_done(files_dir),
         max_attempts=PHASE_ATTEMPTS["report"],
@@ -423,12 +456,17 @@ async def run_pipeline(
         # Phase 5: one revision pass if QA flagged material issues.
         if _qa_verdict(files_dir) == "REVISE":
             print("\n[qa] verdict REVISE — running one revision pass.\n")
-            await _run_turn(client, _report_prompt(revise=True), tracker, transcript)
+            await _run_turn(
+                client, _report_prompt(revise=True, brand_config_path=brand_config_path),
+                tracker, transcript,
+            )
         else:
             print(f"\n[qa] verdict: {_qa_verdict(files_dir)}.\n")
 
 
-async def run_research(query: str | None = None, model: str = "haiku") -> None:
+async def run_research(
+    query: str | None = None, model: str = "haiku", brand_config: Path | None = None
+) -> None:
     """Run the research agent, either one-shot (query given) or interactive."""
 
     # Verify we can authenticate before creating any files.
@@ -456,9 +494,12 @@ async def run_research(query: str | None = None, model: str = "haiku") -> None:
         print("Type 'exit' to quit.\n")
 
     try:
+        brand_config_path = str((brand_config or DEFAULT_BRAND_CONFIG).resolve())
         async with ClaudeSDKClient(options=options) as client:
             if query is not None:
-                await run_pipeline(client, query, files_dir, tracker, transcript)
+                await run_pipeline(
+                    client, query, files_dir, tracker, transcript, brand_config_path
+                )
                 if _final_report_exists(files_dir):
                     print("\n[pipeline] final report present.\n")
                 else:
@@ -491,13 +532,19 @@ def main() -> None:
         help="Run one research request read from a file non-interactively, then exit.",
     )
     parser.add_argument("--model", default="haiku", help="Model for all agents (default: haiku).")
+    parser.add_argument(
+        "--brand-config",
+        type=Path,
+        default=None,
+        help="Path to a brand config JSON for the report-branding skill (default: neutral).",
+    )
     args = parser.parse_args()
 
     query = args.query
     if args.query_file is not None:
         query = args.query_file.read_text(encoding="utf-8").strip()
 
-    asyncio.run(run_research(query=query, model=args.model))
+    asyncio.run(run_research(query=query, model=args.model, brand_config=args.brand_config))
 
 
 if __name__ == "__main__":
