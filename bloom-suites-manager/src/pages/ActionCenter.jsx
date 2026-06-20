@@ -90,7 +90,7 @@ export default function ActionCenter({ onOpenTenant, goTo }) {
           {groups.rent.map((t) => (
             <Row key={t.id} meta={META.rent} onOpen={() => onOpenTenant(t.tenant)}
               title={`Collect rent — ${t.tenant.name}`}
-              subtitle={`${monthLabel(t.row.month)} · ${fmt(t.row.amount)} · ${t.status === "late" ? `${t.overdue} days overdue` : "due now"} · ${t.tenant.suite}`}>
+              subtitle={`${monthLabel(t.row.month)} · ${fmt(t.row.amount)}${t.lateFeeAmount > 0 ? ` + ${fmt(t.lateFeeAmount)} late fee` : ""} · ${t.status === "late" ? `${t.overdue} days overdue` : "due now"} · ${t.tenant.suite}`}>
               <ActionBtn primary onClick={() => actions.markRentPaid(t.row.id)}>Mark paid</ActionBtn>
               <TextBtn phone={t.tenant.phone} body={rentReminder(t.tenant, t.row, data.settings)} />
               <ActionBtn onClick={() => copy(rentReminder(t.tenant, t.row, data.settings))}>Copy</ActionBtn>

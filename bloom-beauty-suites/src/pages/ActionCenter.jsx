@@ -11,7 +11,7 @@ import {
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
 import { Card, SectionHeader, copyText, smsHref } from "../ui";
-import { fmtD } from "../format";
+import { fmtD, daysAgo } from "../format";
 
 const TASK_META = {
   rebook: { icon: Icons.bell, color: C.rose, bg: C.roseLight },
@@ -41,9 +41,10 @@ const ActionBtn = ({ children, onClick, primary }) => (
 );
 
 // Like ActionBtn, but an <a> so it can open the phone's Messages app (sms:).
-const TextBtn = ({ phone, body }) => (
+const TextBtn = ({ phone, body, onClick }) => (
   <a
     href={smsHref(phone, body)}
+    onClick={onClick}
     style={{ padding: "7px 12px", borderRadius: 9, border: "none", background: C.rose, color: C.white, fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 5 }}
   >
     <Icon d={Icons.phone} size={13} color={C.white} /> Text
@@ -106,42 +107,57 @@ export default function ActionCenter({ onOpenClient }) {
 
       {!collapsed && (
         <div>
-          {groups.rebook.map((t) => (
-            <TaskRow
-              key={t.id}
-              meta={TASK_META.rebook}
-              onOpen={() => onOpenClient(t.client)}
-              title={`Rebook ${t.client.name}`}
-              subtitle={
-                t.overdueDays > 0
-                  ? `${t.overdueDays} day${t.overdueDays === 1 ? "" : "s"} past their usual ${t.client.avgInterval}-day cadence`
-                  : "Due for their next appointment"
-              }
-            >
-              <ActionBtn primary onClick={() => actions.rebookClient(t.client.id)}>
-                Rebook
-              </ActionBtn>
-              <TextBtn phone={t.client.phone} body={rebookMessage(t.client, data.settings)} />
-              <ActionBtn onClick={() => copy(rebookMessage(t.client, data.settings))}>
-                Copy
-              </ActionBtn>
-            </TaskRow>
-          ))}
+          {groups.rebook.map((t) => {
+            const contactedDays = t.client.lastContacted ? daysAgo(t.client.lastContacted) : null;
+            const contactedNote = contactedDays != null ? ` · messaged ${contactedDays} day${contactedDays === 1 ? "" : "s"} ago` : "";
+            const subtitleBase = t.overdueDays > 0
+              ? `${t.overdueDays} day${t.overdueDays === 1 ? "" : "s"} past their usual ${t.client.avgInterval}-day cadence`
+              : "Due for their next appointment";
+            return (
+              <TaskRow
+                key={t.id}
+                meta={TASK_META.rebook}
+                onOpen={() => onOpenClient(t.client)}
+                title={`Rebook ${t.client.name}`}
+                subtitle={subtitleBase + contactedNote}
+              >
+                <ActionBtn primary onClick={() => actions.rebookClient(t.client.id)}>
+                  Rebook
+                </ActionBtn>
+                <TextBtn
+                  phone={t.client.phone}
+                  body={rebookMessage(t.client, data.settings)}
+                  onClick={() => actions.markClientContacted(t.client.id)}
+                />
+                <ActionBtn onClick={() => { copy(rebookMessage(t.client, data.settings)); actions.markClientContacted(t.client.id); }}>
+                  Copy
+                </ActionBtn>
+              </TaskRow>
+            );
+          })}
 
-          {groups.winback.map((t) => (
-            <TaskRow
-              key={t.id}
-              meta={TASK_META.winback}
-              onOpen={() => onOpenClient(t.client)}
-              title={`Win back ${t.client.name}`}
-              subtitle={`${t.daysSince} days since last visit`}
-            >
-              <TextBtn phone={t.client.phone} body={winbackMessage(t.client, data.settings)} />
-              <ActionBtn onClick={() => copy(winbackMessage(t.client, data.settings))}>
-                Copy win-back
-              </ActionBtn>
-            </TaskRow>
-          ))}
+          {groups.winback.map((t) => {
+            const contactedDays = t.client.lastContacted ? daysAgo(t.client.lastContacted) : null;
+            const contactedNote = contactedDays != null ? ` · messaged ${contactedDays} day${contactedDays === 1 ? "" : "s"} ago` : "";
+            return (
+              <TaskRow
+                key={t.id}
+                meta={TASK_META.winback}
+                onOpen={() => onOpenClient(t.client)}
+                title={`Win back ${t.client.name}`}
+                subtitle={`${t.daysSince} days since last visit` + contactedNote}
+              >
+                <TextBtn
+                  phone={t.client.phone}
+                  body={winbackMessage(t.client, data.settings)}
+                  onClick={() => actions.markClientContacted(t.client.id)}
+                />
+                <ActionBtn onClick={() => { copy(winbackMessage(t.client, data.settings)); actions.markClientContacted(t.client.id); }}>
+                  Copy win-back
+                </ActionBtn>
+              </TaskRow>
+            );
+          })}
 
           {groups.reorder.map((t) => (
             <TaskRow

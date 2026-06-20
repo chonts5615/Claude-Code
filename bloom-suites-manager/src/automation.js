@@ -72,13 +72,15 @@ export function buildActionCenter(state, base = todayISO()) {
   const renewWindow = settings?.leaseRenewalWindowDays ?? 60;
 
   // 1. Rent to collect (any unpaid row already due).
+  const lateFeeRate = settings?.lateFeeRate ?? 0;
   const rent = ledger
     .filter((r) => !r.paidDate && daysAgo(r.dueDate, base) >= 0)
     .map((r) => {
       const tenant = tenantById(tenants, r.tenantId);
       const status = rentStatus(r, settings, base);
       const overdue = daysAgo(r.dueDate, base);
-      return { id: `rent-${r.id}`, kind: "rent", row: r, tenant, status, overdue, priority: 100 + (status === "late" ? overdue : 0) };
+      const lateFeeAmount = status === "late" && lateFeeRate > 0 ? Math.round(r.amount * lateFeeRate) : 0;
+      return { id: `rent-${r.id}`, kind: "rent", row: r, tenant, status, overdue, lateFeeAmount, priority: 100 + (status === "late" ? overdue : 0) };
     })
     .filter((t) => t.tenant)
     .sort((a, b) => b.priority - a.priority);
