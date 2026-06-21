@@ -102,6 +102,7 @@ export default function Schedule() {
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{a.clientName}</div>
                   <div style={{ fontSize: 12, color: C.gray }}>{a.serviceName}</div>
+                  {a.notes && <div style={{ fontSize: 11, color: C.grayLight, marginTop: 2, fontStyle: "italic" }}>{a.notes}</div>}
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: C.charcoal }}>{fmt(a.price)}</div>
@@ -111,9 +112,10 @@ export default function Schedule() {
 
               {a.status === "scheduled" && (
                 <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-                  {/* Complete/No-show only make sense once the day has arrived. */}
+                  {/* Complete/No-show/Late-cancel only make sense once the day has arrived. */}
                   {a.date <= todayISO() && <MiniBtn solid onClick={() => actions.completeAppointment(a.id)}>✓ Complete</MiniBtn>}
                   {a.date <= todayISO() && <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "no-show")}>No-show</MiniBtn>}
+                  {a.date <= todayISO() && <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "late-cancel")}>Late Cancel</MiniBtn>}
                   <MiniBtn color={C.gray} onClick={() => actions.deleteAppointment(a.id)}>Cancel</MiniBtn>
                 </div>
               )}

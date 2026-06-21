@@ -1,0 +1,43 @@
+{
+  "name": "Bloom Apps",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
+  },
+  "forwardPorts": [5173, 5174, 4173, 4174],
+  "portsAttributes": {
+    "5173": {
+      "label": "Bloom Beauty Suites (dev)",
+      "onAutoForward": "openBrowser"
+    },
+    "5174": {
+      "label": "Bloom Suites Manager (dev)"
+    },
+    "4173": {
+      "label": "Bloom Beauty Suites (preview)"
+    },
+    "4174": {
+      "label": "Bloom Suites Manager (preview)"
+    }
+  },
+  "postCreateCommand": "npm install --prefix bloom-beauty-suites && npm install --prefix bloom-suites-manager",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2,
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+  "remoteUser": "node"
+}
