@@ -174,6 +174,32 @@ def test_cleanup_outputs_removes_strays(tmp_path):
     assert (files_dir / "charts" / "01_chart.png").exists()  # real output kept
 
 
+def test_reset_output_dirs_clears_artifacts_but_keeps_gitkeep(tmp_path):
+    from research_agent.agent import ensure_output_dirs, reset_output_dirs
+
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    (files_dir / "research_notes" / "a.md").write_text("x")
+    (files_dir / "research_notes" / ".gitkeep").write_text("")
+    (files_dir / "charts" / "c.png").write_bytes(b"\x89PNG")
+    reset_output_dirs(files_dir)
+    assert not (files_dir / "research_notes" / "a.md").exists()
+    assert not (files_dir / "charts" / "c.png").exists()
+    assert (files_dir / "research_notes" / ".gitkeep").exists()
+
+
+def test_plan_from_notes_reconstructs_plan(tmp_path):
+    from research_agent.agent import _plan_from_notes, ensure_output_dirs
+
+    files_dir = tmp_path / "files"
+    ensure_output_dirs(files_dir)
+    (files_dir / "research_notes" / "vendor_landscape.md").write_text("x")
+    (files_dir / "research_notes" / "psychometrics.md").write_text("y")
+    plan = _plan_from_notes(files_dir)
+    assert [s["filename"] for s in plan] == ["psychometrics.md", "vendor_landscape.md"]
+    assert plan[0]["title"] == "Psychometrics"
+
+
 def test_max_qa_rounds_is_a_positive_cap():
     from research_agent.agent import MAX_QA_ROUNDS
 

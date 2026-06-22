@@ -149,9 +149,16 @@ Useful for automation and long unattended runs:
 
 ```bash
 research-agent --query "EV adoption in Norway: market share, growth, drivers"
-research-agent --query-file brief.txt          # read the request from a file
-research-agent --query "..." --model sonnet     # override the model (default: haiku)
+research-agent --query-file brief.txt           # read the request from a file
+research-agent --query "..." --model sonnet      # override the model (default: haiku)
+research-agent --query-file brief.txt --brand-config brand.json  # custom brand
+research-agent --query-file brief.txt --resume   # continue an interrupted run
 ```
+
+A fresh run clears `./files/` first. `--resume` instead **reuses** existing
+artifacts and continues an interrupted run — completed phases are skipped (notes
+kept, charts kept, an existing report goes straight to QA), so a run stopped by
+an infra restart can be finished without redoing the expensive research.
 
 Outputs always land under `./files/` (created automatically) relative to the
 directory you launch from — `research_notes/`, `data/`, `charts/`, `reports/`.

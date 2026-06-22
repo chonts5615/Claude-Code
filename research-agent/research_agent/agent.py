@@ -100,6 +100,19 @@ def ensure_output_dirs(files_dir: Path) -> None:
         (files_dir / sub).mkdir(parents=True, exist_ok=True)
 
 
+def reset_output_dirs(files_dir: Path) -> None:
+    """Clear prior artifacts from the output tree (fresh, non-resume runs)."""
+    for sub in OUTPUT_SUBDIRS:
+        d = files_dir / sub
+        if d.is_dir():
+            for p in d.iterdir():
+                if p.is_file() and p.name != ".gitkeep":
+                    try:
+                        p.unlink()
+                    except OSError:
+                        pass
+
+
 def with_output_locations(prompt: str, files_dir: Path) -> str:
     """Append an authoritative, absolute output-location block to a prompt.
 
@@ -210,6 +223,14 @@ def _present_notes(files_dir: Path) -> set[str]:
 def _missing_notes(files_dir: Path, plan: list[dict]) -> list[dict]:
     present = _present_notes(files_dir)
     return [s for s in plan if s["filename"] not in present]
+
+
+def _plan_from_notes(files_dir: Path) -> list[dict]:
+    """Reconstruct a plan from notes already on disk (used when resuming)."""
+    return [
+        {"title": p.stem.replace("_", " ").title(), "filename": p.name, "brief": ""}
+        for p in sorted((files_dir / "research_notes").glob("*.md"))
+    ]
 
 
 def _analysis_done(files_dir: Path) -> bool:
@@ -473,39 +494,55 @@ async def run_pipeline(
     transcript: TranscriptWriter,
     brand_config_path: str = "",
     model: str = "haiku",
+    resume: bool = False,
 ) -> None:
-    """Drive the research pipeline deterministically, gating each phase on disk state."""
-    # Phase 0: PLAN — the code (not the lead's judgement) owns the sequence.
-    plan_text = await _run_turn(client, _plan_prompt(request), tracker, transcript)
-    plan = _parse_plan(plan_text) or [
-        {"title": "Research findings", "filename": "findings.md", "brief": request[:200]}
-    ]
-    print(f"\n[plan] {len(plan)} subtopics: {[s['filename'] for s in plan]}\n")
+    """Drive the research pipeline deterministically, gating each phase on disk state.
 
-    # Phase 1: RESEARCH — gate on all planned notes existing.
-    await _drive_phase(
-        client, tracker, transcript, name="research",
-        instruction_for_attempt=lambda a: _research_prompt(
-            request, _missing_notes(files_dir, plan), first=(a == 1)
-        ),
-        is_done=lambda: not _missing_notes(files_dir, plan),
-        max_attempts=PHASE_ATTEMPTS["research"],
-    )
+    With ``resume=True`` the existing artifacts on disk are reused: a run that was
+    interrupted (e.g. by an infra restart) continues from where it stopped instead
+    of redoing completed phases.
+    """
+    if resume and _report_md_path(files_dir).exists():
+        # The report already exists — re-render if needed and go straight to QA.
+        print("\n[resume] existing report.md found — re-rendering and running QA only\n")
+        if not _final_report_exists(files_dir):
+            _render_pdf(files_dir, brand_config_path)
+    else:
+        # Phase 0: PLAN — reuse a plan from existing notes when resuming.
+        if resume and _present_notes(files_dir):
+            plan = _plan_from_notes(files_dir)
+            print(f"\n[resume] reusing {len(plan)} existing notes: {[s['filename'] for s in plan]}\n")
+        else:
+            plan_text = await _run_turn(client, _plan_prompt(request), tracker, transcript)
+            plan = _parse_plan(plan_text) or [
+                {"title": "Research findings", "filename": "findings.md", "brief": request[:200]}
+            ]
+            print(f"\n[plan] {len(plan)} subtopics: {[s['filename'] for s in plan]}\n")
 
-    # Phase 2: ANALYZE — gate on charts or a data summary existing.
-    await _drive_phase(
-        client, tracker, transcript, name="analyze",
-        instruction_for_attempt=lambda a: _analyze_prompt(),
-        is_done=lambda: _analysis_done(files_dir),
-        max_attempts=PHASE_ATTEMPTS["analyze"],
-    )
+        # Phase 1: RESEARCH — gate on all planned notes existing.
+        await _drive_phase(
+            client, tracker, transcript, name="research",
+            instruction_for_attempt=lambda a: _research_prompt(
+                request, _missing_notes(files_dir, plan), first=(a == 1)
+            ),
+            is_done=lambda: not _missing_notes(files_dir, plan),
+            max_attempts=PHASE_ATTEMPTS["research"],
+        )
 
-    # Phase 3: REPORT — generated via a controlled query whose text we write
-    # ourselves (subagents compose text but unreliably call Write), then the PDF
-    # is rendered deterministically in code.
-    print("\n[phase: report] generating report markdown\n")
-    await _generate_report(files_dir, model)
-    _render_pdf(files_dir, brand_config_path)
+        # Phase 2: ANALYZE — gate on charts or a data summary existing.
+        await _drive_phase(
+            client, tracker, transcript, name="analyze",
+            instruction_for_attempt=lambda a: _analyze_prompt(),
+            is_done=lambda: _analysis_done(files_dir),
+            max_attempts=PHASE_ATTEMPTS["analyze"],
+        )
+
+        # Phase 3: REPORT — generated via a controlled query whose text we write
+        # ourselves (subagents compose text but unreliably call Write), then the
+        # PDF is rendered deterministically in code.
+        print("\n[phase: report] generating report markdown\n")
+        await _generate_report(files_dir, model)
+        _render_pdf(files_dir, brand_config_path)
 
     # Phase 4: QA — review, and on REVISE regenerate + re-render, then re-review,
     # looping until the report passes or MAX_QA_ROUNDS is reached.
@@ -529,7 +566,10 @@ async def run_pipeline(
 
 
 async def run_research(
-    query: str | None = None, model: str = "haiku", brand_config: Path | None = None
+    query: str | None = None,
+    model: str = "haiku",
+    brand_config: Path | None = None,
+    resume: bool = False,
 ) -> None:
     """Run the research agent, either one-shot (query given) or interactive."""
 
@@ -543,6 +583,8 @@ async def run_research(
 
     files_dir = (Path.cwd() / "files").resolve()
     ensure_output_dirs(files_dir)
+    if not resume:
+        reset_output_dirs(files_dir)  # start fresh unless resuming a prior run
 
     transcript_file, session_dir = setup_session()
     transcript = TranscriptWriter(transcript_file)
@@ -562,7 +604,8 @@ async def run_research(
         async with ClaudeSDKClient(options=options) as client:
             if query is not None:
                 await run_pipeline(
-                    client, query, files_dir, tracker, transcript, brand_config_path, model
+                    client, query, files_dir, tracker, transcript, brand_config_path, model,
+                    resume=resume,
                 )
                 if _final_report_exists(files_dir):
                     print("\n[pipeline] final report present.\n")
@@ -602,13 +645,23 @@ def main() -> None:
         default=None,
         help="Path to a brand config JSON for the report-branding skill (default: neutral).",
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Reuse existing files/ artifacts and continue an interrupted run (skips "
+        "completed phases) instead of starting fresh.",
+    )
     args = parser.parse_args()
 
     query = args.query
     if args.query_file is not None:
         query = args.query_file.read_text(encoding="utf-8").strip()
 
-    asyncio.run(run_research(query=query, model=args.model, brand_config=args.brand_config))
+    asyncio.run(
+        run_research(
+            query=query, model=args.model, brand_config=args.brand_config, resume=args.resume
+        )
+    )
 
 
 if __name__ == "__main__":
