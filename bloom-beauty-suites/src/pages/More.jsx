@@ -378,7 +378,7 @@ export default function More() {
       <Card style={{ marginTop: 16 }}>
         <SectionHeader title="Business Snapshot" />
         {[
-          ["Active Clients", `${data.clients.length}`],
+          ["Total Clients", `${data.clients.length}`],
           ["Services Offered", `${data.services.length}`],
           ["Monthly Rent", fmt(data.settings.monthlyExpenses.rent)],
           ["Location", data.settings.location],

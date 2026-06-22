@@ -54,6 +54,7 @@ export default function Dashboard({ onOpenClient, goTo }) {
       weekChange: lastRev > 0 ? Math.round(((thisRev - lastRev) / lastRev) * 100) : 0,
       avgTicket: thisWeek.length ? Math.round(thisRev / thisWeek.length) : 0,
       apptCount: thisWeek.length,
+      todayAll: appointments.filter((a) => a.date === today),
       todayScheduled: appointments.filter((a) => a.date === today && a.status === "scheduled"),
       dailyRev,
       mix: Object.entries(mix).map(([name, value]) => ({ name, value })),
@@ -86,7 +87,7 @@ export default function Dashboard({ onOpenClient, goTo }) {
         <KPI label="Avg Ticket" value={fmt(m.avgTicket)} sub="per appointment" />
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <KPI label="Appointments" value={m.apptCount} sub={`${m.todayScheduled.length} today`} />
+        <KPI label="Appointments" value={m.apptCount} sub={`${m.todayAll.length} today`} />
         <KPI label="Rebook Rate" value={`${m.rebookRate}%`} sub={`${m.health.active} active clients`} trend={m.rebookRate >= 70 ? "up" : "down"} />
       </div>
 
