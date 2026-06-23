@@ -49,6 +49,10 @@
       "HR Service Delivery Excellence",
       "Workforce Analytics & HR Insights"
     ],
+    "grid_keys": {
+      "Benefits (design)": "Benefits",
+      "Leave & Benefits Administration": "Leave & Benefits Administration"
+    },
     "specialization_sets": {
       "Benefits (design)": [
         "Benefits Program Strategy & Management",
@@ -180,11 +184,11 @@
     "intro": "Every Round 1 comment on the competencies this pairing touches, grouped by competency, with how it was used. Nothing was dropped on a statistic.",
     "entries": [
       {"competency": "Benefits Program Strategy & Management", "round1": "Benefits design owner asked to rename to Design and Governance and move operational components out; Leave & Benefits Administration asked for a shared middle ground that reads for both design and administration.", "disposition": "Synthesized / Used", "outcome": "Kept as the shared spine; v5 wording merges the additions. Rename, operational scope, and the design-versus-administration levels are open as Decision 1."},
-      {"competency": "Compensation & Pay Design", "round1": "Benefits rated and carries Compensation with a rewards lens; the competency is owned by the Compensation specialization, not by this pairing.", "disposition": "Via level", "outcome": "Carried by Benefits at advise level (Levels 1 to 2); the authoritative owner version is governed in the Total Rewards session. No change requested here."},
+      {"competency": "Compensation & Pay Design", "round1": "The Benefits reviewer (Kori Chavez) noted the behavioral indicators are primarily compensation-focused and not central to the day-to-day responsibilities of the Benefits COE, and so did not recommend edits; the competency is owned by the Compensation specialization.", "disposition": "Via level", "outcome": "Carried by Benefits at advise level only (close partnership with Compensation); no edits requested. The authoritative owner version is governed in the Total Rewards session."},
       {"competency": "Payroll Operations & Compliance", "round1": "Leave & Benefits Administration administers payroll-adjacent statutory operations; the competency is owned by Payroll.", "disposition": "Via level", "outcome": "Carried by Leave & Benefits Administration at use levels; statutory tax and labour-law depth is held in HR Compliance & Workforce Risk. No change requested here."},
       {"competency": "HR Compliance & Workforce Risk", "round1": "Benefits, Leave & Benefits Administration, HR Operations, and Payroll asked to add labor and collective labor agreements, strengthen vendor oversight, and add cross-border and immigration requirements.", "disposition": "Applied", "outcome": "Reauthored across all four levels as the shared employment-practice anchor (Part A confirmation); not narrowed to any one specialization."},
       {"competency": "HR Service Delivery Excellence", "round1": "Strongly supported; reviewers asked to sharpen vendor, SLA, and process-governance examples.", "disposition": "Corrected", "outcome": "Kept with no change to what it measures; examples sharpened. It is the operations spine and the move-target for operational components from Benefits Program Strategy (Part A, kept)."},
-      {"competency": "Workforce Analytics & HR Insights", "round1": "Used by both specializations at a benefits- and rewards-reporting level (utilization, cost modeling, vendor performance); an earlier weakest-importance label was a data error.", "disposition": "Corrected", "outcome": "Kept at use-not-own levels (Levels 1 to 2); the corrected importance applies. Build-level work sits with roles closer to the analytics."}
+      {"competency": "Workforce Analytics & HR Insights", "round1": "Benefits updated the indicators with a benefits data-analytics and reporting lens — utilization trends, financial forecasting, vendor performance, employee insights, cost modeling, engagement metrics, and outcomes tracking (about 101 tracked insertions); Leave & Benefits Administration mirrored the edits with a support framing. An earlier weakest-importance label was a corrected data error.", "disposition": "Applied", "outcome": "The benefits data-analytics and reporting lens was applied to the indicator examples; kept at use-not-own levels (Levels 1 to 2), with the corrected importance. Build-level work sits with roles closer to the analytics."}
     ]
   },
   "appendix": {

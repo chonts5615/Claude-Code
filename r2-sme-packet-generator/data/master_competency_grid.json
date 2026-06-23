@@ -1,0 +1,148 @@
+{
+  "_source": "HR_SME_Packet_Master_R1.docx master coverage grid (Round 1)",
+  "_note": "Authoritative Round 1 competency membership per specialization. specialization_sets in each packet must equal these. Used by audit.py.",
+  "specializations": {
+    "Benefits": [
+      "HR Compliance & Workforce Risk",
+      "Compensation & Pay Design",
+      "Benefits Program Strategy & Management",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Compensation": [
+      "HR Compliance & Workforce Risk",
+      "Workforce Planning & Capability Strategy",
+      "Compensation & Pay Design",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Early Careers Hiring": [
+      "Talent Sourcing & Pipeline Strategy",
+      "Selection & Assessment Practices",
+      "Recruiting Operations & Systems",
+      "Learning Design & Strategy",
+      "Workforce Planning & Capability Strategy",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Employee & Labor Relations": [
+      "Employee Relations & Investigations",
+      "Labor Relations & Bargaining",
+      "HR Compliance & Workforce Risk",
+      "Change Enablement & Transformation Methods",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Global Mobility": [
+      "HR Compliance & Workforce Risk",
+      "Compensation & Pay Design",
+      "Benefits Program Strategy & Management",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "HR Business Partner": [
+      "Employee Relations & Investigations",
+      "Organization Design & Operating Models",
+      "Change Enablement & Transformation Methods",
+      "Workforce Planning & Capability Strategy",
+      "Compensation & Pay Design",
+      "Workforce Analytics & HR Insights"
+    ],
+    "HR Business Partner - Plant or Site": [
+      "Employee Relations & Investigations",
+      "Labor Relations & Bargaining",
+      "HR Compliance & Workforce Risk",
+      "Organization Design & Operating Models",
+      "Change Enablement & Transformation Methods",
+      "Workforce Planning & Capability Strategy"
+    ],
+    "HR Operations": [
+      "Employee Relations & Investigations",
+      "HR Compliance & Workforce Risk",
+      "Benefits Program Strategy & Management",
+      "Payroll Operations & Compliance",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Learning & Development Design and Strategy": [
+      "Learning Design & Strategy",
+      "Talent Review & Succession Management",
+      "Workforce Planning & Capability Strategy",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Leave & Benefits Administration": [
+      "HR Compliance & Workforce Risk",
+      "Benefits Program Strategy & Management",
+      "Payroll Operations & Compliance",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Organization Development": [
+      "Organization Design & Operating Models",
+      "Change Enablement & Transformation Methods",
+      "Workforce Planning & Capability Strategy",
+      "Workforce Analytics & HR Insights",
+      "Organization Effectiveness & Culture"
+    ],
+    "Payroll": [
+      "HR Compliance & Workforce Risk",
+      "Payroll Operations & Compliance",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Performance & Talent Management": [
+      "Learning Design & Strategy",
+      "Talent Review & Succession Management",
+      "Performance Management Program Design",
+      "Workforce Planning & Capability Strategy",
+      "Workforce Analytics & HR Insights",
+      "Organization Effectiveness & Culture"
+    ],
+    "Production Hiring": [
+      "HR Compliance & Workforce Risk",
+      "Talent Sourcing & Pipeline Strategy",
+      "Selection & Assessment Practices",
+      "Recruiting Operations & Systems",
+      "Workforce Planning & Capability Strategy",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Professional Hiring": [
+      "HR Compliance & Workforce Risk",
+      "Talent Sourcing & Pipeline Strategy",
+      "Selection & Assessment Practices",
+      "Recruiting Operations & Systems",
+      "Workforce Planning & Capability Strategy",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Talent Acquisition Operations": [
+      "HR Compliance & Workforce Risk",
+      "Talent Sourcing & Pipeline Strategy",
+      "Selection & Assessment Practices",
+      "Recruiting Operations & Systems",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Talent Advisory": [
+      "Talent Review & Succession Management",
+      "Performance Management Program Design",
+      "Organization Design & Operating Models",
+      "Workforce Planning & Capability Strategy",
+      "Workforce Analytics & HR Insights",
+      "Organization Effectiveness & Culture"
+    ],
+    "Total Rewards Advisory": [
+      "HR Compliance & Workforce Risk",
+      "Workforce Planning & Capability Strategy",
+      "Compensation & Pay Design",
+      "Benefits Program Strategy & Management",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "Training Delivery": [
+      "Learning Design & Strategy",
+      "Talent Review & Succession Management",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ]
+  }
+}

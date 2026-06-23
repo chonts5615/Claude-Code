@@ -521,6 +521,8 @@ def main(argv):
         out_dir = here / "outputs"
         for data_file in sorted(data_dir.glob("*.json")):
             data = json.loads(data_file.read_text(encoding="utf-8"))
+            if "metadata" not in data or "coverage" not in data:
+                continue  # reference file, not a packet
             sub = data["metadata"].get("sub_family", data_file.stem)
             out = out_dir / f"HR_R2_SME_Review_Packet_{slugify(sub)}.docx"
             generate(data_file, out)

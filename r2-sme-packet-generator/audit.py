@@ -31,6 +31,14 @@ VALID_DISPOSITIONS = {
 LEVELS = ["L1", "L2", "L3", "L4"]
 
 
+def _load_master_grid():
+    """The authoritative Round 1 competency membership per specialization."""
+    path = Path(__file__).resolve().parent / "data" / "master_competency_grid.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8")).get("specializations", {})
+
+
 def _coverage_competencies(data):
     return [r["competency"] for r in data.get("coverage", {}).get("rows", [])]
 
@@ -67,6 +75,31 @@ def audit(data, name):
     coverage = data.get("coverage", {})
     specs = coverage.get("specializations", [])
     spec_sets = coverage.get("specialization_sets", {})
+
+    # B0. CRITICAL — lock declared sets to the master grid. Where a column maps
+    #     to a Round 1 specialization (coverage.grid_keys), its declared
+    #     specialization_set MUST equal the master grid's membership for that
+    #     specialization. This prevents an under-declared set from passing.
+    master = _load_master_grid()
+    for col, canon in coverage.get("grid_keys", {}).items():
+        if canon not in master:
+            fails.append(f"CRITICAL: grid_keys references unknown master specialization '{canon}'")
+            continue
+        declared = set(spec_sets.get(col, []))
+        expected = set(master[canon])
+        missing = expected - declared
+        extra = declared - expected
+        if missing:
+            fails.append(
+                f"CRITICAL: {col} set is missing {len(missing)} competency(ies) from the master "
+                f"grid ({canon}): " + ", ".join(sorted(missing))
+            )
+        if extra:
+            fails.append(
+                f"CRITICAL: {col} set has competency(ies) not in the master grid ({canon}): "
+                + ", ".join(sorted(extra))
+            )
+
     declared_union = set()
     if spec_sets:
         for spec_name, comps in spec_sets.items():
@@ -159,11 +192,16 @@ def main(argv):
     if argv:
         files = [Path(a) for a in argv]
     else:
-        files = sorted((here / "data").glob("*.json"))
+        # Reference/data files (e.g. master_competency_grid.json) are not packets.
+        files = sorted(
+            p for p in (here / "data").glob("*.json") if not p.name.startswith("master_")
+        )
 
     any_fail = False
     for f in files:
         data = json.loads(f.read_text(encoding="utf-8"))
+        if "metadata" not in data or "coverage" not in data:
+            continue  # not a packet data file
         name = data.get("metadata", {}).get("sub_family", f.stem)
         fails = audit(data, name)
         cov_n = len(_coverage_competencies(data))
