@@ -42,6 +42,10 @@
   },
   "coverage": {
     "specializations": ["L&D Strategy & Design", "Training Delivery"],
+    "required_union": [
+      "Learning Design & Strategy",
+      "Workforce Planning & Capability Strategy"
+    ],
     "rows": [
       {"num": "01", "competency": "Learning Design & Strategy", "roles": ["D", "U"]},
       {"num": "02", "competency": "Workforce Planning & Capability Strategy", "roles": ["U", "U"]}
@@ -129,8 +133,15 @@
       "Confirmation · Learning Design expanded definition"
     ]
   },
+  "disposition_register": {
+    "intro": "Every Round 1 comment on the competencies this pairing shares, grouped by competency, with how it was used. Nothing was dropped on a statistic.",
+    "entries": [
+      {"competency": "Learning Design & Strategy", "round1": "Reviewers said the definition focused on design and development, not consulting or facilitation; Training Delivery (Tessa Sprengers, Tori Hulse) flagged role-blending between designers and product owners, said facilitator coordination and evaluation are not typical of the role, called the technology indicator a build rather than leverage, and asked to add an L4 continuous-improvement and external-trends behavior.", "disposition": "Synthesized / Used", "outcome": "Definition expanded to name needs-analysis, consulting, and facilitation (applied, Part A). The designer-owned versus delivery indicator split, the technology reframe, and the L4 addition are open as Decision 1."},
+      {"competency": "Workforce Planning & Capability Strategy", "round1": "Reviewers said the competency reads as un-owned (only a definition today, not on the priority list) and that establishing enterprise standards should align with Cargill overall; the sub-family is a user, not the build owner. Early Careers added that learning design sits with Talent Development, not Talent Acquisition.", "disposition": "Via level", "outcome": "Kept as a shared competency carried by the sub-family at use or support levels, not owner; operational workforce-planning ownership routed to governance; strategic-alignment language added (Decision 2)."}
+    ]
+  },
   "appendix": {
-    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in the disposition register that accompanies this packet.",
+    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in Appendix A.",
     "competencies": [
       {
         "name": "Learning Design & Strategy",

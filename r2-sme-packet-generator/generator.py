@@ -393,9 +393,43 @@ def render_sign_off(doc, so):
             fill_cell(t.rows[i].cells[j], "", size=9, color=INK)
 
 
+DISPOSITION_COLOR = {
+    "Applied": LEAF_GREEN,
+    "Synthesized / Used": PROPOSED_BLUE,
+    "Via level": GRAY,
+    "Deferred": AMBER,
+    "Corrected": ALERT_RED,
+    "Kept": GRAY,
+}
+
+
+def render_disposition_register(doc, dr):
+    doc.add_page_break()
+    heading(doc, "Reference appendix")
+    para(doc, "Everything below is reference. Appendix A records where every Round 1 "
+              "comment went; Appendix B holds the full competency indicators.",
+         italic=True, size=9, color=GRAY)
+    heading(doc, "Appendix A · Disposition register (where your feedback went)", size=14,
+            color=DEEP_GREEN, space_before=10)
+    if dr.get("intro"):
+        para(doc, dr["intro"], size=10, color=INK)
+    headers = ["Competency", "What Round 1 said", "Disposition", "Outcome"]
+    entries = dr.get("entries", [])
+    t = styled_table(doc, len(entries) + 1, 4)
+    header_row(t, headers)
+    for i, e in enumerate(entries, 1):
+        fill_cell(t.rows[i].cells[0], e.get("competency", ""), bold=True, size=9, color=INK)
+        fill_cell(t.rows[i].cells[1], e.get("round1", ""), size=9, color=INK)
+        disp = e.get("disposition", "")
+        fill_cell(t.rows[i].cells[2], disp, bold=True, size=9,
+                  color=DISPOSITION_COLOR.get(disp, INK))
+        fill_cell(t.rows[i].cells[3], e.get("outcome", ""), size=9, color=INK)
+
+
 def render_appendix(doc, ap):
     doc.add_page_break()
-    heading(doc, "Appendix · Competency definitions and indicators for reference")
+    heading(doc, "Appendix B · Competency definitions and indicators for reference", size=14,
+            color=DEEP_GREEN)
     if ap.get("intro"):
         para(doc, ap["intro"], size=10, color=GRAY)
     for comp in ap.get("competencies", []):
@@ -454,6 +488,8 @@ def build_document(data) -> Document:
     if data.get("boundaries"):
         render_boundaries(doc, data["boundaries"])
     render_sign_off(doc, data["sign_off"])
+    if data.get("disposition_register"):
+        render_disposition_register(doc, data["disposition_register"])
     if data.get("appendix"):
         render_appendix(doc, data["appendix"])
     render_footer(doc)

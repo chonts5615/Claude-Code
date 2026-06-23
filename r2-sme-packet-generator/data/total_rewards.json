@@ -42,10 +42,22 @@
   },
   "coverage": {
     "specializations": ["Compensation", "Benefits", "Global Mobility", "Total Rewards Advisory"],
+    "required_union": [
+      "Compensation & Pay Design",
+      "Benefits Program Strategy & Management",
+      "Global Mobility Program Management",
+      "Workforce Analytics & HR Insights",
+      "HR Compliance & Workforce Risk",
+      "HR Service Delivery Excellence",
+      "Performance Management Program Design",
+      "Talent Review & Succession Management",
+      "Organization Design & Operating Models",
+      "Labor Relations & Bargaining"
+    ],
     "rows": [
       {"num": "01", "competency": "Compensation & Pay Design", "roles": ["D", "", "C", "A"]},
       {"num": "02", "competency": "Benefits Program Strategy & Management", "roles": ["", "D", "C", "F"]},
-      {"num": "03", "competency": "Global Mobility Program Management (proposed)", "roles": ["", "", "D", "Aw"]},
+      {"num": "03", "competency": "Global Mobility Program Management", "roles": ["", "", "D", "Aw"]},
       {"num": "04", "competency": "Workforce Analytics & HR Insights", "roles": ["U", "U", "", "U"]},
       {"num": "05", "competency": "HR Compliance & Workforce Risk", "roles": ["", "S", "S", ""]},
       {"num": "06", "competency": "HR Service Delivery Excellence", "roles": ["", "U", "", ""]},
@@ -227,8 +239,23 @@
       "Confirmation 1 · HR Compliance reauthor"
     ]
   },
+  "disposition_register": {
+    "intro": "Every Round 1 comment on the Total Rewards competencies, grouped by competency, with how it was used. Nothing was dropped on a statistic.",
+    "entries": [
+      {"competency": "Compensation & Pay Design", "round1": "SVP (Clinton Shoap) reauthored all four levels and asked to remove HR Service Delivery and Workforce Planning from the Compensation set; Global Mobility asked to tailor toward international-assignment compensation; Total Rewards Advisory asked to broaden to design and deployment.", "disposition": "Applied", "outcome": "SVP wording adopted as the authoritative owner version; set-membership change applied; contributor views honored via level (Decision 2)."},
+      {"competency": "Benefits Program Strategy & Management", "round1": "Benefits asked to rename to Design and Governance and move operational components out; Global Mobility asked to make the mobility dimension explicit; Total Rewards Advisory framed its role as facilitation.", "disposition": "Synthesized / Used", "outcome": "Kept as the shared benefits-and-mobility spine; v5 wording merges the additions; rename, scope, and levels open as Decision 1."},
+      {"competency": "Global Mobility Program Management", "round1": "Global Mobility drafted and supported a new competency for core mobility program management; Total Rewards Advisory agreed it is relevant at awareness level.", "disposition": "Applied", "outcome": "Adopted as a PROPOSED single-specialization competency (Global Mobility owner; TRA awareness); mobility tax stays in HR Compliance (Decision 4)."},
+      {"competency": "Workforce Analytics & HR Insights", "round1": "Compensation, Benefits, and Total Rewards Advisory rated it a user-level competency; an earlier weakest-importance label was a data error.", "disposition": "Corrected", "outcome": "Kept at use-not-own levels with a rewards-and-benefits reporting lens; boundary added against Common Technology & Data Acumen (Decision 3)."},
+      {"competency": "HR Compliance & Workforce Risk", "round1": "Global Mobility confirmed a strong fit and Benefits endorsed it; reviewers asked to add labor agreements, vendor oversight, and cross-border and immigration.", "disposition": "Applied", "outcome": "Reauthored across all four levels as the shared employment-practice anchor (Confirmation 1)."},
+      {"competency": "HR Service Delivery Excellence", "round1": "Strongly supported and endorsed by Global Mobility; reviewers asked to sharpen vendor, SLA, and process-governance examples; SVP asked to remove it from the Compensation set.", "disposition": "Corrected", "outcome": "Kept with no change to what it measures; examples sharpened; removed from the Compensation set; receives operational components from Benefits Program Strategy."},
+      {"competency": "Performance Management Program Design", "round1": "Considerable overlap between performance and pay; reviewers proposed adding it to the Total Rewards Advisory set.", "disposition": "Applied", "outcome": "Added to the Total Rewards Advisory set at advisory (apply-and-advise) levels (Decision 5)."},
+      {"competency": "Talent Review & Succession Management", "round1": "Proposed for the Total Rewards Advisory set alongside Performance Management given the performance-and-pay overlap.", "disposition": "Applied", "outcome": "Added to the Total Rewards Advisory set at advisory levels (Decision 5)."},
+      {"competency": "Organization Design & Operating Models", "round1": "Reviewers said it may be a better job-architecture anchor than Workforce Planning & Capability Strategy and would be an input to broader org work.", "disposition": "Synthesized / Used", "outcome": "Swapped in for Workforce Planning as the Total Rewards Advisory job-architecture anchor (net-neutral to set size; Decision 5)."},
+      {"competency": "Labor Relations & Bargaining", "round1": "Total Rewards Advisory suggested it at Level 2 (limited); adding it alongside the two additions would breach the AS-7 set-size ceiling of eight.", "disposition": "Deferred", "outcome": "Deferred from the Total Rewards Advisory set under AS-7; revisit only if a competency is retired (Decision 5)."}
+    ]
+  },
   "appendix": {
-    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in the disposition register that accompanies this packet.",
+    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in Appendix A.",
     "competencies": [
       {
         "name": "Compensation & Pay Design",

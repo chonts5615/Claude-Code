@@ -53,6 +53,31 @@ appendix of competency indicators.
 The status-legend "You have" counts are computed automatically from the Part A /
 Part B items, so they never drift from the actual blocks.
 
+## Audit (quality gate / test)
+
+`audit.py` checks every data file against the completeness contract before you
+generate, and exits non-zero on any failure (so it doubles as a test):
+
+```bash
+python audit.py            # audit every data/*.json
+python audit.py data/x.json
+```
+
+It enforces:
+- **Complete coverage** — the coverage matrix must contain every competency in
+  `coverage.required_union` (the Round 1 union of the participating
+  specializations). This is what catches a packet that silently drops a
+  competency another group owns.
+- **Appendix completeness** — every non-deferred coverage competency has a full
+  L1–L4 indicator table (≥3 indicators per level).
+- **Feedback appendix** — a `disposition_register` exists and has an entry for
+  every coverage competency, each with a valid disposition
+  (`Applied` / `Synthesized / Used` / `Via level` / `Deferred` / `Corrected` /
+  `Kept`).
+
+Run `audit.py` and `generator.py --all` together; a packet should never be
+generated from a data file that fails the audit.
+
 ## Authoring a new sub-family
 
 Copy an existing file in `data/`, then change **content only** — sub-family

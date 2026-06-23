@@ -41,13 +41,24 @@
   },
   "coverage": {
     "specializations": ["Benefits (design)", "Leave & Benefits Administration"],
+    "required_union": [
+      "Benefits Program Strategy & Management",
+      "Compensation & Pay Design",
+      "Payroll Operations & Compliance",
+      "HR Compliance & Workforce Risk",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
     "rows": [
       {"num": "01", "competency": "Benefits Program Strategy & Management", "roles": ["D", "A"]},
-      {"num": "02", "competency": "HR Compliance & Workforce Risk", "roles": ["S", "S"]},
-      {"num": "03", "competency": "HR Service Delivery Excellence", "roles": ["", "U"]}
+      {"num": "02", "competency": "Compensation & Pay Design", "roles": ["A", ""]},
+      {"num": "03", "competency": "Payroll Operations & Compliance", "roles": ["", "U"]},
+      {"num": "04", "competency": "HR Compliance & Workforce Risk", "roles": ["S", "S"]},
+      {"num": "05", "competency": "HR Service Delivery Excellence", "roles": ["C", "U"]},
+      {"num": "06", "competency": "Workforce Analytics & HR Insights", "roles": ["U", "U"]}
     ],
     "legend": "D designs and owns (Levels 3 to 4) · C carries with the specialization lens · F facilitates · U uses and applies (Levels 1 to 2) · A advises (apply-and-advise) · Aw awareness (Levels 1 to 2) · S shared employment-practice anchor · L2 limited (Level 2).",
-    "note": "Benefits Program Strategy & Management is shared: Benefits owns design and governance (Levels 3 to 4); Leave & Benefits Administration administers (Levels 1 to 2); the essential functions in each job description separate the levels. Leave & Benefits Administration also carries statutory-operations competencies (the Payroll and HR Operations spine: tax, pension, social-security, and labour law applied to payroll, benefits, and leave) held in the HR competency library; those are not built by this pairing."
+    "note": "This matrix shows the complete union of competencies touched by both specializations. Benefits Program Strategy & Management is shared: Benefits owns design and governance (Levels 3 to 4); Leave & Benefits Administration administers (Levels 1 to 2); the essential functions in each job description separate the levels. Compensation & Pay Design is carried by Benefits at advise level (owned by Compensation in Total Rewards); Payroll Operations & Compliance is carried by Leave & Benefits Administration at use levels (owned by Payroll); Workforce Analytics & HR Insights is used by both at a reporting level, not built. These carried competencies were settled in Round 1 and are included here for completeness — read them in the appendix; only Benefits Program Strategy needs a decision this session. The Payroll and HR Operations statutory-operations spine (tax, pension, social-security, and labour law applied to payroll, benefits, and leave) is held in the HR competency library and is not built by this pairing."
   },
   "ratings_legend": {
     "heading": "How to read the Round 1 ratings",
@@ -149,8 +160,19 @@
       "Acknowledgement · HR Service Delivery Excellence kept"
     ]
   },
+  "disposition_register": {
+    "intro": "Every Round 1 comment on the competencies this pairing touches, grouped by competency, with how it was used. Nothing was dropped on a statistic.",
+    "entries": [
+      {"competency": "Benefits Program Strategy & Management", "round1": "Benefits design owner asked to rename to Design and Governance and move operational components out; Leave & Benefits Administration asked for a shared middle ground that reads for both design and administration.", "disposition": "Synthesized / Used", "outcome": "Kept as the shared spine; v5 wording merges the additions. Rename, operational scope, and the design-versus-administration levels are open as Decision 1."},
+      {"competency": "Compensation & Pay Design", "round1": "Benefits rated and carries Compensation with a rewards lens; the competency is owned by the Compensation specialization, not by this pairing.", "disposition": "Via level", "outcome": "Carried by Benefits at advise level (Levels 1 to 2); the authoritative owner version is governed in the Total Rewards session. No change requested here."},
+      {"competency": "Payroll Operations & Compliance", "round1": "Leave & Benefits Administration administers payroll-adjacent statutory operations; the competency is owned by Payroll.", "disposition": "Via level", "outcome": "Carried by Leave & Benefits Administration at use levels; statutory tax and labour-law depth is held in HR Compliance & Workforce Risk. No change requested here."},
+      {"competency": "HR Compliance & Workforce Risk", "round1": "Benefits, Leave & Benefits Administration, HR Operations, and Payroll asked to add labor and collective labor agreements, strengthen vendor oversight, and add cross-border and immigration requirements.", "disposition": "Applied", "outcome": "Reauthored across all four levels as the shared employment-practice anchor (Part A confirmation); not narrowed to any one specialization."},
+      {"competency": "HR Service Delivery Excellence", "round1": "Strongly supported; reviewers asked to sharpen vendor, SLA, and process-governance examples.", "disposition": "Corrected", "outcome": "Kept with no change to what it measures; examples sharpened. It is the operations spine and the move-target for operational components from Benefits Program Strategy (Part A, kept)."},
+      {"competency": "Workforce Analytics & HR Insights", "round1": "Used by both specializations at a benefits- and rewards-reporting level (utilization, cost modeling, vendor performance); an earlier weakest-importance label was a data error.", "disposition": "Corrected", "outcome": "Kept at use-not-own levels (Levels 1 to 2); the corrected importance applies. Build-level work sits with roles closer to the analytics."}
+    ]
+  },
   "appendix": {
-    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in the disposition register that accompanies this packet.",
+    "intro": "Current indicators for every competency in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in Appendix A.",
     "competencies": [
       {
         "name": "Benefits Program Strategy & Management",
@@ -208,6 +230,60 @@
           {"level": "L4", "text": "Establishes enterprise HR service standards for case management, process controls, and knowledge governance."},
           {"level": "L4", "text": "Approves service delivery models, vendor governance, automation priorities, and quality assurance methods."},
           {"level": "L4", "text": "Develops advanced service-process diagnostics, knowledge-base standards, and employee-support measures for ambiguous delivery problems."}
+        ]
+      },
+      {
+        "name": "Compensation & Pay Design",
+        "note": "Carried by Benefits at advise level; owned by the Compensation specialization (authoritative version governed in Total Rewards). Included for completeness; settled in Round 1.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies appropriate external sources of job, salary, incentive, or benefits data and design."},
+          {"level": "L1", "text": "Prepare data files for analysis and draft plan or employee communications."},
+          {"level": "L1", "text": "Record compensation decisions, facilitate data changes and data maintenance within approved systems."},
+          {"level": "L2", "text": "Conduct initial market analysis and benchmarking and prepare preliminary analyses and recommendations."},
+          {"level": "L2", "text": "Validate recommendations comply with plan rules, budget assumptions, and other governance requirements."},
+          {"level": "L2", "text": "Create initial change plan and materials to influence, educate and train employees and managers."},
+          {"level": "L3", "text": "Develop compensation and reward recommendations using advanced market analysis and benchmarking, financial models, and governance requirements."},
+          {"level": "L3", "text": "Develop and execute stakeholder management plan to ensure adoption of Rewards programs."},
+          {"level": "L3", "text": "Anticipate challenges and connect Rewards priorities across businesses and functions to ensure positive impact."},
+          {"level": "L4", "text": "Establishes plan design and governance that represents best practices within Rewards programs."},
+          {"level": "L4", "text": "Influence senior level stakeholders to ensure alignment and acceptance of Reward strategy, supported by external benchmarking."},
+          {"level": "L4", "text": "Ensure compliance with governance requirements and manage exceptions to drive function and business solutions that support talent strategies."}
+        ]
+      },
+      {
+        "name": "Payroll Operations & Compliance",
+        "note": "Carried by Leave & Benefits Administration at use levels; owned by Payroll. Included for completeness; settled in Round 1. Statutory tax and labour-law depth is held in HR Compliance & Workforce Risk.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies payroll calendars, timekeeping inputs, wage rules, and employee pay data requirements."},
+          {"level": "L1", "text": "Prepares payroll records, deduction files, issue tickets, and reconciliation support using standard templates."},
+          {"level": "L1", "text": "Follows payroll control checklists for data entry, approvals, cutoff dates, and confidentiality requirements."},
+          {"level": "L2", "text": "Processes payroll changes using timekeeping files, pay rules, benefits deductions, and approval evidence."},
+          {"level": "L2", "text": "Validates gross-to-net results, payroll exceptions, retroactive adjustments, and tax or wage compliance items."},
+          {"level": "L2", "text": "Maintains reconciliation logs, payroll issue trackers, service tickets, and regulatory reporting evidence."},
+          {"level": "L3", "text": "Leads payroll control reviews using audit trails, exception reports, vendor files, and compliance criteria."},
+          {"level": "L3", "text": "Evaluates payroll process risks across systems, countries, vendors, timekeeping interfaces, and escalation patterns."},
+          {"level": "L3", "text": "Designs payroll improvement routines for accuracy, timeliness, compliance, and employee issue resolution."},
+          {"level": "L4", "text": "Establishes enterprise payroll control standards for process governance, reconciliation, compliance, and issue management."},
+          {"level": "L4", "text": "Approves payroll operating models, vendor controls, system change criteria, and audit response methods."},
+          {"level": "L4", "text": "Develops advanced payroll-control diagnostics, reconciliation methods, and issue-resolution playbooks for complex pay scenarios."}
+        ]
+      },
+      {
+        "name": "Workforce Analytics & HR Insights",
+        "note": "Used by both specializations at a benefits- and rewards-reporting level, not built by them. Included for completeness; settled in Round 1 (an earlier weakest-importance label was a corrected data error).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies HR source systems, metric definitions, population rules, dashboard filters, and privacy requirements for assigned reports."},
+          {"level": "L1", "text": "Prepares workforce data extracts, reconciliation notes, and metric summaries using approved HR reporting definitions."},
+          {"level": "L1", "text": "Logs data-quality exceptions, access constraints, and evidence sources in analytics request trackers."},
+          {"level": "L2", "text": "Builds HR dashboards using population logic, metric calculations, segmentation variables, and source-system refresh schedules."},
+          {"level": "L2", "text": "Validates workforce metrics against the core HR system, payroll, recruiting, learning, and case-management source records."},
+          {"level": "L2", "text": "Documents insight summaries with caveats, privacy thresholds, and recommended interpretation boundaries."},
+          {"level": "L3", "text": "Designs workforce analytics products using data models, cohort definitions, controls, and narrative-driven reporting plans."},
+          {"level": "L3", "text": "Analyzes workforce patterns through trend, cohort, funnel, variance, predictive, and risk methods."},
+          {"level": "L3", "text": "Leads metric-governance reviews that align HR definitions, privacy thresholds, quality rules, and decision use cases."},
+          {"level": "L4", "text": "Establishes workforce analytics standards for HR metric architecture, source-system governance, privacy controls, and validation methods."},
+          {"level": "L4", "text": "Approves analytics product portfolios, workforce insight frameworks, model-risk criteria, and ethical-use guardrails."},
+          {"level": "L4", "text": "Develops reusable measurement designs, validation protocols, and narrative-driven reporting standards for ambiguous workforce decisions."}
         ]
       }
     ]

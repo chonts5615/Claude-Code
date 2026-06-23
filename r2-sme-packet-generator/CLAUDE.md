@@ -33,8 +33,13 @@ quotes, counts, coverage cells, dispositions, indicators); never change the
 10. **Boundaries to note** — `Item | What Round 1 said | Where it goes`.
 11. **Decision capture and sign-off** — one row per Start-here + Part A + Part B
     item, columns `Item | Decision | Owner | Date`.
-12. **Appendix** — competency definitions and full L1–L4 indicators for every
-    competency in play, with accepted Round 1 edits applied.
+12. **Reference appendix** —
+    - **Appendix A · disposition register** (the feedback appendix): every Round 1
+      comment grouped by competency, with a disposition badge
+      (`Applied` / `Synthesized / Used` / `Via level` / `Deferred` / `Corrected` /
+      `Kept`) and the outcome. Nothing is dropped on a statistic.
+    - **Appendix B · competency definitions and full L1–L4 indicators** for every
+      competency in play, with accepted Round 1 edits applied.
 
 Footer on every page: `Proprietary — SME reviewers and project stakeholders
 only | Assessment, Competency & Career Framework Team · 2026`.
@@ -73,7 +78,10 @@ changed levels are flagged `· updated`; L3–L4 get the elevated tint.
 
 - **Complete coverage (hard rule).** A multi-specialization packet must include
   every technical competency belonging to any participating specialization —
-  the full union, never a per-group subset.
+  the full union, never a per-group subset. Encode the union in
+  `coverage.required_union` and run `audit.py`; competencies that are settled or
+  carried (not in dispute) still appear in the matrix, the disposition register,
+  and Appendix B — they are simply not raised as Part A / Part B items.
 - **Voice.** Sentence case. Direct Round 1 quotes in "What each group said"
   (italic). Recommendations are neutral — never advocate a position.
 - **Traceability.** Every decision traces to Round 1 feedback; every
