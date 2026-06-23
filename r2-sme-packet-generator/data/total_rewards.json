@@ -1,0 +1,421 @@
+{
+  "metadata": {
+    "eyebrow": "Technical Competency",
+    "title": "Round 2 SME Review Packet",
+    "sub_family": "Total Rewards",
+    "subtitle": "Compensation · Benefits · Global Mobility · Total Rewards Advisory",
+    "function": "Cargill Talent Solutions",
+    "prepared_by": "Assessment, Competency & Career Framework Team",
+    "date": "2026-06-22",
+    "return_by": "[RETURN_BY_DATE]",
+    "specialization_label": "Total Rewards",
+    "time_required": "About 75 minutes for this focus group",
+    "sub_family_owner": "John"
+  },
+  "how_this_works": {
+    "what_we_did": "We combined your Round 1 edits, comment by comment, into one proposed version of each competency. Where several specializations edited the same competency we kept as many requested changes as possible, merged the named methods and standards, and where edits conflicted we weighted the owner's version. Changes that were clear and agreed have already been applied; they appear in Part A. Where reviewers saw the work differently, or where a change shifts who owns it, we drafted a recommendation rather than deciding for you; those appear in Part B.",
+    "what_we_need": "For Part A, read each applied change and confirm it fits your specialization or note a correction. For Part B, review the recommendation and bring your view to the focus group. Nothing in Part B is final until the group decides.",
+    "where_feedback_went": "Every Round 1 comment is accounted for in the appendix disposition. If you do not see one of your edits in the wording, the disposition states how it was used or why it was adjusted.",
+    "status_intro": "Every competency below carries a status label so you can see, at a glance, what is already settled and what still needs the group. Items are grouped into two parts: Part A holds changes we have already applied (read and confirm); Part B holds the items for live discussion (decisions and proposals)."
+  },
+  "ground_rules": [
+    {"lead": "Scope before words.", "text": "Decide who designs, advises, or administers, and at what level, before debating wording."},
+    {"lead": "Weighting.", "text": "Where Clinton Shoap (SVP, Total Rewards) and another reviewer proposed conflicting edits to the same shared competency, the SVP wording governs and is shown as the owner version."},
+    {"lead": "Sub-family owner.", "text": "Owners and dates recorded at sign-off feed the decision registry; the sub-family owner is John."}
+  ],
+  "start_here": {
+    "heading": "Start here: agree the design-versus-facilitation convention",
+    "intro": "Total Rewards owns the design and governance of pay, benefits, and mobility programs, while advisors and administrators facilitate, apply, and use those programs. Place each role on the ladder rather than rewriting a shared competency for each one.",
+    "table": {
+      "headers": ["Position", "Levels", "What it means"],
+      "rows": [
+        ["Net user or facilitator", "1 to 2", "Applies, advises on, or facilitates programs others design; not accountable for building them"],
+        ["Accountable designer", "3", "Designs and deploys programs and owns the decisions made from them"],
+        ["Owner or standard-setter", "4", "Defines the strategy, governance, and standards others follow"]
+      ]
+    },
+    "quote": {
+      "label": "A quote that sets the line (Total Rewards Advisory).",
+      "text": "This is written more aligned to a Domain. TRA plays a role in this but often does not own the frameworks used. We are net users of info, not developers of it typically."
+    },
+    "decide": "Adopt this convention for today, then apply it to the shared competencies below."
+  },
+  "coverage": {
+    "specializations": ["Compensation", "Benefits", "Global Mobility", "Total Rewards Advisory"],
+    "rows": [
+      {"num": "01", "competency": "Compensation & Pay Design", "roles": ["D", "", "C", "A"]},
+      {"num": "02", "competency": "Benefits Program Strategy & Management", "roles": ["", "D", "C", "F"]},
+      {"num": "03", "competency": "Global Mobility Program Management (proposed)", "roles": ["", "", "D", "Aw"]},
+      {"num": "04", "competency": "Workforce Analytics & HR Insights", "roles": ["U", "U", "", "U"]},
+      {"num": "05", "competency": "HR Compliance & Workforce Risk", "roles": ["", "S", "S", ""]},
+      {"num": "06", "competency": "HR Service Delivery Excellence", "roles": ["", "U", "", ""]},
+      {"num": "07", "competency": "Performance Management Program Design", "roles": ["", "", "", "A"]},
+      {"num": "08", "competency": "Talent Review & Succession Management", "roles": ["", "", "", "A"]},
+      {"num": "09", "competency": "Organization Design & Operating Models", "roles": ["", "", "", "A"]},
+      {"num": "10", "competency": "Labor Relations & Bargaining", "roles": ["", "", "", "def"]}
+    ],
+    "legend": "D designs and owns (Levels 3 to 4) · C carries with the specialization lens · F facilitates · U uses and applies (Levels 1 to 2) · A advises (apply-and-advise) · Aw awareness (Levels 1 to 2) · S shared employment-practice anchor · L2 limited (Level 2) · def deferred.",
+    "note": "Benefits Program Strategy & Management is also administered by Benefits Administration (Leave & Benefits Administration) in HR Operations at Levels 1 to 2. Workforce Planning & Capability Strategy was removed from the Compensation set and is replaced for Total Rewards Advisory by Organization Design & Operating Models (Decisions 2 and 5). Labor Relations & Bargaining is deferred from the Total Rewards Advisory set under AS-7 (set-size ceiling of eight); def means deferred."
+  },
+  "ratings_legend": {
+    "heading": "How to read the Round 1 ratings",
+    "headers": ["Score", "Label", "Definition"],
+    "rows": [
+      ["5", "Essential", "Jobs in this specialization cannot perform core work without this capability. Absence equals role failure."],
+      ["4", "Very important", "Jobs perform noticeably better with strong capability. Weak capability creates measurable friction and rework."],
+      ["3", "Important", "Useful and expected, but not a differentiator. Other competencies carry more weight day to day."],
+      ["2", "Limited", "Occasionally relevant. Not a reliable predictor of performance for this specialization."],
+      ["1", "Low", "Rarely relevant. Borderline for inclusion in this specialization."]
+    ]
+  },
+  "part_a": {
+    "intro": "These changes were clear and agreed in Round 1 and have been applied to the wording. Read each one and confirm it fits, or note a correction. Updated levels are flagged in the indicator tables.",
+    "items": [
+      {
+        "status": "NEEDS YOUR CONFIRMATION",
+        "status_note": "feedback applied; structure unchanged",
+        "assigned_to": "Shared employment-practice anchor (confirmed by Global Mobility and Benefits)",
+        "title": "HR Compliance & Workforce Risk",
+        "what_changed": "Reauthored to add labor and collective labor agreements alongside law and policy, to strengthen vendor oversight, and to add cross-border and immigration requirements. The construct stays the shared employment-practice anchor; it is not narrowed to any one specialization. The labor-agreement and cross-border language now reads across all four levels.",
+        "round1_signal": "Global Mobility confirmed a strong fit (policy, documentation, audit, vendor, cross-border risk); Benefits endorsed it.",
+        "indicators": [
+          {"level": "L1", "updated": true, "text": "Identifies applicable employment policies, statutory requirements, labor and collective labor agreements, and recordkeeping rules for assigned HR activities."},
+          {"level": "L1", "updated": true, "text": "Prepares compliance files, policy acknowledgments, audit evidence, and required HR documentation."},
+          {"level": "L1", "updated": true, "text": "Follows privacy, retention, equal-employment, and escalation procedures when handling employee records."},
+          {"level": "L2", "updated": true, "text": "Reviews HR transactions against policy requirements, labor-agreement provisions, regulatory checklists, and documentation standards, including cross-border mobility processes."},
+          {"level": "L2", "updated": true, "text": "Maintains compliance calendars, evidence repositories, and control logs for assigned HR processes."},
+          {"level": "L2", "updated": true, "text": "Documents exceptions, remediation actions, and control gaps for review by HR, Legal, or governance owners."},
+          {"level": "L3", "updated": true, "text": "Leads compliance reviews using audit protocols, risk registers, policy and labor-agreement matrices, and corrective-action plans."},
+          {"level": "L3", "updated": true, "text": "Evaluates employment-practice and labor-agreement risk across cases, systems, vendors, process changes, immigration requirements, and cross-border jurisdictional requirements."},
+          {"level": "L3", "updated": true, "text": "Designs HR control procedures, policy and labor-agreement governance tools, vendor-oversight methods, and compliance reporting for complex operations."},
+          {"level": "L4", "updated": true, "text": "Establishes enterprise HR compliance controls and standards across employment practices, labor and collective labor agreements, records governance, and audit readiness."},
+          {"level": "L4", "updated": true, "text": "Approves risk-control frameworks for cross-border employment practices, vendor oversight, policy exceptions, and high-impact remediation plans."},
+          {"level": "L4", "updated": true, "text": "Develops advanced HR compliance diagnostics, remediation playbooks, and control-evidence standards for complex employment-practice and labor-relations risks."}
+        ],
+        "action": {"lead": "Confirm.", "text": "Confirm the reauthored wording reads right for Global Mobility and Benefits."}
+      },
+      {
+        "status": "KEPT, NO ACTION",
+        "status_note": "strongly supported and unchanged",
+        "assigned_to": "Benefits (kept, strongly supported)",
+        "title": "HR Service Delivery Excellence",
+        "what_changed": "Kept with no change to what it measures. Examples were sharpened for vendor, SLA, and process governance. This competency is the move-target for operational components from Benefits Program Strategy, and it was removed from the Compensation set.",
+        "round1_signal": "Strongly supported in Round 1; endorsed by Global Mobility as a strong fit for case workflows, employee support, process controls, escalation, and vendor handoffs.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies service catalog entries, case categories, knowledge articles, and process ownership records."},
+          {"level": "L1", "text": "Records employee inquiries, resolution steps, handoff notes, and service evidence in case systems."},
+          {"level": "L1", "text": "Follows standard operating procedures for HR transactions, employee support, and escalation routing."},
+          {"level": "L2", "text": "Manages HR service cases using workflow rules, knowledge articles, service-level targets, and process controls."},
+          {"level": "L2", "text": "Maintains process documentation, standard work, vendor tickets, and quality assurance checklists."},
+          {"level": "L2", "text": "Analyzes case volumes, cycle times, rework, escalation patterns, and customer support themes."},
+          {"level": "L3", "text": "Designs HR service process improvements using workflow maps, service metrics, controls, and employee feedback."},
+          {"level": "L3", "text": "Leads quality reviews for case handling, knowledge management, vendor performance, and process adherence."},
+          {"level": "L3", "text": "Evaluates service delivery models against compliance requirements, employee needs, cost, and operational risk."},
+          {"level": "L4", "text": "Establishes enterprise HR service standards for case management, process controls, and knowledge governance."},
+          {"level": "L4", "text": "Approves service delivery models, vendor governance, automation priorities, and quality assurance methods."},
+          {"level": "L4", "text": "Develops advanced service-process diagnostics, knowledge-base standards, and employee-support measures for ambiguous delivery problems."}
+        ],
+        "action": {"lead": "Acknowledge.", "text": "No action needed. Acknowledge, or note an issue with the sharpened vendor, SLA, and process-governance examples."}
+      }
+    ]
+  },
+  "part_b": {
+    "intro": "Each item below was seen differently by reviewers or shifts who owns the work. A recommendation is drafted for the group. Full indicator tables for every competency in play are in the appendix.",
+    "items": [
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Benefits (owner) · Global Mobility · Total Rewards Advisory",
+        "number": "Decision 1.",
+        "title": "Benefits Program Strategy & Management: design and governance, the rename, and operational scope",
+        "owners_line": "Benefits (owner), Global Mobility, Total Rewards Advisory   |   15 min",
+        "what_each_group_said": {
+          "headers": ["Benefits (owner)", "Global Mobility", "Total Rewards Advisory"],
+          "rows": [
+            ["Change this to Benefits Program Strategy, Design and Governance and move more operational components to HR Service Delivery Excellence or HR Compliance & Workforce Risk. (361 insertions, 170 deletions synthesized.)", "Relevant and essential for Global Mobility, but the current framing is too benefits-oriented. Make the mobility dimension more explicit by reflecting international assignment activity.", "Current wording is very design and programmatic; TRA plays more of a facilitation role. Need to re-assess Level alignment once we see the updated definition."]
+          ]
+        },
+        "recommendation": "Keep this as the shared benefits-and-mobility program competency. The v5 wording already merges the well-being and governance additions and the mobility dimension (see appendix). Resolve the rename to Benefits Program Strategy, Design and Governance, and decide which operational components move to HR Service Delivery Excellence and HR Compliance. Apply the convention across the roles that touch it: Benefits owns design and governance at Levels 3 to 4; Global Mobility carries it with the mobility lens; Total Rewards Advisory facilitates at apply-and-advise levels; and Benefits Administration (HR Operations) administers at Levels 1 to 2. Because the competency is shared with Benefits Administration, the wording must hold a middle ground that reads for both design and administration.",
+        "decide": {"lead": "Decide.", "text": "Adopt the rename? Which operational components move out, and to which competency? Confirm the design-versus-facilitation levels per role?"}
+      },
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Compensation (Clinton Shoap, SVP, owner) · Global Mobility · Total Rewards Advisory",
+        "number": "Decision 2.",
+        "title": "Compensation & Pay Design: adopt the SVP owner version and set membership",
+        "owners_line": "Compensation (Clinton Shoap, SVP, owner), with Global Mobility and Total Rewards Advisory   |   12 min",
+        "note": {"lead": "Weighting.", "text": "Clinton Shoap is the SVP and competency owner. His reauthored wording (39 insertions, 24 deletions) is the owner version shown in the appendix and supersedes the other reviewers' edits on this competency where they conflict."},
+        "what_each_group_said": {
+          "headers": ["Compensation (Clinton Shoap, SVP)", "Global Mobility", "Total Rewards Advisory"],
+          "rows": [
+            ["Reauthored all four levels (data-maintenance facilitation, educate and train managers, stakeholder adoption, influence senior stakeholders, governance). Also: remove HR Service Delivery Excellence and Workforce Planning & Capability Strategy from the competencies used for this specialization.", "Relevant for Global Mobility, but current wording is too broad and Compensation-centered. Tailor toward international assignment compensation.", "TRA plays a role but often does not own the frameworks used. Can we broaden language to design and deployment?"]
+          ]
+        },
+        "recommendation": "Adopt Clinton Shoap's reauthored wording as the authoritative owner version. Apply his set-membership change: remove HR Service Delivery Excellence and Workforce Planning & Capability Strategy from the Compensation specialization. The Compensation packet still lists Workforce Planning as an open decision tied to the enterprise Workforce Planning versus Talent Demand Planning question; the SVP removal resolves it for Compensation, and Talent Demand Planning is the Talent Acquisition demand-side replacement, not a Compensation competency. Honor the contributor views through level, not by overwriting the owner: Global Mobility carries Compensation with the international-assignment-compensation lens; Total Rewards Advisory sits at apply-and-advise levels, which accommodates the design-and-deployment framing without changing ownership.",
+        "decide": {"lead": "Decide.", "text": "Adopt the SVP reauthored wording as authoritative, remove the two competencies from the Compensation set, and confirm the contributor levels?"}
+      },
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Compensation · Benefits · Total Rewards Advisory",
+        "number": "Decision 3.",
+        "title": "Workforce Analytics & HR Insights: what each role does with data, and the boundary",
+        "owners_line": "Compensation, Benefits, Total Rewards Advisory   |   10 min",
+        "note": {"lead": "Note.", "text": "Importance is settled and high; an earlier weakest label was a corrected data error. The Benefits and Compensation packets both route this as a live decision because reviewers saw the role of data differently. This is about what each role does with data and the levels, not whether it belongs."},
+        "what_each_group_said": {
+          "headers": ["Compensation", "Benefits", "Total Rewards Advisory"],
+          "rows": [
+            ["Rated a user-level competency (Limited). Compensation applies and interprets reward data; it does not build the analytics.", "Apply a benefits data-analytics and reporting lens: plan utilization, financial forecasting, vendor performance, and cost modeling.", "We are net users of info, not developers of it typically. Defer the build-level description to roles closer to the analytics work."]
+          ]
+        },
+        "recommendation": "Keep Workforce Analytics for Total Rewards at applied, use-not-own levels. Place Compensation, Benefits, and Total Rewards Advisory at Levels 1 to 2 with a rewards-and-benefits reporting lens (utilization, cost modeling, vendor performance, financial forecasting); they interpret and act on analytics rather than building tools. Add one boundary sentence so this does not duplicate the Common Technology & Data Acumen competency: this is the rewards-data application of analytics to Total Rewards decisions, not general data literacy.",
+        "decide": {"lead": "Decide.", "text": "Confirm the use-not-own levels per role and the boundary sentence against the Common Technology & Data Acumen competency?"}
+      },
+      {
+        "status": "PROPOSED",
+        "status_note": "new or expanded, drafted in full",
+        "assigned_to": "Global Mobility (owner) · Total Rewards Advisory",
+        "number": "Decision 4.",
+        "title": "Global Mobility Program Management: adopt the new competency",
+        "owners_line": "Global Mobility (owner), Total Rewards Advisory   |   12 min",
+        "what_each_group_said": {
+          "headers": ["Global Mobility focus group", "Total Rewards Advisory"],
+          "rows": [
+            ["The group drafted and supported a new competency capturing core mobility program management (relocation policy administration, vendor and tax expertise, compliant cross-border transitions) not explicit in the current set. They also decided to integrate mobility tax compliance into HR Compliance rather than a separate niche competency.", "Agreed the Global Mobility competency is relevant for advisory roles too, provided their expected proficiency is set at an awareness level."]
+          ]
+        },
+        "recommendation": "Adopt Global Mobility Program Management (drafted in full in the appendix) as a single-specialization competency owned by Global Mobility through Levels 3 to 4. Add it to Total Rewards Advisory at awareness level (Levels 1 to 2). Keep mobility tax compliance inside HR Compliance & Workforce Risk, which is already reauthored to include cross-border and immigration, rather than creating a separate competency.",
+        "decide": {"lead": "Decide.", "text": "Adopt Global Mobility Program Management for Global Mobility (owner) and Total Rewards Advisory (awareness)? Confirm mobility tax stays in HR Compliance?"}
+      },
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Total Rewards Advisory leads",
+        "number": "Decision 5.",
+        "title": "Total Rewards Advisory roster",
+        "owners_line": "Total Rewards Advisory leads   |   11 min",
+        "note": {"lead": "Logged change (AS-7).", "text": "Before (as first drafted from Round 1): add Performance Management Program Design, Talent Review & Succession Management, and Labor Relations & Bargaining (three additions), then run a set-size check. After (this version): add Performance Management and Talent Review, swap Workforce Planning for Organization Design (net-neutral to set size), and defer Labor Relations & Bargaining. Rationale: adding all three would breach the AS-7 hard ceiling of eight competencies for the Total Rewards Advisory set, so net additions are capped at two. Source: AS-7 and tcb_as7_validator_v3_7. Owner: Chris Honts. Date: 2026-06-22. Revisit Labor Relations & Bargaining only if a competency is retired to make room."},
+        "what_each_group_said": {
+          "headers": ["Add for overlap with pay", "Job-architecture anchor", "Other roster notes"],
+          "rows": [
+            ["Performance Management Program Design and Talent Review & Succession Management should be considered given the considerable overlap between performance and pay.", "Organization Design & Operating Models may be a better fit than Workforce Planning & Capability Strategy. We need something tied to job architecture. This competency would be an input to broader org work.", "Labor Relations & Bargaining at Level 2 (limited). Workforce Planning is not TRA core work."]
+          ]
+        },
+        "recommendation": "For the Total Rewards Advisory set, add Performance Management Program Design and Talent Review & Succession Management at advisory (apply-and-advise) levels. Replace Workforce Planning & Capability Strategy with Organization Design & Operating Models as the job-architecture anchor (a net-neutral swap). Defer Labor Relations & Bargaining to keep the set within the AS-7 ceiling of eight; revisit it only if a competency is retired. With the two additions and the swap, the final set stays within range.",
+        "decide": {"lead": "Decide.", "text": "Confirm the two additions (Performance Management and Talent Review), the Workforce Planning to Organization Design swap, and the deferral of Labor Relations & Bargaining per AS-7?"}
+      }
+    ]
+  },
+  "boundaries": {
+    "headers": ["Item", "What Round 1 said", "Where it goes"],
+    "rows": [
+      ["Shared competencies span Total Rewards and HR Operations", "Compensation and Benefits are also carried by Payroll and Leave & Benefits Administration in HR Operations, who administer rather than design.", "Total Rewards owns design and governance; HR Operations administers. The design-versus-facilitation leveling handles the overlap."],
+      ["HR Service Delivery Excellence", "Benefits kept it (strongly supported); examples sharpened for vendor, SLA, and process governance. It is the move-target for Benefits operational components and was removed from the Compensation set.", "Kept, no change to what it measures; receives operational components from Benefits Program Strategy."],
+      ["Mobility tax compliance", "Global Mobility: integrate mobility tax into the broader compliance competency rather than adding a separate niche competency.", "Stays inside HR Compliance & Workforce Risk, not a separate competency."]
+    ]
+  },
+  "sign_off": {
+    "intro": "Record the agreed outcome. Owners and dates feed the decision registry; the sub-family owner is John.",
+    "rows": [
+      "Design-versus-facilitation convention",
+      "Decision 1 · Benefits rename, ops scope, levels",
+      "Decision 2 · Compensation SVP version and set membership",
+      "Decision 3 · Workforce Analytics levels and boundary",
+      "Decision 4 · Adopt Global Mobility Program Management",
+      "Decision 5 · Total Rewards Advisory roster",
+      "Confirmation 1 · HR Compliance reauthor"
+    ]
+  },
+  "appendix": {
+    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in the disposition register that accompanies this packet.",
+    "competencies": [
+      {
+        "name": "Compensation & Pay Design",
+        "note": "SVP (Clinton Shoap) reauthored owner version; supersedes conflicting edits (Decision 2).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies appropriate external sources of job, salary, incentive, or benefits data and design."},
+          {"level": "L1", "text": "Prepare data files for analysis and draft plan or employee communications."},
+          {"level": "L1", "text": "Record compensation decisions, facilitate data changes and data maintenance within approved systems."},
+          {"level": "L2", "text": "Conduct initial market analysis and benchmarking and prepare preliminary analyses and recommendations."},
+          {"level": "L2", "text": "Validate recommendations comply with plan rules, budget assumptions, and other governance requirements."},
+          {"level": "L2", "text": "Create initial change plan and materials to influence, educate and train employees and managers."},
+          {"level": "L3", "text": "Develop compensation and reward recommendations using advanced market analysis and benchmarking, financial models, and governance requirements."},
+          {"level": "L3", "text": "Develop and execute stakeholder management plan to ensure adoption of Rewards programs."},
+          {"level": "L3", "text": "Anticipate challenges and connect Rewards priorities across businesses and functions to ensure positive impact."},
+          {"level": "L4", "text": "Establishes plan design and governance that represents best practices within Rewards programs."},
+          {"level": "L4", "text": "Influence senior level stakeholders to ensure alignment and acceptance of Reward strategy, supported by external benchmarking."},
+          {"level": "L4", "text": "Ensure compliance with governance requirements and manage exceptions to drive function and business solutions that support talent strategies."}
+        ]
+      },
+      {
+        "name": "Benefits Program Strategy & Management",
+        "note": "Shared benefits-and-mobility program competency; v5 wording merges well-being, governance, and the mobility dimension. Rename and operational scope are open (Decision 1).",
+        "indicators": [
+          {"level": "L1", "text": "Demonstrates foundational understanding of benefits and well-being programs, including eligibility rules, plan provisions, leave rules, and mobility requirements."},
+          {"level": "L1", "text": "Prepares and maintains benefits records, leave files, assignment packets, vendor intake materials, and program documentation within established processes and governance standards."},
+          {"level": "L1", "text": "Records employee elections, mobility case updates, vendor responses, and documentation evidence in benefits systems."},
+          {"level": "L1", "text": "Supports implementation and communication of program changes."},
+          {"level": "L2", "text": "Administers benefits, leave, wellness, and mobility cases using plan rules, mobility policies, and service procedures."},
+          {"level": "L2", "text": "Supports program updates, vendor activities, and policy changes through coordination with internal stakeholders and external partners."},
+          {"level": "L2", "text": "Reviews market data, utilization trends, employee feedback, and vendor performance to identify design and operational optimization opportunities."},
+          {"level": "L2", "text": "Applies plan provisions, governance standards, compliance requirements, and applicable labor agreements when supporting the design and strategy of benefits and well-being programs."},
+          {"level": "L3", "text": "Designs benefits, well-being, and mobility program improvements using market insights, utilization data, vendor performance metrics, employee feedback, and business objectives, while balancing compliance, financial risk, and labor and union considerations."},
+          {"level": "L3", "text": "Leads complex leave, benefits, and international assignment reviews involving policy, tax, payroll, immigration, and vendor inputs."},
+          {"level": "L3", "text": "Evaluates vendor performance, plan effectiveness, cost trends, workforce needs, and employee impact to support strategic recommendations and benefits design decisions."},
+          {"level": "L3", "text": "Leads cross-functional initiatives involving benefits design, vendor strategy, governance improvements, and employee experience enhancements."},
+          {"level": "L4", "text": "Establishes enterprise strategies, governance frameworks, cross-functional operating standards, and stakeholder alignment models for benefits, well-being, and mobility programs in alignment with workforce and business priorities."},
+          {"level": "L4", "text": "Defines and drives benefits strategy, vendor governance, financial risk management, employee engagement, and program optimization to improve employee experience, business outcomes, and long-term cost sustainability."},
+          {"level": "L4", "text": "Integrates analytics, market insights, compliance considerations, and workforce trends to guide enterprise benefits decision-making."},
+          {"level": "L4", "text": "Sponsors large-scale benefits transformation initiatives, including program innovation, communication strategies, and continuous improvement to strengthen governance, operational effectiveness, employee experience, and business outcomes."}
+        ]
+      },
+      {
+        "name": "Global Mobility Program Management",
+        "note": "PROPOSED new competency owned by Global Mobility; TRA at awareness (Decision 4).",
+        "indicators": [
+          {"level": "L1", "text": "Processes assignment documentation and initiation steps following established mobility checklists."},
+          {"level": "L1", "text": "Applies standard mobility policy provisions to routine assignment cases under guidance."},
+          {"level": "L1", "text": "Logs assignment milestones and vendor handoffs in the mobility tracking system."},
+          {"level": "L2", "text": "Administers standard international assignments end to end, coordinating immigration, tax, and payroll inputs."},
+          {"level": "L2", "text": "Applies mobility policy and documented exceptions to non-routine cases independently."},
+          {"level": "L2", "text": "Coordinates assigned mobility vendors against service expectations for routine moves."},
+          {"level": "L3", "text": "Manages complex or sensitive assignments (e.g., multi-country moves, senior transfers) across functions and vendors."},
+          {"level": "L3", "text": "Interprets mobility policy for ambiguous cases and recommends defensible exception decisions."},
+          {"level": "L3", "text": "Designs the move-coordination workflow and vendor-management approach for an assignment portfolio."},
+          {"level": "L3", "text": "Advises HR and business stakeholders on assignment feasibility, cost drivers, and compliance risk."},
+          {"level": "L4", "text": "Sets the standard for how international assignments are administered and governed across the mobility program."},
+          {"level": "L4", "text": "Defines mobility policy application, exception frameworks, and vendor-governance standards."},
+          {"level": "L4", "text": "Resolves the most complex cross-border compliance and duty-of-care issues as the program authority."},
+          {"level": "L4", "text": "Shapes the mobility program design that aligns assignment delivery with talent and compliance strategy."}
+        ]
+      },
+      {
+        "name": "Workforce Analytics & HR Insights",
+        "note": "Used by Total Rewards, not built by it; levels decided in session (Decision 3).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies HR source systems, metric definitions, population rules, dashboard filters, and privacy requirements for assigned reports."},
+          {"level": "L1", "text": "Prepares workforce data extracts, reconciliation notes, and metric summaries using approved HR reporting definitions."},
+          {"level": "L1", "text": "Logs data-quality exceptions, access constraints, and evidence sources in analytics request trackers."},
+          {"level": "L2", "text": "Builds HR dashboards using population logic, metric calculations, segmentation variables, and source-system refresh schedules."},
+          {"level": "L2", "text": "Validates workforce metrics against the core HR system, payroll, recruiting, learning, and case-management source records."},
+          {"level": "L2", "text": "Documents insight summaries with caveats, privacy thresholds, and recommended interpretation boundaries."},
+          {"level": "L3", "text": "Designs workforce analytics products using data models, cohort definitions, controls, and narrative-driven reporting plans."},
+          {"level": "L3", "text": "Analyzes workforce patterns through trend, cohort, funnel, variance, predictive, and risk methods."},
+          {"level": "L3", "text": "Leads metric-governance reviews that align HR definitions, privacy thresholds, quality rules, and decision use cases."},
+          {"level": "L4", "text": "Establishes workforce analytics standards for HR metric architecture, source-system governance, privacy controls, and validation methods."},
+          {"level": "L4", "text": "Approves analytics product portfolios, workforce insight frameworks, model-risk criteria, and ethical-use guardrails."},
+          {"level": "L4", "text": "Develops reusable measurement designs, validation protocols, and narrative-driven reporting standards for ambiguous workforce decisions."}
+        ]
+      },
+      {
+        "name": "HR Compliance & Workforce Risk",
+        "note": "Reauthored to add labor and collective labor agreements, vendor oversight, and cross-border and immigration (Confirmation 1).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies applicable employment policies, statutory requirements, labor and collective labor agreements, and recordkeeping rules for assigned HR activities."},
+          {"level": "L1", "text": "Prepares compliance files, policy acknowledgments, audit evidence, and required HR documentation."},
+          {"level": "L1", "text": "Follows privacy, retention, equal-employment, and escalation procedures when handling employee records."},
+          {"level": "L2", "text": "Reviews HR transactions against policy requirements, labor-agreement provisions, regulatory checklists, and documentation standards, including cross-border mobility processes."},
+          {"level": "L2", "text": "Maintains compliance calendars, evidence repositories, and control logs for assigned HR processes."},
+          {"level": "L2", "text": "Documents exceptions, remediation actions, and control gaps for review by HR, Legal, or governance owners."},
+          {"level": "L3", "text": "Leads compliance reviews using audit protocols, risk registers, policy and labor-agreement matrices, and corrective-action plans."},
+          {"level": "L3", "text": "Evaluates employment-practice and labor-agreement risk across cases, systems, vendors, process changes, immigration requirements, and cross-border jurisdictional requirements."},
+          {"level": "L3", "text": "Designs HR control procedures, policy and labor-agreement governance tools, vendor-oversight methods, and compliance reporting for complex operations."},
+          {"level": "L4", "text": "Establishes enterprise HR compliance controls and standards across employment practices, labor and collective labor agreements, records governance, and audit readiness."},
+          {"level": "L4", "text": "Approves risk-control frameworks for cross-border employment practices, vendor oversight, policy exceptions, and high-impact remediation plans."},
+          {"level": "L4", "text": "Develops advanced HR compliance diagnostics, remediation playbooks, and control-evidence standards for complex employment-practice and labor-relations risks."}
+        ]
+      },
+      {
+        "name": "Performance Management Program Design",
+        "note": "Candidate addition to the Total Rewards Advisory set (Decision 5).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies performance-cycle milestones, goal-setting requirements, rating criteria, and calibration materials for assigned populations."},
+          {"level": "L1", "text": "Records goal plans, check-in evidence, rating inputs, and calibration notes in approved performance management files."},
+          {"level": "L1", "text": "Follows performance documentation templates for cycle launch, progress review, rating entry, and completion tracking."},
+          {"level": "L2", "text": "Manages performance-cycle activities using calendar controls, goal-setting guidance, rating rules, and manager support materials."},
+          {"level": "L2", "text": "Validates performance ratings, calibration inputs, completion data, and exception records against process standards."},
+          {"level": "L2", "text": "Maintains performance dashboards, manager toolkits, feedback records, and cycle issue logs for assigned populations."},
+          {"level": "L3", "text": "Designs performance management processes using goal architectures, rating criteria, calibration routines, and feedback tools."},
+          {"level": "L3", "text": "Evaluates performance-cycle outcomes through completion metrics, rating distributions, quality checks, and manager feedback."},
+          {"level": "L3", "text": "Leads calibration quality reviews that improve rating consistency, documentation quality, and performance decision evidence."},
+          {"level": "L4", "text": "Establishes performance management standards for cycle governance, goal quality, calibration evidence, and rating controls."},
+          {"level": "L4", "text": "Approves performance-system design methods for complex workforces, regulated contexts, and high-impact talent decisions."},
+          {"level": "L4", "text": "Develops advanced performance-cycle diagnostics, calibration methods, and feedback tools for ambiguous performance problems."}
+        ]
+      },
+      {
+        "name": "Talent Review & Succession Management",
+        "note": "Candidate addition to the Total Rewards Advisory set (Decision 5).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies talent review inputs, critical-role lists, succession slates, and readiness criteria from approved templates."},
+          {"level": "L1", "text": "Records calibration notes, successor profiles, readiness ratings, and development-plan actions in talent review files."},
+          {"level": "L1", "text": "Follows succession planning checklists for data preparation, slate review, confidentiality, and action tracking."},
+          {"level": "L2", "text": "Conducts talent review preparation using 9-box grids, readiness definitions, successor data, and calibration materials."},
+          {"level": "L2", "text": "Maintains succession pipelines, development-plan trackers, and critical-role coverage records for assigned populations."},
+          {"level": "L2", "text": "Validates readiness data, successor movement, talent actions, and development-plan evidence against agreed criteria."},
+          {"level": "L3", "text": "Designs talent review routines using 9-box grids, readiness criteria, succession slates, and development-plan evidence."},
+          {"level": "L3", "text": "Evaluates bench strength, critical-role coverage, successor readiness, and action completion to improve talent outcomes."},
+          {"level": "L3", "text": "Leads calibration sessions that translate talent review evidence into succession decisions and development priorities."},
+          {"level": "L4", "text": "Establishes talent and succession standards for critical-role segmentation, readiness governance, and succession evidence."},
+          {"level": "L4", "text": "Approves succession governance methods for complex populations, high-risk roles, and leadership continuity scenarios."},
+          {"level": "L4", "text": "Develops advanced readiness diagnostics, slate-quality tools, and bench-strength measures for unresolved succession risks."}
+        ]
+      },
+      {
+        "name": "Organization Design & Operating Models",
+        "note": "Proposed job-architecture anchor for Total Rewards Advisory (Decision 5).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies organization charts, role profiles, process maps, and design assumptions from source materials."},
+          {"level": "L1", "text": "Prepares spans, layers, role inventory, and operating-model data using approved templates."},
+          {"level": "L1", "text": "Records design issues, stakeholder inputs, and implementation risks in organization design trackers."},
+          {"level": "L2", "text": "Analyzes current-state structures using role segmentation, decision-right maps, and workflow evidence."},
+          {"level": "L2", "text": "Maintains organization design scenarios, role comparison tables, and transition planning artifacts."},
+          {"level": "L2", "text": "Documents design tradeoffs, governance requirements, and adoption risks for review by decision owners."},
+          {"level": "L3", "text": "Designs target operating models using design principles, governance forums, role architecture, and process interfaces."},
+          {"level": "L3", "text": "Leads organization effectiveness diagnostics using team data, process evidence, and operating-model metrics."},
+          {"level": "L3", "text": "Designs change-impact assessments, stakeholder readiness tools, adoption measurement plans, and communication strategies for structure and process transitions."},
+          {"level": "L4", "text": "Establishes enterprise organization design standards for operating models, decision rights, and role architecture."},
+          {"level": "L4", "text": "Approves design governance methods for large-scale restructures, integrations, transformations, and capability shifts."},
+          {"level": "L4", "text": "Develops advanced design diagnostics, decision-right methods, and change-readiness tools for complex organization transitions."}
+        ]
+      },
+      {
+        "name": "HR Service Delivery Excellence",
+        "note": "Kept and sharpened for Benefits (vendor, SLA, process governance); operational-component move target; removed from Compensation set.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies service catalog entries, case categories, knowledge articles, and process ownership records."},
+          {"level": "L1", "text": "Records employee inquiries, resolution steps, handoff notes, and service evidence in case systems."},
+          {"level": "L1", "text": "Follows standard operating procedures for HR transactions, employee support, and escalation routing."},
+          {"level": "L2", "text": "Manages HR service cases using workflow rules, knowledge articles, service-level targets, and process controls."},
+          {"level": "L2", "text": "Maintains process documentation, standard work, vendor tickets, and quality assurance checklists."},
+          {"level": "L2", "text": "Analyzes case volumes, cycle times, rework, escalation patterns, and customer support themes."},
+          {"level": "L3", "text": "Designs HR service process improvements using workflow maps, service metrics, controls, and employee feedback."},
+          {"level": "L3", "text": "Leads quality reviews for case handling, knowledge management, vendor performance, and process adherence."},
+          {"level": "L3", "text": "Evaluates service delivery models against compliance requirements, employee needs, cost, and operational risk."},
+          {"level": "L4", "text": "Establishes enterprise HR service standards for case management, process controls, and knowledge governance."},
+          {"level": "L4", "text": "Approves service delivery models, vendor governance, automation priorities, and quality assurance methods."},
+          {"level": "L4", "text": "Develops advanced service-process diagnostics, knowledge-base standards, and employee-support measures for ambiguous delivery problems."}
+        ]
+      },
+      {
+        "name": "Workforce Planning & Capability Strategy",
+        "note": "For contrast: removed from Compensation; replaced for TRA by Organization Design.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies workforce segments, capability terms, and demand assumptions from planning templates and job data."},
+          {"level": "L1", "text": "Records headcount, skills, role, and vacancy information in workforce planning files."},
+          {"level": "L1", "text": "Follows data-quality checks for workforce planning inputs, capability inventories, and scenario assumptions."},
+          {"level": "L2", "text": "Builds workforce snapshots using job architecture data, skills taxonomy entries, role inventories, and demand inputs."},
+          {"level": "L2", "text": "Conducts gap analyses comparing workforce supply, hiring plans, capability needs, and attrition patterns."},
+          {"level": "L2", "text": "Maintains scenario files, action trackers, and planning dashboards for assigned workforce segments."},
+          {"level": "L3", "text": "Designs workforce plans using competency frameworks, Cargill capability model inputs, demand forecasts, and business scenarios."},
+          {"level": "L3", "text": "Evaluates build-buy-borrow scenarios through cost, risk, timeline, and capability impact analyses."},
+          {"level": "L3", "text": "Leads workforce planning reviews that translate capability gaps into talent, hiring, and development actions."},
+          {"level": "L4", "text": "Establishes enterprise workforce planning standards for capability taxonomies, forecasting methods, and scenario governance."},
+          {"level": "L4", "text": "Approves strategic workforce planning models for critical capabilities, transformation portfolios, and long-range demand."},
+          {"level": "L4", "text": "Develops advanced workforce-planning diagnostics that translate capability risk into portfolio, build-buy-borrow, and development choices."}
+        ]
+      }
+    ]
+  }
+}
