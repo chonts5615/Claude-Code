@@ -49,6 +49,22 @@
       "HR Service Delivery Excellence",
       "Workforce Analytics & HR Insights"
     ],
+    "specialization_sets": {
+      "Benefits (design)": [
+        "Benefits Program Strategy & Management",
+        "Compensation & Pay Design",
+        "HR Compliance & Workforce Risk",
+        "HR Service Delivery Excellence",
+        "Workforce Analytics & HR Insights"
+      ],
+      "Leave & Benefits Administration": [
+        "Benefits Program Strategy & Management",
+        "Payroll Operations & Compliance",
+        "HR Compliance & Workforce Risk",
+        "HR Service Delivery Excellence",
+        "Workforce Analytics & HR Insights"
+      ]
+    },
     "rows": [
       {"num": "01", "competency": "Benefits Program Strategy & Management", "roles": ["D", "A"]},
       {"num": "02", "competency": "Compensation & Pay Design", "roles": ["A", ""]},

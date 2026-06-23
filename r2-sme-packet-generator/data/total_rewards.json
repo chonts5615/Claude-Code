@@ -54,6 +54,34 @@
       "Organization Design & Operating Models",
       "Labor Relations & Bargaining"
     ],
+    "specialization_sets": {
+      "Compensation": [
+        "Compensation & Pay Design",
+        "Workforce Analytics & HR Insights"
+      ],
+      "Benefits": [
+        "Benefits Program Strategy & Management",
+        "Workforce Analytics & HR Insights",
+        "HR Compliance & Workforce Risk",
+        "HR Service Delivery Excellence"
+      ],
+      "Global Mobility": [
+        "Compensation & Pay Design",
+        "Benefits Program Strategy & Management",
+        "Global Mobility Program Management",
+        "HR Compliance & Workforce Risk"
+      ],
+      "Total Rewards Advisory": [
+        "Compensation & Pay Design",
+        "Benefits Program Strategy & Management",
+        "Global Mobility Program Management",
+        "Workforce Analytics & HR Insights",
+        "Performance Management Program Design",
+        "Talent Review & Succession Management",
+        "Organization Design & Operating Models",
+        "Labor Relations & Bargaining"
+      ]
+    },
     "rows": [
       {"num": "01", "competency": "Compensation & Pay Design", "roles": ["D", "", "C", "A"]},
       {"num": "02", "competency": "Benefits Program Strategy & Management", "roles": ["", "D", "C", "F"]},

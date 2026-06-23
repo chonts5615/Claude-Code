@@ -74,14 +74,25 @@ Cargill green `#00843D` (deep `#01632D`); amber `#FEA800`; proposed blue
 case everywhere. Every competency uses the L1·L2·L3·L4 indicator structure;
 changed levels are flagged `· updated`; L3–L4 get the elevated tint.
 
-## Writing rules
+## CRITICAL RULE — complete coverage (non-negotiable)
 
-- **Complete coverage (hard rule).** A multi-specialization packet must include
-  every technical competency belonging to any participating specialization —
-  the full union, never a per-group subset. Encode the union in
-  `coverage.required_union` and run `audit.py`; competencies that are settled or
-  carried (not in dispute) still appear in the matrix, the disposition register,
-  and Appendix B — they are simply not raised as Part A / Part B items.
+A packet MUST include **every** technical competency that **any** participating
+specialization touches — both the **shared (union)** competencies and the
+**specialization-specific (non-shared)** ones. None may be dropped because
+another group owns it, rates it lower, only uses it, or it is "held in the
+library." Each such competency appears in the coverage matrix **with a role**,
+in the disposition register, and (unless deferred) in Appendix B. Settled or
+carried competencies still appear — they are simply not raised as Part A /
+Part B items.
+
+This is enforced, not advisory. In each data file declare every
+specialization's full competency set under `coverage.specialization_sets`
+(keyed by the exact specialization column name). `audit.py` verifies, per
+specialization, that every competency in the set is present in the matrix with
+a non-blank role, and fails **CRITICAL** on any gap. Never generate a packet
+from a data file that does not pass `audit.py`.
+
+## Writing rules
 - **Voice.** Sentence case. Direct Round 1 quotes in "What each group said"
   (italic). Recommendations are neutral — never advocate a position.
 - **Traceability.** Every decision traces to Round 1 feedback; every

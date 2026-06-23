@@ -64,10 +64,13 @@ python audit.py data/x.json
 ```
 
 It enforces:
-- **Complete coverage** — the coverage matrix must contain every competency in
-  `coverage.required_union` (the Round 1 union of the participating
-  specializations). This is what catches a packet that silently drops a
-  competency another group owns.
+- **Complete coverage (CRITICAL)** — every competency that *any* participating
+  specialization touches must appear in the matrix **with a role**: both the
+  shared (union) competencies and the specialization-specific (non-shared)
+  ones. Declare each specialization's full set under
+  `coverage.specialization_sets`; the audit checks the matrix against it per
+  specialization and fails CRITICAL on any gap. This is what catches a packet
+  that silently drops a competency another group owns, uses, or carries.
 - **Appendix completeness** — every non-deferred coverage competency has a full
   L1–L4 indicator table (≥3 indicators per level).
 - **Feedback appendix** — a `disposition_register` exists and has an entry for
@@ -86,9 +89,11 @@ dispositions, and indicator tables. Do not change the section order, the status
 values, the coverage codes, or the colors; those are the locked contract
 documented in `CLAUDE.md`.
 
-### Complete-coverage rule
+### Complete-coverage rule (CRITICAL)
 
 When a packet spans more than one specialization, it must include **every**
-technical competency belonging to any participating specialization — the full
-union, never a per-group subset. A blank coverage cell means "no role," never
-"omitted."
+technical competency belonging to any participating specialization — both the
+shared (union) and the specialization-specific (non-shared) competencies, never
+a per-group subset. Declare each specialization's full set under
+`coverage.specialization_sets` so `audit.py` can enforce it per specialization.
+A blank coverage cell means "no role," never "omitted."

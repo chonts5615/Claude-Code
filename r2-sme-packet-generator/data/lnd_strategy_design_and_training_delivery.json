@@ -46,6 +46,16 @@
       "Learning Design & Strategy",
       "Workforce Planning & Capability Strategy"
     ],
+    "specialization_sets": {
+      "L&D Strategy & Design": [
+        "Learning Design & Strategy",
+        "Workforce Planning & Capability Strategy"
+      ],
+      "Training Delivery": [
+        "Learning Design & Strategy",
+        "Workforce Planning & Capability Strategy"
+      ]
+    },
     "rows": [
       {"num": "01", "competency": "Learning Design & Strategy", "roles": ["D", "U"]},
       {"num": "02", "competency": "Workforce Planning & Capability Strategy", "roles": ["U", "U"]}

@@ -5,6 +5,13 @@ Checks each data/*.json against the locked-format completeness contract
 (see CLAUDE.md) so a packet cannot ship with a missing competency, a missing
 appendix, or a missing feedback (disposition) register. Run before generating.
 
+CRITICAL RULE (complete coverage): every competency that ANY participating
+specialization touches must appear in the coverage matrix WITH a role — both
+the shared (union) competencies and the specialization-specific (non-shared)
+ones. Declare each specialization's full competency set in
+`coverage.specialization_sets`; the audit verifies the matrix against it per
+specialization and fails CRITICAL on any gap.
+
 Usage:
     python audit.py                 # audit every data/*.json
     python audit.py data/x.json     # audit one file
@@ -52,14 +59,58 @@ def audit(data, name):
         if not any((c or "").strip() for c in r.get("roles", [])):
             fails.append(f"coverage row '{r['competency']}' has no role in any specialization")
 
-    # B. complete-coverage rule: matrix must cover the declared Round 1 union.
-    required = data.get("coverage", {}).get("required_union")
+    # B. CRITICAL — complete-coverage rule. Every competency that ANY
+    #    participating specialization touches must appear in the matrix WITH a
+    #    role: both the shared (union) competencies and the specialization-
+    #    specific (non-shared) ones. None may be dropped because another group
+    #    owns it, rates it lower, only uses it, or it is "held in the library."
+    coverage = data.get("coverage", {})
+    specs = coverage.get("specializations", [])
+    spec_sets = coverage.get("specialization_sets", {})
+    declared_union = set()
+    if spec_sets:
+        for spec_name, comps in spec_sets.items():
+            declared_union |= set(comps)
+            if spec_name not in specs:
+                fails.append(
+                    f"CRITICAL: specialization_sets names '{spec_name}', which is not a "
+                    "column in coverage.specializations"
+                )
+                continue
+            col = specs.index(spec_name)
+            for comp in comps:
+                row = next((r for r in cov_rows if r["competency"] == comp), None)
+                if row is None:
+                    fails.append(
+                        f"CRITICAL: '{comp}' is in the {spec_name} set but missing from the "
+                        "coverage matrix (complete-coverage violation)"
+                    )
+                elif col >= len(row.get("roles", [])) or not (row["roles"][col] or "").strip():
+                    fails.append(
+                        f"CRITICAL: '{comp}' is listed for {spec_name} but its matrix cell "
+                        "for that specialization is blank (no role marked)"
+                    )
+
+    # A flat required_union may also be declared; it must equal the set union.
+    required = coverage.get("required_union")
     if required:
         missing = [c for c in required if c not in cov_set]
         if missing:
             fails.append(
-                "complete-coverage violation: coverage matrix is missing "
+                "CRITICAL: complete-coverage violation — coverage matrix is missing "
                 + str(len(missing)) + " required competency(ies): " + ", ".join(missing)
+            )
+        if spec_sets and set(required) != declared_union:
+            only_req = set(required) - declared_union
+            only_set = declared_union - set(required)
+            detail = []
+            if only_req:
+                detail.append("in required_union only: " + ", ".join(sorted(only_req)))
+            if only_set:
+                detail.append("in specialization_sets only: " + ", ".join(sorted(only_set)))
+            fails.append(
+                "CRITICAL: required_union does not match the union of specialization_sets ("
+                + "; ".join(detail) + ")"
             )
 
     # C. every non-deferred coverage competency must have an Appendix B entry.
@@ -118,7 +169,10 @@ def main(argv):
         cov_n = len(_coverage_competencies(data))
         if fails:
             any_fail = True
-            print(f"✗ FAIL  {name}  ({cov_n} competencies)")
+            n_crit = sum(1 for m in fails if m.startswith("CRITICAL"))
+            tag = f"✗ FAIL  {name}  ({cov_n} competencies"
+            tag += f", {n_crit} CRITICAL)" if n_crit else ")"
+            print(tag)
             for msg in fails:
                 print(f"        - {msg}")
         else:
