@@ -1,0 +1,215 @@
+{
+  "metadata": {
+    "eyebrow": "Technical Competency",
+    "title": "Round 2 SME Review Packet",
+    "sub_family": "Benefits  +  Leave & Benefits Administration",
+    "subtitle": "Combined Round 2 focus group · the benefits competency shared by design and administration",
+    "function": "Cargill Talent Solutions",
+    "prepared_by": "Assessment, Competency & Career Framework Team",
+    "date": "2026-06-22",
+    "return_by": "[RETURN_BY_DATE]",
+    "specialization_label": "Benefits  +  Leave & Benefits Administration",
+    "time_required": "About 35 minutes for this focus group",
+    "sub_family_owner": "John"
+  },
+  "how_this_works": {
+    "what_we_did": "We combined your Round 1 edits, comment by comment, into one proposed version of each competency. The shared compliance anchor was reauthored and the service-operations competency was kept and sharpened; both are applied (Part A). The one item that needs the design and administration groups together, the shared Benefits Program Strategy competency, is drafted as a recommendation (Part B).",
+    "what_we_need": "Confirm the two applied changes in Part A. In Part B, settle the shared-spine middle ground for Benefits Program Strategy: who owns design and governance, who administers, and which operational components move out. Nothing in Part B is final until you decide.",
+    "where_feedback_went": "Every Round 1 comment on these competencies is in the appendix disposition, including the Benefits design-owner edits and the Benefits Administration request for a middle ground that reads for both design and administration.",
+    "status_intro": "Every competency below carries a status label so you can see, at a glance, what is already settled and what still needs the group. Items are grouped into two parts: Part A holds changes we have already applied (read and confirm); Part B holds the items for live discussion (decisions and proposals)."
+  },
+  "ground_rules": [
+    {"lead": "Scope before words.", "text": "Decide who designs, governs, or administers, and at what level, before debating wording. Wording fixes already handled in the edit lane do not need this room."},
+    {"lead": "Design versus administration.", "text": "Benefits owns the design and governance of benefits and well-being programs; Leave & Benefits Administration administers them. Place each role on the ladder, and let the essential functions in the job descriptions separate the levels, rather than splitting the shared competency in two."},
+    {"lead": "Owners and dates.", "text": "Owners and dates recorded at sign-off feed the decision registry; the sub-family owner is John."}
+  ],
+  "start_here": {
+    "heading": "Start here: agree the design-versus-administration split",
+    "intro": "Set the level for the shared Benefits competency by role rather than writing two competencies. Use the split below; the job-description essential functions then separate the levels for each specialization.",
+    "table": {
+      "headers": ["Position", "Levels", "What it means"],
+      "rows": [
+        ["Administers / applies", "1 to 2", "Processes benefits, leave, wellness, and mobility cases using plan rules and service procedures; maintains records and supports change"],
+        ["Designs / governs", "3 to 4", "Designs program improvements and sets enterprise strategy, governance, and vendor and financial-risk standards"]
+      ]
+    },
+    "quote": {
+      "label": "On the shared spine (Benefits Administration).",
+      "text": "This competency will be shared across Benefits and Benefits Admin specializations, so we'll need to find a middle ground that reflects the Benefits competency required within both, and let the essential functions in the job descriptions separate out the levels."
+    },
+    "decide": "Adopt the design-versus-administration split for today, then apply it to the shared competency below."
+  },
+  "coverage": {
+    "specializations": ["Benefits (design)", "Leave & Benefits Administration"],
+    "rows": [
+      {"num": "01", "competency": "Benefits Program Strategy & Management", "roles": ["D", "A"]},
+      {"num": "02", "competency": "HR Compliance & Workforce Risk", "roles": ["S", "S"]},
+      {"num": "03", "competency": "HR Service Delivery Excellence", "roles": ["", "U"]}
+    ],
+    "legend": "D designs and owns (Levels 3 to 4) · C carries with the specialization lens · F facilitates · U uses and applies (Levels 1 to 2) · A advises (apply-and-advise) · Aw awareness (Levels 1 to 2) · S shared employment-practice anchor · L2 limited (Level 2).",
+    "note": "Benefits Program Strategy & Management is shared: Benefits owns design and governance (Levels 3 to 4); Leave & Benefits Administration administers (Levels 1 to 2); the essential functions in each job description separate the levels. Leave & Benefits Administration also carries statutory-operations competencies (the Payroll and HR Operations spine: tax, pension, social-security, and labour law applied to payroll, benefits, and leave) held in the HR competency library; those are not built by this pairing."
+  },
+  "ratings_legend": {
+    "heading": "How to read the Round 1 ratings",
+    "headers": ["Score", "Label", "Definition"],
+    "rows": [
+      ["5", "Essential", "Jobs in this specialization cannot perform core work without this capability. Absence equals role failure."],
+      ["4", "Very important", "Jobs perform noticeably better with strong capability. Weak capability creates measurable friction and rework."],
+      ["3", "Important", "Useful and expected, but not a differentiator. Other competencies carry more weight day to day."],
+      ["2", "Limited", "Occasionally relevant. Not a reliable predictor of performance for this specialization."],
+      ["1", "Low", "Rarely relevant. Borderline for inclusion in this specialization."]
+    ]
+  },
+  "part_a": {
+    "intro": "These changes were clear and agreed in Round 1 and have been applied to the wording. Read each one and confirm it fits, or note a correction. Updated levels are flagged in the indicator tables.",
+    "items": [
+      {
+        "status": "NEEDS YOUR CONFIRMATION",
+        "status_note": "feedback applied; structure unchanged",
+        "assigned_to": "Shared employment-practice anchor · carried by Benefits, Leave & Benefits Administration, HR Operations, Payroll, Global Mobility",
+        "title": "HR Compliance & Workforce Risk",
+        "what_changed": "Reauthored to add labor and collective labor agreements alongside law and policy, strengthen vendor oversight, and add cross-border and immigration requirements, drawing on the Benefits, Global Mobility, HR Operations, Leave and Benefits, and Payroll feedback. The construct stays the shared employment-practice anchor; it is not narrowed to any one specialization.",
+        "round1_signal": "Endorsed across Benefits, Leave and Benefits, HR Operations, and Payroll in Round 1.",
+        "indicators": [
+          {"level": "L1", "updated": true, "text": "Identifies applicable employment policies, statutory requirements, labor and collective labor agreements, and recordkeeping rules for assigned HR activities."},
+          {"level": "L1", "updated": true, "text": "Prepares compliance files, policy acknowledgments, audit evidence, and required HR documentation."},
+          {"level": "L1", "updated": true, "text": "Follows privacy, retention, equal-employment, and escalation procedures when handling employee records."},
+          {"level": "L2", "updated": true, "text": "Reviews HR transactions against policy requirements, labor-agreement provisions, regulatory checklists, and documentation standards, including cross-border mobility processes."},
+          {"level": "L2", "updated": true, "text": "Maintains compliance calendars, evidence repositories, and control logs for assigned HR processes."},
+          {"level": "L2", "updated": true, "text": "Documents exceptions, remediation actions, and control gaps for review by HR, Legal, or governance owners."},
+          {"level": "L3", "updated": true, "text": "Leads compliance reviews using audit protocols, risk registers, policy and labor-agreement matrices, and corrective-action plans."},
+          {"level": "L3", "updated": true, "text": "Evaluates employment-practice and labor-agreement risk across cases, systems, vendors, process changes, immigration requirements, and cross-border jurisdictional requirements."},
+          {"level": "L3", "updated": true, "text": "Designs HR control procedures, policy and labor-agreement governance tools, vendor-oversight methods, and compliance reporting for complex operations."},
+          {"level": "L4", "updated": true, "text": "Establishes enterprise HR compliance controls and standards across employment practices, labor and collective labor agreements, records governance, and audit readiness."},
+          {"level": "L4", "updated": true, "text": "Approves risk-control frameworks for cross-border employment practices, vendor oversight, policy exceptions, and high-impact remediation plans."},
+          {"level": "L4", "updated": true, "text": "Develops advanced HR compliance diagnostics, remediation playbooks, and control-evidence standards for complex employment-practice and labor-relations risks."}
+        ],
+        "action": {"lead": "Confirm.", "text": "Confirm the reauthored wording reads right for Benefits and for Leave & Benefits Administration."}
+      },
+      {
+        "status": "KEPT, NO ACTION",
+        "status_note": "strongly supported and unchanged",
+        "assigned_to": "Leave & Benefits Administration (operations spine) · HR Operations",
+        "title": "HR Service Delivery Excellence",
+        "what_changed": "Kept with no change to what it measures. Examples sharpened for vendor, SLA, and process governance. This is the operations spine for benefits and leave administration and the move-target for operational components from Benefits Program Strategy.",
+        "round1_signal": "Strongly supported in Round 1.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies service catalog entries, case categories, knowledge articles, and process ownership records."},
+          {"level": "L1", "text": "Records employee inquiries, resolution steps, handoff notes, and service evidence in case systems."},
+          {"level": "L1", "text": "Follows standard operating procedures for HR transactions, employee support, and escalation routing."},
+          {"level": "L2", "text": "Manages HR service cases using workflow rules, knowledge articles, service-level targets, and process controls."},
+          {"level": "L2", "text": "Maintains process documentation, standard work, vendor tickets, and quality assurance checklists."},
+          {"level": "L2", "text": "Analyzes case volumes, cycle times, rework, escalation patterns, and customer support themes."},
+          {"level": "L3", "text": "Designs HR service process improvements using workflow maps, service metrics, controls, and employee feedback."},
+          {"level": "L3", "text": "Leads quality reviews for case handling, knowledge management, vendor performance, and process adherence."},
+          {"level": "L3", "text": "Evaluates service delivery models against compliance requirements, employee needs, cost, and operational risk."},
+          {"level": "L4", "text": "Establishes enterprise HR service standards for case management, process controls, and knowledge governance."},
+          {"level": "L4", "text": "Approves service delivery models, vendor governance, automation priorities, and quality assurance methods."},
+          {"level": "L4", "text": "Develops advanced service-process diagnostics, knowledge-base standards, and employee-support measures for ambiguous delivery problems."}
+        ],
+        "action": {"lead": "Acknowledge.", "text": "No action unless the sharpened vendor, SLA, and process-governance examples need a correction."}
+      }
+    ]
+  },
+  "part_b": {
+    "intro": "Each item below was seen differently by reviewers or shifts who owns the work. A recommendation is drafted for the group. Full indicator tables for every competency in play are in the appendix.",
+    "items": [
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Benefits (design owner) · Leave & Benefits Administration (administration)",
+        "number": "Decision 1.",
+        "title": "Benefits Program Strategy & Management: the shared-spine middle ground for design and administration",
+        "owners_line": "Benefits (design owner), Leave & Benefits Administration   |   15 min",
+        "note": {"lead": "Note.", "text": "The competency is shared across the Benefits and Benefits Administration specializations. The aim is one set of indicators that reads for both, with the job-description essential functions separating the levels, not two competencies."},
+        "what_each_group_said": {
+          "headers": ["Benefits (design owner)", "Leave & Benefits Administration"],
+          "rows": [
+            ["Change this to Benefits Program Strategy, Design and Governance and move more operational components to HR Service Delivery Excellence or HR Compliance & Workforce Risk. (361 insertions, 170 deletions synthesized.)", "This competency will be shared across Benefits and Benefits Admin specializations, so we'll need to find a middle ground that reflects the Benefits competency required within both, and let the essential functions in the job descriptions separate out the levels."]
+          ]
+        },
+        "recommendation": "Keep this as the shared benefits competency across design and administration. Benefits owns design and governance at Levels 3 to 4; Leave & Benefits Administration administers at Levels 1 to 2; the essential functions in each job description separate the levels, so the indicator wording holds a middle ground that reads for both. Resolve the rename to Benefits Program Strategy, Design and Governance, and move the operational components the design owner flagged to HR Service Delivery Excellence and HR Compliance & Workforce Risk. The v5 wording already merges the well-being, governance, and mobility additions (see appendix).",
+        "decide": {"lead": "Decide.", "text": "Adopt the rename? Confirm the design-at-Levels-3-to-4 and administer-at-Levels-1-to-2 split, with job-description essential functions separating the levels? Which operational components move out, and to which competency?"}
+      }
+    ]
+  },
+  "boundaries": {
+    "headers": ["Item", "What Round 1 said", "Where it goes"],
+    "rows": [
+      ["Operational components of Benefits Program Strategy", "Benefits design owner: move operational components to HR Service Delivery Excellence or HR Compliance.", "HR Service Delivery Excellence receives the operational components; the shared competency keeps design and governance."],
+      ["Statutory operations (Payroll spine)", "Payroll, HR Operations, and Leave & Benefits Administration share statutory-operations competencies (tax, pension, social-security, and labour law applied to payroll, benefits, and leave).", "Held in the HR competency library under the Payroll and HR Operations spine; not built by this pairing."]
+    ]
+  },
+  "sign_off": {
+    "intro": "Record the agreed outcome. Owners and dates feed the decision registry; the sub-family owner is John.",
+    "rows": [
+      "Design-versus-administration split",
+      "Decision 1 · Benefits Program Strategy shared-spine middle ground, rename, operational scope",
+      "Confirmation · HR Compliance reauthor",
+      "Acknowledgement · HR Service Delivery Excellence kept"
+    ]
+  },
+  "appendix": {
+    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in the disposition register that accompanies this packet.",
+    "competencies": [
+      {
+        "name": "Benefits Program Strategy & Management",
+        "note": "Shared by Benefits (design and governance) and Leave & Benefits Administration (administration); v5 wording merges well-being, governance, and the mobility dimension; rename and operational scope are open (Decision 1).",
+        "indicators": [
+          {"level": "L1", "text": "Demonstrates foundational understanding of benefits and well-being programs, including eligibility rules, plan provisions, leave rules, and mobility requirements."},
+          {"level": "L1", "text": "Prepares and maintains benefits records, leave files, assignment packets, vendor intake materials, and program documentation within established processes and governance standards."},
+          {"level": "L1", "text": "Records employee elections, mobility case updates, vendor responses, and documentation evidence in benefits systems."},
+          {"level": "L1", "text": "Supports implementation and communication of program changes."},
+          {"level": "L2", "text": "Administers benefits, leave, wellness, and mobility cases using plan rules, mobility policies, and service procedures."},
+          {"level": "L2", "text": "Supports program updates, vendor activities, and policy changes through coordination with internal stakeholders and external partners."},
+          {"level": "L2", "text": "Reviews market data, utilization trends, employee feedback, and vendor performance to identify design and operational optimization opportunities."},
+          {"level": "L2", "text": "Applies plan provisions, governance standards, compliance requirements, and applicable labor agreements when supporting the design and strategy of benefits and well-being programs."},
+          {"level": "L3", "text": "Designs benefits, well-being, and mobility program improvements using market insights, utilization data, vendor performance metrics, employee feedback, and business objectives, while balancing compliance, financial risk, and labor and union considerations."},
+          {"level": "L3", "text": "Leads complex leave, benefits, and international assignment reviews involving policy, tax, payroll, immigration, and vendor inputs."},
+          {"level": "L3", "text": "Evaluates vendor performance, plan effectiveness, cost trends, workforce needs, and employee impact to support strategic recommendations and benefits design decisions."},
+          {"level": "L3", "text": "Leads cross-functional initiatives involving benefits design, vendor strategy, governance improvements, and employee experience enhancements."},
+          {"level": "L4", "text": "Establishes enterprise strategies, governance frameworks, cross-functional operating standards, and stakeholder alignment models for benefits, well-being, and mobility programs in alignment with workforce and business priorities."},
+          {"level": "L4", "text": "Defines and drives benefits strategy, vendor governance, financial risk management, employee engagement, and program optimization to improve employee experience, business outcomes, and long-term cost sustainability."},
+          {"level": "L4", "text": "Integrates analytics, market insights, compliance considerations, and workforce trends to guide enterprise benefits decision-making."},
+          {"level": "L4", "text": "Sponsors large-scale benefits transformation initiatives, including program innovation, communication strategies, and continuous improvement to strengthen governance, operational effectiveness, employee experience, and business outcomes."}
+        ]
+      },
+      {
+        "name": "HR Compliance & Workforce Risk",
+        "note": "Reauthored to add labor and collective labor agreements, vendor oversight, and cross-border and immigration, drawing on Benefits, Leave and Benefits, HR Operations, and Payroll feedback (Confirmation).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies applicable employment policies, statutory requirements, labor and collective labor agreements, and recordkeeping rules for assigned HR activities."},
+          {"level": "L1", "text": "Prepares compliance files, policy acknowledgments, audit evidence, and required HR documentation."},
+          {"level": "L1", "text": "Follows privacy, retention, equal-employment, and escalation procedures when handling employee records."},
+          {"level": "L2", "text": "Reviews HR transactions against policy requirements, labor-agreement provisions, regulatory checklists, and documentation standards, including cross-border mobility processes."},
+          {"level": "L2", "text": "Maintains compliance calendars, evidence repositories, and control logs for assigned HR processes."},
+          {"level": "L2", "text": "Documents exceptions, remediation actions, and control gaps for review by HR, Legal, or governance owners."},
+          {"level": "L3", "text": "Leads compliance reviews using audit protocols, risk registers, policy and labor-agreement matrices, and corrective-action plans."},
+          {"level": "L3", "text": "Evaluates employment-practice and labor-agreement risk across cases, systems, vendors, process changes, immigration requirements, and cross-border jurisdictional requirements."},
+          {"level": "L3", "text": "Designs HR control procedures, policy and labor-agreement governance tools, vendor-oversight methods, and compliance reporting for complex operations."},
+          {"level": "L4", "text": "Establishes enterprise HR compliance controls and standards across employment practices, labor and collective labor agreements, records governance, and audit readiness."},
+          {"level": "L4", "text": "Approves risk-control frameworks for cross-border employment practices, vendor oversight, policy exceptions, and high-impact remediation plans."},
+          {"level": "L4", "text": "Develops advanced HR compliance diagnostics, remediation playbooks, and control-evidence standards for complex employment-practice and labor-relations risks."}
+        ]
+      },
+      {
+        "name": "HR Service Delivery Excellence",
+        "note": "Kept and sharpened; operations spine for benefits and leave administration; receives operational components from Benefits Program Strategy.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies service catalog entries, case categories, knowledge articles, and process ownership records."},
+          {"level": "L1", "text": "Records employee inquiries, resolution steps, handoff notes, and service evidence in case systems."},
+          {"level": "L1", "text": "Follows standard operating procedures for HR transactions, employee support, and escalation routing."},
+          {"level": "L2", "text": "Manages HR service cases using workflow rules, knowledge articles, service-level targets, and process controls."},
+          {"level": "L2", "text": "Maintains process documentation, standard work, vendor tickets, and quality assurance checklists."},
+          {"level": "L2", "text": "Analyzes case volumes, cycle times, rework, escalation patterns, and customer support themes."},
+          {"level": "L3", "text": "Designs HR service process improvements using workflow maps, service metrics, controls, and employee feedback."},
+          {"level": "L3", "text": "Leads quality reviews for case handling, knowledge management, vendor performance, and process adherence."},
+          {"level": "L3", "text": "Evaluates service delivery models against compliance requirements, employee needs, cost, and operational risk."},
+          {"level": "L4", "text": "Establishes enterprise HR service standards for case management, process controls, and knowledge governance."},
+          {"level": "L4", "text": "Approves service delivery models, vendor governance, automation priorities, and quality assurance methods."},
+          {"level": "L4", "text": "Develops advanced service-process diagnostics, knowledge-base standards, and employee-support measures for ambiguous delivery problems."}
+        ]
+      }
+    ]
+  }
+}
