@@ -171,8 +171,8 @@ export default function ActionCenter({ onOpenClient }) {
             <TaskRow
               key={t.id}
               meta={TASK_META.waitlist}
-              title={`Follow up with ${t.entry.name}`}
-              subtitle={`Waiting ${t.waitingDays} days for ${t.entry.service}`}
+              title={t.entry.status === "contacted" ? `Follow up again — ${t.entry.name}` : `Follow up with ${t.entry.name}`}
+              subtitle={`${t.waitingDays} days on waitlist · ${t.entry.service}${t.entry.preferred ? ` · ${t.entry.preferred}` : ""}`}
             >
               <ActionBtn primary onClick={() => actions.setWaitlistStatus(t.entry.id, "booked")}>
                 Mark booked
