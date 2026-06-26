@@ -109,11 +109,14 @@ export default function Schedule() {
                 </div>
               </div>
 
+              {a.notes && <div style={{ fontSize: 12, color: C.gray, marginTop: 6, fontStyle: "italic" }}>{a.notes}</div>}
+
               {a.status === "scheduled" && (
                 <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-                  {/* Complete/No-show only make sense once the day has arrived. */}
+                  {/* Complete/No-show/Late-cancel only make sense once the day has arrived. */}
                   {a.date <= todayISO() && <MiniBtn solid onClick={() => actions.completeAppointment(a.id)}>✓ Complete</MiniBtn>}
                   {a.date <= todayISO() && <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "no-show")}>No-show</MiniBtn>}
+                  {a.date <= todayISO() && <MiniBtn color={C.rose} onClick={() => actions.setAppointmentStatus(a.id, "late-cancel")}>Late cancel</MiniBtn>}
                   <MiniBtn color={C.gray} onClick={() => actions.deleteAppointment(a.id)}>Cancel</MiniBtn>
                 </div>
               )}
@@ -128,6 +131,14 @@ export default function Schedule() {
                       Rebook
                     </MiniBtn>
                   )}
+                </div>
+              )}
+
+              {(a.status === "no-show" || a.status === "late-cancel") && (
+                <div style={{ marginTop: 8 }}>
+                  <MiniBtn color={C.gray} onClick={() => actions.setAppointmentStatus(a.id, "scheduled")}>
+                    Undo — reschedule
+                  </MiniBtn>
                 </div>
               )}
             </div>
