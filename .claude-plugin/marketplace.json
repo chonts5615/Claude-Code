@@ -1,0 +1,32 @@
+{
+  "name": "cargill-bloom-suite",
+  "owner": {
+    "name": "chonts5615",
+    "email": "vt67gzt6mc@privaterelay.appleid.com"
+  },
+  "description": "Two-plugin marketplace for an IO-psychologist: Cargill talent-systems tooling (selection, job analysis, assessment centers, career architecture, adverse impact) and Bloom Beauty Suites & Lash Bar operations (marketing, booking, pricing, hiring).",
+  "version": "0.1.0",
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "cargill-io-psych",
+      "source": "./plugins/cargill-io-psych",
+      "description": "Industrial-organizational psychology skills for talent assessment, job analysis, assessment-center design, career architecture, and adverse-impact analysis. Grounded in the SIOP Principles (5th ed.), the Uniform Guidelines (29 CFR Part 1607), and Sackett et al. (2022) operational validities.",
+      "version": "0.1.0",
+      "author": { "name": "chonts5615" },
+      "category": "hr",
+      "keywords": ["hr", "io-psychology", "talent-assessment", "selection", "job-analysis", "competency", "career-architecture", "adverse-impact", "psychometrics", "validation"]
+    },
+    {
+      "name": "bloom-beauty-ops",
+      "source": "./plugins/bloom-beauty-ops",
+      "description": "Operations skills for Bloom Beauty Suites & Lash Bar (Maple Grove, MN): on-brand marketing & content, booking/retention workflows, service pricing & suite-rental financials, and lash-tech hiring & onboarding.",
+      "version": "0.1.0",
+      "author": { "name": "chonts5615" },
+      "category": "small-business",
+      "keywords": ["salon", "lash", "beauty", "small-business", "marketing", "scheduling", "pricing", "hiring", "suite-rental", "maple-grove"]
+    }
+  ]
+}
