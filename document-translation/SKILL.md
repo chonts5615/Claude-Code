@@ -7,8 +7,8 @@ description: >
   Dutch, French, French-Canadian, German, Indonesian (Bahasa), Polish, Portuguese,
   Russian, Spanish, and Latin American Spanish — but handles any language the user
   names. Use this skill whenever the user asks to "translate this document," "create
-  translated versions," "localize the interview guide," "produce the Chinese/German/
-  Spanish version," "we need this in 11 languages," "make language versions of the
+  translated versions," "localize the interview guide," "produce the Chinese, German,
+  or Spanish version," "we need this in 11 languages," "make language versions of the
   packet," or uploads an approved deliverable (interview guide, SME package, competency
   document, training material, policy, survey, scorecard) and asks for it in another
   language. Also trigger for translation QA requests — "check this translation,"

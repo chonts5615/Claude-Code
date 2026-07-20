@@ -23,7 +23,7 @@ Rules that apply everywhere:
 
 ## Word (.docx) — python-docx
 
-Enumerate, in order: body paragraphs, tables (cell by cell — cells contain paragraphs and possibly nested tables), headers and footers per section, footnotes/endnotes (python-docx exposes these only via the XML part — walk `document.part` related parts or use `docx`'s `footnotes_part`; do not skip them), text boxes and shapes (in `w:txbxContent` — reachable only via XML: iterate `document.element.body.iter()` for `//w:txbxContent//w:t`), and core properties if reader-visible.
+Enumerate, in order: body paragraphs, tables (cell by cell — cells contain paragraphs and possibly nested tables), headers and footers per section, footnotes/endnotes (python-docx does not model these — they live in the `word/footnotes.xml` and `word/endnotes.xml` package parts; edit them via `document.part.package` related parts or directly inside the zip; do not skip them), text boxes and shapes (in `w:txbxContent` — reachable only via XML: iterate `document.element.body.iter()` for `//w:txbxContent//w:t`), and core properties if reader-visible.
 
 ```python
 import copy, docx
@@ -78,11 +78,12 @@ Translate: every shape with a text frame on every slide, tables in graphic frame
 
 ```python
 from pptx import Presentation
+from pptx.enum.shapes import MSO_SHAPE_TYPE
 prs = Presentation("copy_fr-FR.pptx")
 
 def walk_shapes(shapes):
     for sh in shapes:
-        if sh.shape_type == 6:                     # group
+        if sh.shape_type == MSO_SHAPE_TYPE.GROUP:
             yield from walk_shapes(sh.shapes)
         elif sh.has_text_frame:
             yield sh
