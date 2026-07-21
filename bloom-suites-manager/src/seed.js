@@ -58,6 +58,7 @@ export const DEFAULT_SETTINGS = {
   address: "9325 Upland Ln N, Maple Grove",
   rentDueDay: 1, // rent is due on the 1st of each month
   lateGraceDays: 5, // days after due date before rent is "late"
+  lateFeeRate: 0.05, // fraction of monthly rent charged as a late fee (5%)
   leaseRenewalWindowDays: 60, // start renewal outreach this far ahead
   monthlyExpenses: { mortgage: 4200, utilities: 680, insurance: 240, cleaning: 320, internet: 140, other: 200 },
   welcomeDismissed: false, // first-run welcome banner

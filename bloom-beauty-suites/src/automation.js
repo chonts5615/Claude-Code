@@ -5,6 +5,7 @@ import { daysAgo, todayISO, addDays } from "./format.js";
 
 const EXPIRY_WINDOW_DAYS = 30; // flag products expiring within a month
 const WAITLIST_FOLLOWUP_DAYS = 5; // nudge to follow up on stale waitlist entries
+const CONTACTED_SUPPRESS_DAYS = 2; // don't re-surface a client who was messaged within 2 days
 
 export const firstName = (name) => name.split(" ")[0];
 
@@ -49,13 +50,19 @@ export function buildActionCenter(state, base = todayISO()) {
   const { clients, appointments, inventory, waitlist, settings } = state;
 
   // 1. Clients due / overdue for a rebook with nothing already on the books.
+  // Priority factors: overdue days, lapsing status, and lifetime value (top LTV
+  // clients rank higher when multiple clients are equally overdue).
+  const maxLtv = Math.max(1, ...clients.map((c) => c.ltv || 0));
   const rebook = clients
     .map((c) => ({ client: c, status: clientStatus(c, base), due: daysUntilDue(c, settings, base) }))
     .filter(
       (x) =>
         x.status !== "lost" &&
         x.due <= 0 &&
-        !hasUpcomingAppointment(x.client.id, appointments, base)
+        !hasUpcomingAppointment(x.client.id, appointments, base) &&
+        // Skip clients messaged very recently — don't nag the owner about someone
+        // she just texted this morning or yesterday.
+        (!x.client.lastContacted || daysAgo(x.client.lastContacted, base) >= CONTACTED_SUPPRESS_DAYS)
     )
     .map((x) => ({
       id: `rebook-${x.client.id}`,
@@ -63,13 +70,18 @@ export function buildActionCenter(state, base = todayISO()) {
       client: x.client,
       overdueDays: -x.due,
       status: x.status,
-      priority: 100 + -x.due + (x.status === "lapsing" ? 30 : 0),
+      priority: 100 + -x.due + (x.status === "lapsing" ? 30 : 0) + Math.round(((x.client.ltv || 0) / maxLtv) * 20),
     }))
     .sort((a, b) => b.priority - a.priority);
 
   // 2. Win-back: clients who have fully lapsed into "lost" with nothing booked.
   const winback = clients
-    .filter((c) => clientStatus(c, base) === "lost" && !hasUpcomingAppointment(c.id, appointments, base))
+    .filter(
+      (c) =>
+        clientStatus(c, base) === "lost" &&
+        !hasUpcomingAppointment(c.id, appointments, base) &&
+        (!c.lastContacted || daysAgo(c.lastContacted, base) >= CONTACTED_SUPPRESS_DAYS)
+    )
     .map((c) => ({
       id: `winback-${c.id}`,
       kind: "winback",

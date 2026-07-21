@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { buildSeedData, DEFAULT_SETTINGS } from "./seed";
 import { eligibleToBill } from "./automation";
-import { todayISO, monthKey, addDays } from "./format";
+import { todayISO, monthKey, monthLabel, addDays } from "./format";
 
 const STORAGE_KEY = "bloom-suites.v1";
 const BloomContext = createContext(null);
@@ -69,8 +69,10 @@ export function BloomProvider({ children }) {
     return {
       // --- Rent ---
       markRentPaid(rowId) {
+        const row = data.ledger.find((r) => r.id === rowId);
+        const tenant = row ? data.tenants.find((t) => t.id === row.tenantId) : null;
         update((d) => ({ ledger: d.ledger.map((r) => (r.id === rowId ? { ...r, paidDate: todayISO() } : r)) }));
-        notify("Rent recorded");
+        notify(tenant ? `${tenant.name.split(" ")[0]}'s rent recorded` : "Rent recorded");
       },
       markRentUnpaid(rowId) {
         update((d) => ({ ledger: d.ledger.map((r) => (r.id === rowId ? { ...r, paidDate: null } : r)) }));
@@ -86,7 +88,7 @@ export function BloomProvider({ children }) {
           added = newRows.length;
           return { ...d, ledger: [...d.ledger, ...newRows] };
         });
-        notify(added ? `Billed ${added} tenant${added === 1 ? "" : "s"}` : "Already billed");
+        notify(added ? `Billed ${added} tenant${added === 1 ? "" : "s"} for ${monthLabel(mk)}` : "Already billed");
       },
 
       // --- Tenants ---

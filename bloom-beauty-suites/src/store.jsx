@@ -128,6 +128,11 @@ export function BloomProvider({ children }) {
         notify(`${created.name.split(" ")[0]} added`);
         return created;
       },
+      markClientContacted(id) {
+        update((d) => ({
+          clients: d.clients.map((c) => (c.id === id ? { ...c, lastContacted: todayISO() } : c)),
+        }));
+      },
       updateClient(id, patch) {
         update((d) => ({
           clients: d.clients.map((c) => (c.id === id ? { ...c, ...patch } : c)),
