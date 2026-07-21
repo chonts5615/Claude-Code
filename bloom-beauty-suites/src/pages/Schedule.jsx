@@ -111,12 +111,14 @@ export default function Schedule() {
 
               {a.status === "scheduled" && (
                 <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-                  {/* Complete/No-show only make sense once the day has arrived. */}
+                  {/* Complete/No-show/Late-cancel only make sense once the day has arrived. */}
                   {a.date <= todayISO() && <MiniBtn solid onClick={() => actions.completeAppointment(a.id)}>✓ Complete</MiniBtn>}
                   {a.date <= todayISO() && <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "no-show")}>No-show</MiniBtn>}
+                  {a.date <= todayISO() && <MiniBtn color={C.amber} onClick={() => actions.setAppointmentStatus(a.id, "late-cancel")}>Late cancel</MiniBtn>}
                   <MiniBtn color={C.gray} onClick={() => actions.deleteAppointment(a.id)}>Cancel</MiniBtn>
                 </div>
               )}
+              {a.notes ? <div style={{ marginTop: 8, fontSize: 12, color: C.gray, fontStyle: "italic" }}>{a.notes}</div> : null}
 
               {a.status === "completed" && (
                 <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
