@@ -1,0 +1,188 @@
+# Strategy Workflow Agent Configuration
+# Multi-Agent Strategic Planning with Learning Feedback Loops
+
+workflow_name: StrategyWorkflowAgent
+version: "1.0.0"
+description: "Multi-step multi-agent workflow for strategic planning with feedback loops"
+
+# =============================================================================
+# ORCHESTRATION SETTINGS
+# =============================================================================
+orchestration:
+  max_retries_per_step: 2
+  enable_parallel_processing: false
+  checkpoint_enabled: true
+  checkpoint_directory: ./data/checkpoints
+  timeout_per_step_seconds: 300
+
+# =============================================================================
+# AGENT CONFIGURATION
+# =============================================================================
+agents:
+  # Ingestion Phase
+  vision_extractor:
+    enabled: true
+    timeout_seconds: 120
+    retry_on_failure: true
+
+  # Analysis Phase
+  context_analyzer:
+    enabled: true
+    include_swot: true
+    include_gap_analysis: true
+    include_trends: true
+
+  # Synthesis Phase
+  pillar_synthesizer:
+    enabled: true
+    min_pillars: 3
+    max_pillars: 5
+
+  goal_generator:
+    enabled: true
+    require_smart_compliance: true
+    min_goals_per_pillar: 2
+    max_goals_per_pillar: 5
+
+  # Planning Phase
+  initiative_designer:
+    enabled: true
+    min_initiatives_per_goal: 1
+    max_initiatives_per_goal: 3
+    include_resource_estimates: true
+
+  risk_assessor:
+    enabled: true
+    risk_categories:
+      - market
+      - operational
+      - financial
+      - regulatory
+      - technology
+      - talent
+      - reputation
+      - strategic
+    require_mitigation: true
+
+  resource_planner:
+    enabled: true
+    planning_granularity: quarterly
+
+  # Optimization Phase
+  timeline_optimizer:
+    enabled: true
+    optimize_critical_path: true
+    balance_resources: true
+
+  # Validation Phase
+  validator:
+    enabled: true
+    strict_mode: false
+
+  # Output Phase
+  output_generator:
+    enabled: true
+    formats:
+      - executive_summary
+      - strategy_document
+      - presentation_outline
+      - kpi_dashboard
+
+  # Feedback Phase
+  feedback_processor:
+    enabled: true
+    collect_quality_metrics: true
+    collect_user_feedback: true
+
+  learning_optimizer:
+    enabled: true
+    auto_apply_low_risk: true
+
+# =============================================================================
+# LLM PROVIDER SETTINGS
+# =============================================================================
+llm:
+  # Claude (Anthropic)
+  anthropic:
+    model: claude-sonnet-4-20250514
+    temperature: 0.3
+    max_tokens: 8192
+
+  # OpenAI (for ChatGPT Custom GPT)
+  openai:
+    model: gpt-5.2-pro  # Extended thinking mode
+    temperature: 0.3
+    max_tokens: 8192
+    enable_extended_thinking: true
+
+# =============================================================================
+# QUALITY THRESHOLDS
+# =============================================================================
+thresholds:
+  # Goal Quality
+  min_goals_per_pillar: 2
+  max_goals_per_pillar: 5
+  goal_smart_score_min: 0.70
+
+  # Initiative Quality
+  min_initiatives_per_goal: 1
+  max_initiatives_per_goal: 5
+  initiative_feasibility_min: 0.60
+
+  # Risk Management
+  max_critical_risks: 3
+  risk_mitigation_coverage: 0.80
+
+  # Resource Planning
+  budget_variance_max: 0.15
+  resource_utilization_min: 0.60
+
+  # Overall Quality
+  alignment_score_min: 0.75
+  coherence_score_min: 0.80
+  completeness_score_min: 0.85
+
+  # Feedback Loop
+  learning_confidence_min: 0.70
+  optimization_impact_min: 0.10
+
+# =============================================================================
+# FEEDBACK LOOP CONFIGURATION
+# =============================================================================
+feedback:
+  enabled: true
+  learning_rate: 0.1
+  memory_decay: 0.95
+  min_samples_for_learning: 3
+  include_user_feedback: true
+  include_outcome_tracking: true
+  include_quality_metrics: true
+  include_execution_metrics: true
+  auto_optimize: true
+  optimization_frequency: per_run
+  min_improvement_threshold: 0.05
+  feedback_log_path: ./data/feedback_logs
+  max_feedback_history: 1000
+
+# =============================================================================
+# OUTPUT SETTINGS
+# =============================================================================
+output:
+  default_format: comprehensive
+  available_formats:
+    - comprehensive
+    - executive
+    - minimal
+  default_time_horizon_years: 3
+  planning_granularity: quarterly
+  output_directory: ./data/output
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level: INFO
+  structured: true
+  output_file: ./data/output/workflow.log
+  include_timestamps: true
+  include_agent_ids: true
