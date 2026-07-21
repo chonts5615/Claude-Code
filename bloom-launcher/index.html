@@ -5,104 +5,86 @@
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#e8a0b4" />
+    <meta name="theme-color" content="#fbf4fc" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Bloom" />
     <title>Bloom Beauty Suites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --rose: #e8a0b4; --rose-dark: #d4849c; --rose-light: #fce4ec;
-        --gold: #c9a96e; --gold-dark: #b8945a; --gold-light: #f5e6c8;
-        --charcoal: #2d2d2d; --gray: #6b6b6b; --gray-light: #a0a0a0;
-        --border: #e8e0dc; --bg: #faf7f5; --white: #fff;
+        --blush: #fbf4fc; --blush-2: #f3e6ee; --ink: #1c1c1c; --charcoal: #2d2d2d;
+        --gray: #6b6b6b; --gray-light: #a8a0a5; --border: #ece3ea; --mauve: #9a6e84; --white: #fff;
+        --serif: "Playfair Display", Georgia, "Times New Roman", serif;
       }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       html, body { margin: 0; padding: 0; }
       body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: var(--bg); color: var(--charcoal); min-height: 100vh;
+        font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--blush); color: var(--ink); min-height: 100vh;
         display: flex; flex-direction: column; align-items: center;
       }
       .shell { width: 100%; max-width: 480px; }
       .header {
-        background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
-        padding: max(20px, env(safe-area-inset-top)) 20px 22px; text-align: center; color: var(--white);
+        background: var(--white); border-bottom: 1px solid var(--border);
+        padding: max(26px, env(safe-area-inset-top)) 20px 22px; text-align: center;
       }
-      .logo { display: flex; align-items: baseline; justify-content: center; gap: 10px; }
-      .logo b { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-      .logo span { font-size: 13px; opacity: 0.9; }
-      .tag { font-size: 12px; opacity: 0.9; margin-top: 6px; }
-      .body { padding: 22px 18px 40px; }
-      .lead { font-size: 14px; color: var(--gray); text-align: center; margin: 0 0 20px; line-height: 1.5; }
+      .wordmark { font-family: var(--serif); font-size: 30px; font-weight: 600; letter-spacing: 7px; color: var(--charcoal); line-height: 1; }
+      .subwordmark { font-size: 10px; letter-spacing: 5px; color: var(--gray); margin-top: 6px; font-weight: 500; }
+      .tag { font-size: 11px; letter-spacing: 1px; color: var(--gray-light); margin-top: 12px; }
+      .body { padding: 26px 18px 40px; }
+      .lead { font-size: 13px; color: var(--gray); text-align: center; margin: 0 0 22px; letter-spacing: 0.3px; }
       .card {
         display: block; text-decoration: none; color: inherit;
-        background: var(--white); border-radius: 18px; padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 16px;
-        border-left: 5px solid var(--rose); transition: transform .12s ease, box-shadow .12s ease;
+        background: var(--white); border: 1px solid var(--border); border-radius: 4px;
+        padding: 22px 20px; margin-bottom: 16px; transition: border-color .15s ease, transform .12s ease;
       }
-      .card:active { transform: scale(0.99); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-      .card.manager { border-left-color: var(--gold); }
-      .card-top { display: flex; align-items: center; gap: 14px; }
-      .badge {
-        width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center; font-size: 26px;
-        background: var(--rose-light);
-      }
-      .card.manager .badge { background: var(--gold-light); }
-      .card h2 { font-size: 18px; font-weight: 700; margin: 0 0 2px; }
-      .who { font-size: 12px; font-weight: 600; color: var(--rose); text-transform: uppercase; letter-spacing: 0.5px; }
-      .card.manager .who { color: var(--gold-dark); }
-      .desc { font-size: 13px; color: var(--gray); margin: 12px 0 16px; line-height: 1.5; }
+      .card:active { transform: scale(0.995); }
+      .card:hover { border-color: var(--charcoal); }
+      .eyebrow { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mauve); font-weight: 600; }
+      .card h2 { font-family: var(--serif); font-size: 22px; font-weight: 600; margin: 8px 0 0; color: var(--charcoal); }
+      .desc { font-size: 13px; color: var(--gray); margin: 12px 0 18px; line-height: 1.55; }
       .open {
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-        background: var(--rose); color: var(--white); border-radius: 12px;
-        padding: 13px; font-size: 15px; font-weight: 700;
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+        color: var(--charcoal); border-bottom: 1px solid var(--charcoal); padding-bottom: 3px;
       }
-      .card.manager .open { background: var(--gold); }
       .hint {
-        margin-top: 10px; background: var(--rose-light); border-radius: 14px;
-        padding: 14px 16px; font-size: 12.5px; color: var(--charcoal); line-height: 1.55;
+        margin-top: 8px; background: var(--blush-2); border-radius: 4px;
+        padding: 16px 18px; font-size: 12.5px; color: var(--ink); line-height: 1.6; letter-spacing: 0.2px;
       }
-      .hint b { color: var(--rose-dark); }
-      .foot { text-align: center; font-size: 11px; color: var(--gray-light); margin-top: 22px; }
+      .hint b { color: var(--charcoal); }
+      .foot { text-align: center; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); margin-top: 26px; }
     </style>
   </head>
   <body>
     <div class="shell">
       <div class="header">
-        <div class="logo"><b>bloom</b><span>beauty suites</span></div>
+        <div class="wordmark">BLOOM</div>
+        <div class="subwordmark">BEAUTY&nbsp;&nbsp;SUITES</div>
         <div class="tag">Maple Grove, MN</div>
       </div>
 
       <div class="body">
-        <p class="lead">Welcome! Choose the app you want to open.</p>
+        <p class="lead">Choose the workspace you'd like to open.</p>
 
         <a class="card" id="link-app" href="#">
-          <div class="card-top">
-            <div class="badge">💄</div>
-            <div>
-              <div class="who">For the beauty pro</div>
-              <h2>Bloom Beauty Suites</h2>
-            </div>
-          </div>
-          <p class="desc">Run your day: clients, schedule, finances, inventory, and an automatic to-do list (rebookings, reorders, waitlist).</p>
-          <div class="open">Open app →</div>
+          <div class="eyebrow">For the beauty pro</div>
+          <h2>Suite Studio</h2>
+          <p class="desc">Run your day inside your suite — clients, schedule, finances, inventory, and an automatic to-do list for rebookings, reorders, and your waitlist.</p>
+          <span class="open">Open →</span>
         </a>
 
-        <a class="card manager" id="link-manager" href="#">
-          <div class="card-top">
-            <div class="badge">🏢</div>
-            <div>
-              <div class="who">For the suite owner</div>
-              <h2>Bloom Suites Manager</h2>
-            </div>
-          </div>
-          <p class="desc">Run the rentals: suites, tenants, rent collection, leases, applicants, and maintenance — with an automatic daily to-do list.</p>
-          <div class="open">Open app →</div>
+        <a class="card" id="link-manager" href="#">
+          <div class="eyebrow">For the suite owner</div>
+          <h2>Suites Manager</h2>
+          <p class="desc">Run the rentals — suites, tenants, rent collection, leases, applicants, and maintenance, with an automatic daily to-do list.</p>
+          <span class="open">Open →</span>
         </a>
 
         <div class="hint">
-          📲 <b>Tip:</b> open the app you use most, then choose <b>"Add to Home Screen"</b> from your phone's browser menu. It will open full-screen like a regular app and works offline.
+          <b>Tip —</b> open the workspace you use most, then choose <b>"Add to Home Screen"</b> from your browser menu. It opens full-screen like an app and works offline.
         </div>
 
         <div class="foot">Bloom Beauty Suites · Beta</div>
@@ -112,17 +94,10 @@
     <script>
       // ─────────────────────────────────────────────────────────────────────
       // EDIT THESE TWO LINKS to point at wherever each app is hosted.
-      // The defaults assume all three are deployed together under one site,
-      // e.g.  yoursite.com/  (this page)
-      //        yoursite.com/app/      → the beauty professional's app
-      //        yoursite.com/manager/  → the suite owner's app
-      // If you host the apps on their own URLs, paste the full links instead,
-      //   e.g.  app: "https://bloom-beauty.netlify.app/"
+      // Defaults assume all three are deployed together under one site:
+      //   yoursite.com/  (this page)  ·  /app/  (studio)  ·  /manager/
       // ─────────────────────────────────────────────────────────────────────
-      var BLOOM_LINKS = {
-        app: "./app/",
-        manager: "./manager/"
-      };
+      var BLOOM_LINKS = { app: "./app/", manager: "./manager/" };
       document.getElementById("link-app").href = BLOOM_LINKS.app;
       document.getElementById("link-manager").href = BLOOM_LINKS.manager;
     </script>
