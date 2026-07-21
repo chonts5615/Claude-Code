@@ -1,0 +1,266 @@
+{
+  "metadata": {
+    "eyebrow": "Technical Competency",
+    "title": "Round 2 SME Review Packet",
+    "sub_family": "Learning & Development Strategy and Design  +  Training Delivery",
+    "subtitle": "Combined Round 2 focus group · the two specializations that share the Learning Design competency",
+    "function": "Cargill Talent Solutions",
+    "prepared_by": "Assessment, Competency & Career Framework Team",
+    "date": "2026-06-22",
+    "return_by": "[RETURN_BY_DATE]",
+    "specialization_label": "Learning & Development Strategy and Design  +  Training Delivery",
+    "time_required": "About 35 minutes for this focus group",
+    "sub_family_owner": "Vidula"
+  },
+  "how_this_works": {
+    "what_we_did": "We combined your Round 1 edits on the shared Learning Design competency into one proposed version, kept as many requested changes as possible, and expanded the definition to name needs-analysis, consulting, and facilitation alongside design. The expanded definition is already applied (Part A). The one item that genuinely needs the two specializations together, the design-versus-delivery boundary, is drafted as a recommendation (Part B).",
+    "what_we_need": "Confirm the applied definition change in Part A. In Part B, settle which Learning Design indicators are designer-owned (Learning & Development Strategy and Design) versus delivery or product-owner scope (Training Delivery), and confirm how the sub-family carries Workforce Planning. Nothing in Part B is final until you decide.",
+    "where_feedback_went": "Every Round 1 comment on these competencies is in the appendix disposition, including the Training Delivery edits (Tessa Sprengers, Tori Hulse) on role-blending, the technology indicator, and facilitator coordination.",
+    "status_intro": "Every competency below carries a status label so you can see, at a glance, what is already settled and what still needs the group. Items are grouped into two parts: Part A holds changes we have already applied (read and confirm); Part B holds the items for live discussion (decisions and proposals)."
+  },
+  "ground_rules": [
+    {"lead": "Scope before words.", "text": "Decide who owns each indicator and at what level, and for which specialization, before debating wording. Wording fixes already handled in the edit lane do not need this room."},
+    {"lead": "Intake model.", "text": "At intake the hiring manager selects three to five competencies for the job. Set each competency essential, important, or limited per specialization; the job then selects its own set within the recommended size."},
+    {"lead": "Sub-family owner.", "text": "Owners and dates recorded at sign-off feed the decision registry; the sub-family owner is Vidula."}
+  ],
+  "start_here": {
+    "heading": "Start here: agree the rating guidance and the intake-selection model",
+    "intro": "Set the rating and floor level for the shared Learning Design competency by specialization, rather than splitting the competency in two. Use the rating guidance below with the intake model.",
+    "table": {
+      "headers": ["Rating", "Meaning", "Level guidance"],
+      "rows": [
+        ["Essential", "Core to the role; expected at proficiency", "Level 3 to 4 for owners; Level 1 to 2 for users"],
+        ["Important", "Relevant but not defining", "Level 2 to 3, set by job"],
+        ["Limited", "Awareness or occasional use", "Level 1 to 2 or unassigned"]
+      ]
+    },
+    "quote": {
+      "label": "On intake (Organization Development panel).",
+      "text": "As T&D has been talking with TA, at intake the hiring manager can choose three to five competencies for the job."
+    },
+    "decide": "Adopt the rating guidance and the intake-selection model for today, then apply them to the items below."
+  },
+  "coverage": {
+    "specializations": ["L&D Strategy & Design", "Training Delivery"],
+    "required_union": [
+      "Learning Design & Strategy",
+      "Talent Review & Succession Management",
+      "Workforce Planning & Capability Strategy",
+      "HR Service Delivery Excellence",
+      "Workforce Analytics & HR Insights"
+    ],
+    "grid_keys": {
+      "L&D Strategy & Design": "Learning & Development Design and Strategy",
+      "Training Delivery": "Training Delivery"
+    },
+    "specialization_sets": {
+      "L&D Strategy & Design": [
+        "Learning Design & Strategy",
+        "Talent Review & Succession Management",
+        "Workforce Planning & Capability Strategy",
+        "HR Service Delivery Excellence",
+        "Workforce Analytics & HR Insights"
+      ],
+      "Training Delivery": [
+        "Learning Design & Strategy",
+        "Talent Review & Succession Management",
+        "HR Service Delivery Excellence",
+        "Workforce Analytics & HR Insights"
+      ]
+    },
+    "rows": [
+      {"num": "01", "competency": "Learning Design & Strategy", "roles": ["D", "U"]},
+      {"num": "02", "competency": "Talent Review & Succession Management", "roles": ["C", "U"]},
+      {"num": "03", "competency": "Workforce Planning & Capability Strategy", "roles": ["U", ""]},
+      {"num": "04", "competency": "HR Service Delivery Excellence", "roles": ["U", "U"]},
+      {"num": "05", "competency": "Workforce Analytics & HR Insights", "roles": ["U", "U"]}
+    ],
+    "legend": "D designs and owns (Levels 3 to 4) · C carries with the specialization lens · F facilitates · U uses and applies (Levels 1 to 2) · A advises (apply-and-advise) · Aw awareness (Levels 1 to 2) · S shared employment-practice anchor · L2 limited (Level 2).",
+    "note": "This matrix shows the complete union of competencies touched by both specializations (the L&D Strategy & Design Round 1 set of 5 and the Training Delivery set of 4). Learning Design & Strategy is shared and is the live item: Decision 1 settles which indicators are designer-owned (L&D Strategy and Design) versus delivery or product-owner scope (Training Delivery). Workforce Planning & Capability Strategy is carried by L&D Strategy and Design as a user or contributor, not an owner (Decision 2); it is not in the Training Delivery set. Talent Review & Succession Management, HR Service Delivery Excellence, and Workforce Analytics & HR Insights are carried or used by the sub-family at contributor and reporting levels; they were settled in Round 1 and are included here for completeness — read them in the appendix; only Learning Design and Workforce Planning need the group this session."
+  },
+  "part_a": {
+    "intro": "These changes were clear and agreed in Round 1 and have been applied to the wording. Read each one and confirm it fits, or note a correction. Updated levels are flagged in the indicator tables.",
+    "items": [
+      {
+        "status": "NEEDS YOUR CONFIRMATION",
+        "status_note": "feedback applied; structure unchanged",
+        "assigned_to": "Learning & Development Strategy and Design (designer-owned) · Training Delivery (delivery)",
+        "title": "Learning Design & Strategy: expanded definition",
+        "what_changed": "The definition was expanded to name needs-analysis and consulting and facilitation alongside design, with a clearer link to current and future business needs. The Round 1 edits were applied. The current indicator wording is below; which indicators are designer-owned versus delivery scope is Decision 1.",
+        "round1_signal": "Endorsed in Round 1; needs only a confirming nod (Confirmation 2 in the Talent & Development session).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies learning objectives, audience requirements, and content sources from needs-analysis records."},
+          {"level": "L1", "text": "Prepares course materials, facilitator guides, job aids, and learning-system entries using approved templates."},
+          {"level": "L1", "text": "Records attendance, completions, evaluations, and logistics information in learning management systems."},
+          {"level": "L2", "text": "Develops learning modules, practice activities, and facilitation plans using adult-learning and instructional methods."},
+          {"level": "L2", "text": "Facilitates standard sessions using delivery guides, participant materials, and transfer-of-learning tools."},
+          {"level": "L2", "text": "Analyzes completion data, survey results, assessment scores, and learner feedback to adjust programs."},
+          {"level": "L3", "text": "Designs curriculum architectures using capability gaps, learning journeys, modality decisions, and measurement plans."},
+          {"level": "L3", "text": "Leads pilot reviews, facilitator calibration, and learning transfer evaluation for complex programs."},
+          {"level": "L3", "text": "Evaluates vendors, platforms, content libraries, and learning analytics against capability outcomes."},
+          {"level": "L4", "text": "Establishes enterprise learning design standards for curricula, modality strategy, facilitation quality, and measurement."},
+          {"level": "L4", "text": "Approves learning portfolio governance, vendor strategy, and capability academy architecture for priority domains."},
+          {"level": "L4", "text": "Develops advanced instructional design methods, capability-transfer measures, and reusable learning assets for complex skill-building needs."}
+        ],
+        "action": {"lead": "Confirm.", "text": "Confirm the expanded definition reads right for the design role. The indicator split between design and delivery is Decision 1, not this confirmation."}
+      }
+    ]
+  },
+  "part_b": {
+    "intro": "Each item below was seen differently by reviewers or shifts who owns the work. A recommendation is drafted for the group. Full indicator tables for every competency in play are in the appendix.",
+    "items": [
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Learning & Development Strategy and Design · Training Delivery",
+        "number": "Decision 1.",
+        "title": "Learning Design & Strategy: scope and the design-versus-delivery boundary",
+        "owners_line": "Learning & Development Strategy and Design, Training Delivery   |   15 min",
+        "what_each_group_said": {
+          "headers": ["Scope of the competency", "Role-blending concern", "Specific indicator notes"],
+          "rows": [
+            ["The definition seems focused on the Design and Development capability of L&D, and not consulting (needs analysis) or facilitation.", "I don't disagree, but they're blending roles. Some of these things Designers would own, and others Product Owners would own. And: coordination of facilitators and evaluation is not something you typically see in this role.", "Targeted workforce skills and capabilities are too vague (link to current and future business needs). Technology: the skill is leveraging available technology, not performing the build. Add at L4: continuous improvement and external L&D trends."]
+          ]
+        },
+        "recommendation": "Expand the competency to name needs-analysis and consulting and facilitation alongside design, with a clearer link to current and future business needs (the expanded definition is in the appendix). Resolve the role-blending: decide which indicators stay in Learning Design as designer-owned, and which move to delivery or product-owner scope (facilitator coordination and evaluation are the contested ones). Reframe the technology indicator as leveraging available technology, and add the L4 continuous-improvement and external-trends behavior.",
+        "decide": {"lead": "Decide.", "text": "Adopt the expanded scope? Which indicators stay as designer-owned versus move to delivery or product-owner scope?"}
+      },
+      {
+        "status": "NEEDS YOUR DECISION",
+        "status_note": "bring your view to the focus group",
+        "assigned_to": "Learning & Development Strategy and Design · Training Delivery (as users or contributors)",
+        "number": "Decision 2.",
+        "title": "Workforce Planning & Capability Strategy: ownership and level for this sub-family",
+        "owners_line": "Learning & Development Strategy and Design, Training Delivery   |   10 min",
+        "what_each_group_said": {
+          "headers": ["Ownership concern", "Strategic-alignment note"],
+          "rows": [
+            ["Until an owner is identified for Operational WFP and movement is made in the SWP space (we only have a definition today and it is not on the priority list). The competency reads as un-owned.", "Establishing enterprise workforce-planning standards should be in strategic alignment with Cargill overall; the sub-family is a user, not the build owner."]
+          ]
+        },
+        "recommendation": "Workforce Planning & Capability Strategy stays a shared competency, but the Talent & Development sub-family is a user or contributor, not the owner. Operational workforce planning has no named owner and only a definition today, so do not place build-level expectations on these roles. Set the sub-family at use-output or support levels, and add the strategic-alignment-with-Cargill language Talent Advisory flagged. Operational workforce-planning ownership is routed to governance.",
+        "decide": {"lead": "Decide.", "text": "Confirm the sub-family carries Workforce Planning at use or support levels, not owner, and that operational ownership is deferred to governance?"}
+      }
+    ]
+  },
+  "boundaries": {
+    "headers": ["Item", "What Round 1 said", "Where it goes"],
+    "rows": [
+      ["Learning design ownership versus Talent Acquisition", "Early Careers reviewers: Learning design is a component of a successful early career strategy, however, this work has clearly been owned by Talent Development, not TA. We do not expect our EC team to create these programs.", "Owner-aligned: learning design sits with this sub-family, not Talent Acquisition. Early Careers teams ensure the business considers development needs but do not build programs."]
+    ]
+  },
+  "sign_off": {
+    "intro": "Record the agreed outcome. Owners and dates feed the decision registry; the sub-family owner is Vidula.",
+    "rows": [
+      "Rating guidance and intake-selection model",
+      "Decision 1 · Learning Design scope and the design-versus-delivery indicator split",
+      "Decision 2 · Workforce Planning ownership and levels for the sub-family",
+      "Confirmation · Learning Design expanded definition"
+    ]
+  },
+  "disposition_register": {
+    "intro": "Every Round 1 comment on the competencies this pairing shares, grouped by competency, with how it was used. Nothing was dropped on a statistic.",
+    "entries": [
+      {"competency": "Learning Design & Strategy", "round1": "Reviewers said the definition focused on design and development, not consulting or facilitation; Training Delivery (Tessa Sprengers, Tori Hulse) flagged role-blending between designers and product owners, said facilitator coordination and evaluation are not typical of the role, called the technology indicator a build rather than leverage, and asked to add an L4 continuous-improvement and external-trends behavior.", "disposition": "Synthesized / Used", "outcome": "Definition expanded to name needs-analysis, consulting, and facilitation (applied, Part A). The designer-owned versus delivery indicator split, the technology reframe, and the L4 addition are open as Decision 1."},
+      {"competency": "Workforce Planning & Capability Strategy", "round1": "Reviewers said the competency reads as un-owned (only a definition today, not on the priority list) and that establishing enterprise standards should align with Cargill overall; the sub-family is a user, not the build owner. Early Careers added that learning design sits with Talent Development, not Talent Acquisition.", "disposition": "Via level", "outcome": "Kept as a shared competency carried by the sub-family at use or support levels, not owner; operational workforce-planning ownership routed to governance; strategic-alignment language added (Decision 2)."},
+      {"competency": "Talent Review & Succession Management", "round1": "Carried in the L&D Strategy and Design and Training Delivery Round 1 sets; reviewed and rated, with no wording change requested. Owned by Performance & Talent Management and Talent Advisory.", "disposition": "Kept", "outcome": "Carried by the sub-family as a contributor, not an owner; settled in Round 1 with no edits. Included for completeness; full indicators in Appendix B."},
+      {"competency": "HR Service Delivery Excellence", "round1": "In the Training Delivery Round 1 set; reviewed and rated, with no wording change requested. It is the HR operations spine, owned by HR Operations.", "disposition": "Kept", "outcome": "Carried at use levels by the sub-family; settled in Round 1 with no edits. Included for completeness."},
+      {"competency": "Workforce Analytics & HR Insights", "round1": "In both the L&D Strategy and Design and Training Delivery Round 1 sets; reviewed and rated as a user-level competency, with no wording change requested by this sub-family.", "disposition": "Kept", "outcome": "Used at a learning-reporting level (completion, transfer, evaluation data), not built; settled in Round 1. Included for completeness."}
+    ]
+  },
+  "appendix": {
+    "intro": "Current indicators for the competencies in play, with accepted Round 1 edits applied. Read these as reminders before the session. The session decides ownership and level, not the wording. Every Round 1 comment is accounted for in Appendix A.",
+    "competencies": [
+      {
+        "name": "Learning Design & Strategy",
+        "note": "Definition (current): Designs curricula, learning experiences, facilitation assets, and measurement plans that build targeted workforce skills and capabilities. Expanded to name needs-analysis, consulting, and facilitation (Confirmation; Decision 1). Shared by Learning & Development Strategy and Design (designer-owned) and Training Delivery (delivery).",
+        "indicators": [
+          {"level": "L1", "text": "Identifies learning objectives, audience requirements, and content sources from needs-analysis records."},
+          {"level": "L1", "text": "Prepares course materials, facilitator guides, job aids, and learning-system entries using approved templates."},
+          {"level": "L1", "text": "Records attendance, completions, evaluations, and logistics information in learning management systems."},
+          {"level": "L2", "text": "Develops learning modules, practice activities, and facilitation plans using adult-learning and instructional methods."},
+          {"level": "L2", "text": "Facilitates standard sessions using delivery guides, participant materials, and transfer-of-learning tools."},
+          {"level": "L2", "text": "Analyzes completion data, survey results, assessment scores, and learner feedback to adjust programs."},
+          {"level": "L3", "text": "Designs curriculum architectures using capability gaps, learning journeys, modality decisions, and measurement plans."},
+          {"level": "L3", "text": "Leads pilot reviews, facilitator calibration, and learning transfer evaluation for complex programs."},
+          {"level": "L3", "text": "Evaluates vendors, platforms, content libraries, and learning analytics against capability outcomes."},
+          {"level": "L4", "text": "Establishes enterprise learning design standards for curricula, modality strategy, facilitation quality, and measurement."},
+          {"level": "L4", "text": "Approves learning portfolio governance, vendor strategy, and capability academy architecture for priority domains."},
+          {"level": "L4", "text": "Develops advanced instructional design methods, capability-transfer measures, and reusable learning assets for complex skill-building needs."}
+        ]
+      },
+      {
+        "name": "Workforce Planning & Capability Strategy",
+        "note": "Shared competency; this sub-family is a user or contributor, not the owner (Decision 2). Operational workforce-planning ownership is routed to governance.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies workforce segments, capability terms, and demand assumptions from planning templates and job data."},
+          {"level": "L1", "text": "Records headcount, skills, role, and vacancy information in workforce planning files."},
+          {"level": "L1", "text": "Follows data-quality checks for workforce planning inputs, capability inventories, and scenario assumptions."},
+          {"level": "L2", "text": "Builds workforce snapshots using job architecture data, skills taxonomy entries, role inventories, and demand inputs."},
+          {"level": "L2", "text": "Conducts gap analyses comparing workforce supply, hiring plans, capability needs, and attrition patterns."},
+          {"level": "L2", "text": "Maintains scenario files, action trackers, and planning dashboards for assigned workforce segments."},
+          {"level": "L3", "text": "Designs workforce plans using competency frameworks, Cargill capability model inputs, demand forecasts, and business scenarios."},
+          {"level": "L3", "text": "Evaluates build-buy-borrow scenarios through cost, risk, timeline, and capability impact analyses."},
+          {"level": "L3", "text": "Leads workforce planning reviews that translate capability gaps into talent, hiring, and development actions."},
+          {"level": "L4", "text": "Establishes enterprise workforce planning standards for capability taxonomies, forecasting methods, and scenario governance."},
+          {"level": "L4", "text": "Approves strategic workforce planning models for critical capabilities, transformation portfolios, and long-range demand."},
+          {"level": "L4", "text": "Develops advanced workforce-planning diagnostics that translate capability risk into portfolio, build-buy-borrow, and development choices."}
+        ]
+      },
+      {
+        "name": "Talent Review & Succession Management",
+        "note": "Carried by the sub-family as a contributor; owned by Performance & Talent Management and Talent Advisory. Included for completeness; settled in Round 1.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies talent review inputs, critical-role lists, succession slates, and readiness criteria from approved templates."},
+          {"level": "L1", "text": "Records calibration notes, successor profiles, readiness ratings, and development-plan actions in talent review files."},
+          {"level": "L1", "text": "Follows succession planning checklists for data preparation, slate review, confidentiality, and action tracking."},
+          {"level": "L2", "text": "Conducts talent review preparation using 9-box grids, readiness definitions, successor data, and calibration materials."},
+          {"level": "L2", "text": "Maintains succession pipelines, development-plan trackers, and critical-role coverage records for assigned populations."},
+          {"level": "L2", "text": "Validates readiness data, successor movement, talent actions, and development-plan evidence against agreed criteria."},
+          {"level": "L3", "text": "Designs talent review routines using 9-box grids, readiness criteria, succession slates, and development-plan evidence."},
+          {"level": "L3", "text": "Evaluates bench strength, critical-role coverage, successor readiness, and action completion to improve talent outcomes."},
+          {"level": "L3", "text": "Leads calibration sessions that translate talent review evidence into succession decisions and development priorities."},
+          {"level": "L4", "text": "Establishes talent and succession standards for critical-role segmentation, readiness governance, and succession evidence."},
+          {"level": "L4", "text": "Approves succession governance methods for complex populations, high-risk roles, and leadership continuity scenarios."},
+          {"level": "L4", "text": "Develops advanced readiness diagnostics, slate-quality tools, and bench-strength measures for unresolved succession risks."}
+        ]
+      },
+      {
+        "name": "HR Service Delivery Excellence",
+        "note": "In the Training Delivery Round 1 set; the HR operations spine, owned by HR Operations. Carried at use levels. Included for completeness; settled in Round 1.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies service catalog entries, case categories, knowledge articles, and process ownership records."},
+          {"level": "L1", "text": "Records employee inquiries, resolution steps, handoff notes, and service evidence in case systems."},
+          {"level": "L1", "text": "Follows standard operating procedures for HR transactions, employee support, and escalation routing."},
+          {"level": "L2", "text": "Manages HR service cases using workflow rules, knowledge articles, service-level targets, and process controls."},
+          {"level": "L2", "text": "Maintains process documentation, standard work, vendor tickets, and quality assurance checklists."},
+          {"level": "L2", "text": "Analyzes case volumes, cycle times, rework, escalation patterns, and customer support themes."},
+          {"level": "L3", "text": "Designs HR service process improvements using workflow maps, service metrics, controls, and employee feedback."},
+          {"level": "L3", "text": "Leads quality reviews for case handling, knowledge management, vendor performance, and process adherence."},
+          {"level": "L3", "text": "Evaluates service delivery models against compliance requirements, employee needs, cost, and operational risk."},
+          {"level": "L4", "text": "Establishes enterprise HR service standards for case management, process controls, and knowledge governance."},
+          {"level": "L4", "text": "Approves service delivery models, vendor governance, automation priorities, and quality assurance methods."},
+          {"level": "L4", "text": "Develops advanced service-process diagnostics, knowledge-base standards, and employee-support measures for ambiguous delivery problems."}
+        ]
+      },
+      {
+        "name": "Workforce Analytics & HR Insights",
+        "note": "In both Round 1 sets; used at a learning-reporting level (completion, transfer, evaluation data), not built. Included for completeness; settled in Round 1.",
+        "indicators": [
+          {"level": "L1", "text": "Identifies HR source systems, metric definitions, population rules, dashboard filters, and privacy requirements for assigned reports."},
+          {"level": "L1", "text": "Prepares workforce data extracts, reconciliation notes, and metric summaries using approved HR reporting definitions."},
+          {"level": "L1", "text": "Logs data-quality exceptions, access constraints, and evidence sources in analytics request trackers."},
+          {"level": "L2", "text": "Builds HR dashboards using population logic, metric calculations, segmentation variables, and source-system refresh schedules."},
+          {"level": "L2", "text": "Validates workforce metrics against the core HR system, payroll, recruiting, learning, and case-management source records."},
+          {"level": "L2", "text": "Documents insight summaries with caveats, privacy thresholds, and recommended interpretation boundaries."},
+          {"level": "L3", "text": "Designs workforce analytics products using data models, cohort definitions, controls, and narrative-driven reporting plans."},
+          {"level": "L3", "text": "Analyzes workforce patterns through trend, cohort, funnel, variance, predictive, and risk methods."},
+          {"level": "L3", "text": "Leads metric-governance reviews that align HR definitions, privacy thresholds, quality rules, and decision use cases."},
+          {"level": "L4", "text": "Establishes workforce analytics standards for HR metric architecture, source-system governance, privacy controls, and validation methods."},
+          {"level": "L4", "text": "Approves analytics product portfolios, workforce insight frameworks, model-risk criteria, and ethical-use guardrails."},
+          {"level": "L4", "text": "Develops reusable measurement designs, validation protocols, and narrative-driven reporting standards for ambiguous workforce decisions."}
+        ]
+      }
+    ]
+  }
+}
