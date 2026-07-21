@@ -1,0 +1,241 @@
+{
+  "tcb_system_verification_schema": {
+    "package_date": "2026-04-25",
+    "tcb_version": "v3.1",
+    "spec_document": "docs/reference/TCB_System_Instructions_v3_1.md",
+    "system_components": {
+      "core_instructions": {
+        "tcb_v3_0": {
+          "version": "3.0",
+          "date": "2026-03-24",
+          "enhancements": 26,
+          "phases": [
+            {"name": "Phase 1: Parse", "spec_section": "§8", "code_path": "src/agents/job_ingestion.py"},
+            {"name": "Phase 2: Research and Library Check", "spec_section": "§9", "code_path": "src/agents/benchmark_researcher.py, src/utils/five_qmt.py"},
+            {"name": "Phase 3: Build", "spec_section": "§10", "code_path": "src/agents/competency_mapping.py, src/agents/normalizer.py, src/agents/criticality_ranker.py"},
+            {"name": "Phase 4: QA Gate", "spec_section": "§11", "code_path": "src/agents/overlap_auditor.py, src/orchestrator/gates.py"},
+            {"name": "Phase 5: Output", "spec_section": "§12", "code_path": "src/agents/template_populator.py, src/deliverables/*"},
+            {"name": "Phase 6: Feedback Processing", "spec_section": "§13", "code_path": "src/agents/feedback_ingestion.py + 6E-bis/ter/quater agents"},
+            {"name": "Phase 6F: CTIC", "spec_section": "§14", "code_path": "src/agents/ctic_validator.py, src/utils/ctic_diff.py"},
+            {"name": "Phase 6G: Focus Group Preparation", "spec_section": "§15", "code_path": "src/agents/focus_group_prep.py"},
+            {"name": "Phase 7: Learning Synthesis", "spec_section": "§16", "code_path": "src/agents/learning_synthesis.py"}
+          ]
+        },
+        "tcb_v3_1_amendment": {
+          "version": "3.1",
+          "date": "2026-04-09",
+          "enhancements": [27, 28, 29, 30],
+          "enhancement_27": {
+            "name": "Post-Edit Coverage Refresh",
+            "phase": "6E-bis",
+            "spec_section": "§13.6E-bis",
+            "code_path": "src/agents/coverage_refresh.py",
+            "gate": "If coverage <90%, block output"
+          },
+          "enhancement_28": {
+            "name": "Post-Edit V&B/Common Boundary Re-Scan",
+            "phase": "6E-ter",
+            "spec_section": "§13.6E-ter",
+            "code_path": "src/agents/boundary_rescan.py"
+          },
+          "enhancement_29": {
+            "name": "Post-Edit Inter-Competency Overlap Re-Audit",
+            "phase": "6E-quater",
+            "spec_section": "§13.6E-quater",
+            "code_path": "src/agents/overlap_reaudit.py"
+          },
+          "enhancement_30": {
+            "name": "BCO Ledger",
+            "phase": "All stages",
+            "spec_section": "§18.5",
+            "code_path": "src/schemas/bco_ledger.py, src/deliverables/bco_ledger_writer.py",
+            "tabs": ["EF_Coverage_Tracker", "Boundary_Audit_History", "Overlap_Audit_History", "Stage_Summary"]
+          }
+        },
+        "tcb_v3_1_repo_extensions": {
+          "version": "3.1 repo edition",
+          "date": "2026-04-25",
+          "enhancements": [31, 32, 33, 34, 35],
+          "enhancement_31": {
+            "name": "Skill Development & Mapping Module",
+            "spec_section": "§26-27",
+            "code_path": "src/skill_mapping/*",
+            "stages": ["SM1 catalog_loader", "SM2 library_loader", "SM3 bloom_classifier", "SM4 semantic_matcher", "SM5 level_resolver", "SM5-gate", "SM6 coverage_aggregator", "SM7 gap_reporter", "SM8 excel_writer"]
+          },
+          "enhancement_32": {
+            "name": "Master Skills Library (parallel)",
+            "spec_section": "§28",
+            "code_path": "src/skill_library/skill_library.py",
+            "canonical_file": "data/library/Skills_Library_Master.xlsx",
+            "event_journal": "data/library/Skills_Library_Master.jsonl"
+          },
+          "enhancement_33": {
+            "name": "Skill→Competency Crosswalk (rolling)",
+            "spec_section": "§29",
+            "code_path": "src/skill_library/crosswalk_merger.py",
+            "canonical_file": "data/library/Skill_Competency_Crosswalk.xlsx",
+            "idempotent": true
+          },
+          "enhancement_34": {
+            "name": "Continuous Tracing Infrastructure",
+            "spec_section": "§30",
+            "code_path": "src/tracing/*",
+            "append_only_files": [
+              "data/trace/run_ledger.jsonl",
+              "data/trace/step_log.jsonl",
+              "data/trace/decision_log.jsonl",
+              "data/trace/change_log.jsonl",
+              "data/trace/review_log.jsonl"
+            ]
+          },
+          "enhancement_35": {
+            "name": "Review & Update Protocol Based on Intended Functionality",
+            "spec_section": "§31",
+            "triggers": ["PR touches src/schemas/ or src/orchestrator/", "Every FINAL completion", "Quarterly calendar review", "User request"],
+            "severity_levels": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+            "review_log": "data/trace/review_log.jsonl"
+          }
+        }
+      },
+      "reference_materials": {
+        "v_and_b_and_common_competencies": {
+          "source": "Cargill Competency Framework (March 18, 2026)",
+          "v_and_b_names": ["Do the Right Thing", "Put People First", "Reach Higher", "Act as an Owner", "Bias for Action", "Win as One Cargill"],
+          "common_competencies": ["Change Acumen", "Technology & Data Acumen", "Business Acumen", "Financial Acumen", "Partner with Impact"],
+          "boundary_classification_quick_test": [
+            "Does it use V&B language without domain context? → V&B",
+            "Does it use Common language without domain knowledge? → Common",
+            "Does it require non-transferable knowledge? → Technical",
+            "Does it contain both elements? → Mixed"
+          ],
+          "code_path": "src/utils/boundary_classifier.py, config/boundary_terms.yaml"
+        }
+      },
+      "library_schema": {
+        "version": "v3",
+        "columns": 23,
+        "code_path": "src/schemas/library.py::LIBRARY_COLUMNS",
+        "deliverable_writer": "src/deliverables/library_writer.py"
+      },
+      "skills_library_schema": {
+        "version": "v1",
+        "columns": 22,
+        "code_path": "src/skill_library/schemas.py",
+        "canonical_file": "data/library/Skills_Library_Master.xlsx",
+        "persistence_rules": [
+          "Append-only by Skill_ID",
+          "Updates bump Version and replace row in-place",
+          "Status transitions explicit (Active/Deprecated/Superseded)",
+          "Linked_Competencies refreshed every map-skills run"
+        ]
+      },
+      "crosswalk_schema": {
+        "version": "v1",
+        "keyed_by": "(course_id, competency_id)",
+        "code_path": "src/skill_library/crosswalk_merger.py",
+        "canonical_file": "data/library/Skill_Competency_Crosswalk.xlsx",
+        "merger_properties": ["idempotent", "preserves run_history", "auto-deprecates after 2 missing runs"]
+      },
+      "tracing_infrastructure": {
+        "module": "src/tracing",
+        "ledgers": {
+          "run_ledger": {
+            "file": "data/trace/run_ledger.jsonl",
+            "trigger": "Every run start / complete",
+            "writer": "src/tracing/run_ledger.py"
+          },
+          "step_log": {
+            "file": "data/trace/step_log.jsonl",
+            "trigger": "Every step enter / exit",
+            "writer": "BaseAgent.execute() via src/tracing/step_log.py"
+          },
+          "decision_log": {
+            "file": "data/trace/decision_log.jsonl",
+            "trigger": "Every gated decision (5QMT, BOUNDARY, CRITICALITY_RANK, FEEDBACK_DISPOSITION, CTIC)",
+            "writer": "Phase agents via src/tracing/decision_log.py"
+          },
+          "change_log": {
+            "file": "data/trace/change_log.jsonl",
+            "trigger": "Every field-level change",
+            "writer": "CTIC + Output + Library Merger via src/tracing/change_log.py"
+          },
+          "review_log": {
+            "file": "data/trace/review_log.jsonl",
+            "trigger": "Every review cycle",
+            "writer": "§31.4 workflow"
+          }
+        },
+        "guarantees": ["Append-only (never rewritten)", "No silent gaps", "Idempotent merger"]
+      }
+    },
+    "validation_criteria": {
+      "phase_3c_gate": {
+        "title_word_count": {"min": 3, "max": 6, "enforcement": "Validator", "code": "src/schemas/competency.py::title_word_count"},
+        "definition": {"sentences": 1, "min_words": 15, "max_words": 25, "abbreviation_tolerance": true, "code": "src/schemas/competency.py::definition_one_sentence_15_25"}
+      },
+      "phase_4_qa_gate": {
+        "three_lens_review": {"lens_1": "IO Psychologist", "lens_2": "HRBP", "lens_3": "Executive"},
+        "max_revision_cycles": 3,
+        "escalation": "STOP after 3 failed cycles"
+      },
+      "coverage_threshold": {"minimum_pct": 90, "scope": "Top 6 per specialization", "code": "src/orchestrator/gates.py"},
+      "ctic": {
+        "drift_rate_max": 0.05,
+        "revert_persistence": "src/agents/ctic_validator.py::_persist_corrected_state writes data/output/{run_id}_6F_post_ctic_state.json",
+        "artifact_pointer": "ArtifactRegistry.post_ctic_state"
+      },
+      "top_n_cap": {"value": 6, "code": "src/schemas/competency.py::JobCompetencies.cap_at_six"},
+      "skill_mapping_gates": {
+        "min_mapping_confidence": {"value": 0.55, "warn_below": 0.65, "error_below": 0.55},
+        "unmapped_course_rate": {"max": 0.15, "error_above": 0.25},
+        "zero_training_competency_rate": {"max": 0.20, "error_above": 0.40},
+        "audience_band_level_mismatch_rate": {"max": 0.10}
+      }
+    },
+    "proficiency_level_definitions": {
+      "code_path": "src/schemas/rubric.py",
+      "levels": [
+        {"level": "L1", "label": "Basic"},
+        {"level": "L2", "label": "Developing"},
+        {"level": "L3", "label": "Skilled"},
+        {"level": "L4", "label": "Expert"}
+      ],
+      "band_to_proficiency_mapping_source": "config/band_proficiency_targets.yaml"
+    },
+    "guardrails": [
+      {"id": 1, "rule": "Library primacy", "code": "src/utils/five_qmt.py"},
+      {"id": 2, "rule": "Technical boundary (no V&B/Common drift)", "code": "src/utils/boundary_classifier.py"},
+      {"id": 3, "rule": "Observable indicators only", "code": "src/schemas/competency.py::BehavioralIndicator"},
+      {"id": 4, "rule": "No hierarchy linkage"},
+      {"id": 5, "rule": "Cross-family consistency"},
+      {"id": 6, "rule": "Coverage ≥90%", "code": "src/orchestrator/gates.py"},
+      {"id": 7, "rule": "Source integrity tagging", "code": "src/utils/source_integrity.py"},
+      {"id": 8, "rule": "No silent degradation"},
+      {"id": 9, "rule": "Iteration ceiling (max 3 QA cycles)"},
+      {"id": 10, "rule": "Library persistence"},
+      {"id": 11, "rule": "Label & definition quality"},
+      {"id": 12, "rule": "No-drift across revisions", "code": "src/agents/ctic_validator.py"},
+      {"id": 13, "rule": "Verbatim fidelity"},
+      {"id": 14, "rule": "Deferral discipline"},
+      {"id": 15, "rule": "Coverage persistence (v3.1)", "code": "src/agents/coverage_refresh.py"},
+      {"id": 16, "rule": "Boundary enforcement (v3.1)", "code": "src/agents/boundary_rescan.py"},
+      {"id": 17, "rule": "Overlap monitoring (v3.1)", "code": "src/agents/overlap_reaudit.py"},
+      {"id": 18, "rule": "BCO Ledger current (v3.1)", "code": "src/deliverables/bco_ledger_writer.py"},
+      {"id": 19, "rule": "Skill mapping triggers downstream, never upstream", "code": "src/skill_mapping/graph.py"},
+      {"id": 20, "rule": "Bloom level evidence required", "code": "src/skill_mapping/bloom_classifier.py"},
+      {"id": 21, "rule": "Crosswalk merger preserves history", "code": "src/skill_library/crosswalk_merger.py"},
+      {"id": 22, "rule": "Skills Library entries immutable by ID", "code": "src/skill_library/skill_library.py"},
+      {"id": 23, "rule": "Append-only ledgers", "code": "src/tracing/ledger.py"},
+      {"id": 24, "rule": "No silent ledger gaps"},
+      {"id": 25, "rule": "Master library merger is idempotent", "code": "src/skill_library/library_merger.py"}
+    ],
+    "verification_modes": {
+      "lint": {"tool": "ruff + mypy", "duration": "seconds", "when": "every commit"},
+      "unit": {"tool": "pytest tests/", "duration": "<30s", "when": "every commit"},
+      "simulation": {"tool": "pytest tests/test_simulation/", "duration": "~2min", "when": "every PR"},
+      "spec_code_alignment": {"tool": "Explore agent", "duration": "~5min", "when": "PR touching schemas/orchestrator"},
+      "three_lens_live": {"tool": "human review", "duration": "hours", "when": "every FINAL"},
+      "quarterly_audit": {"tool": "all + operator manual", "duration": "days", "when": "4x/year"}
+    }
+  }
+}
