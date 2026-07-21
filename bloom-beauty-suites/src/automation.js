@@ -5,6 +5,7 @@ import { daysAgo, todayISO, addDays } from "./format.js";
 
 const EXPIRY_WINDOW_DAYS = 30; // flag products expiring within a month
 const WAITLIST_FOLLOWUP_DAYS = 5; // nudge to follow up on stale waitlist entries
+const WAITLIST_REFOLLOW_DAYS = 3; // re-surface "contacted" entries if still unbooked
 
 export const firstName = (name) => name.split(" ")[0];
 
@@ -96,9 +97,15 @@ export function buildActionCenter(state, base = todayISO()) {
     priority: 60,
   }));
 
-  // 5. Waitlist follow-ups (still waiting — not yet contacted or booked).
+  // 5. Waitlist follow-ups: new entries after WAITLIST_FOLLOWUP_DAYS, and
+  //    "contacted" entries that still haven't converted after WAITLIST_REFOLLOW_DAYS
+  //    more — so reaching out once doesn't make someone fall through the cracks.
   const waitlistFollowups = waitlist
-    .filter((w) => w.status === "waiting" && daysAgo(w.added, base) >= WAITLIST_FOLLOWUP_DAYS)
+    .filter(
+      (w) =>
+        (w.status === "waiting" && daysAgo(w.added, base) >= WAITLIST_FOLLOWUP_DAYS) ||
+        (w.status === "contacted" && daysAgo(w.added, base) >= WAITLIST_FOLLOWUP_DAYS + WAITLIST_REFOLLOW_DAYS)
+    )
     .map((w) => ({
       id: `waitlist-${w.id}`,
       kind: "waitlist",

@@ -181,7 +181,7 @@ export function BloomProvider({ children }) {
             {
               id: nextId(d.maintenance),
               suiteId: Number(form.suiteId) || null,
-              tenantId: null,
+              tenantId: form.tenantId ? Number(form.tenantId) : null,
               title: form.title.trim(),
               priority: form.priority || "normal",
               status: "open",
@@ -216,7 +216,11 @@ export function BloomProvider({ children }) {
         notify("Applicant added");
       },
       setApplicantStatus(id, status) {
-        update((d) => ({ applicants: d.applicants.map((a) => (a.id === id ? { ...a, status } : a)) }));
+        update((d) => ({
+          applicants: d.applicants.map((a) =>
+            a.id === id ? { ...a, status, ...(status === "contacted" ? { contacted: todayISO() } : {}) } : a
+          ),
+        }));
       },
       removeApplicant(id) {
         update((d) => ({ applicants: d.applicants.filter((a) => a.id !== id) }));

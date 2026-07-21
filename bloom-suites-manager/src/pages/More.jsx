@@ -12,7 +12,7 @@ import {
   Field, Input, Select, Textarea, PrimaryButton, GhostButton, Modal, copyText,
 } from "../ui";
 
-const APPLICANT_NEXT = { new: "toured", toured: "applied", applied: "approved" };
+const APPLICANT_NEXT = { new: "contacted", contacted: "toured", toured: "applied", applied: "approved" };
 
 // ---------- Applicants ----------
 function Applicants({ onBack }) {
@@ -72,7 +72,7 @@ function Applicants({ onBack }) {
 function Maintenance({ onBack }) {
   const { data, actions } = useBloom();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ suiteId: data.suites[0]?.id || "", title: "", priority: "normal" });
+  const [form, setForm] = useState({ suiteId: data.suites[0]?.id || "", tenantId: "", title: "", priority: "normal" });
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const open = data.maintenance.filter((m) => m.status !== "done");
   const done = data.maintenance.filter((m) => m.status === "done");
@@ -114,11 +114,19 @@ function Maintenance({ onBack }) {
         <Field label="Suite">
           <Select value={form.suiteId} onChange={set("suiteId")}>{data.suites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select>
         </Field>
+        <Field label="Reported by (optional)">
+          <Select value={form.tenantId} onChange={set("tenantId")}>
+            <option value="">Common area / owner</option>
+            {data.tenants.filter((t) => t.status !== "past").map((t) => (
+              <option key={t.id} value={t.id}>{t.name} — {t.suite}</option>
+            ))}
+          </Select>
+        </Field>
         <Field label="Issue"><Input value={form.title} onChange={set("title")} placeholder="e.g. Leaky faucet" /></Field>
         <Field label="Priority">
           <Select value={form.priority} onChange={set("priority")}><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></Select>
         </Field>
-        <PrimaryButton disabled={!form.title} onClick={() => { actions.addMaintenance(form); setForm({ suiteId: data.suites[0]?.id || "", title: "", priority: "normal" }); setAdding(false); }}>Log Request</PrimaryButton>
+        <PrimaryButton disabled={!form.title} onClick={() => { actions.addMaintenance(form); setForm({ suiteId: data.suites[0]?.id || "", tenantId: "", title: "", priority: "normal" }); setAdding(false); }}>Log Request</PrimaryButton>
       </Modal>
     </div>
   );

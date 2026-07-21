@@ -3,6 +3,7 @@
 import { daysAgo, todayISO, monthKey, monthLabel } from "./format.js";
 
 const APPLICANT_FOLLOWUP_DAYS = 3;
+const APPLICANT_REFOLLOW_DAYS = 3; // re-surface "contacted" leads if still not toured
 
 export const firstName = (name) => name.split(" ")[0];
 export const tenantById = (tenants, id) => tenants.find((t) => t.id === id) || null;
@@ -16,7 +17,7 @@ export function rentStatus(row, settings, base = todayISO()) {
   if (row.paidDate) return "paid";
   const grace = settings?.lateGraceDays ?? 5;
   const dueDays = daysAgo(row.dueDate, base); // days since due (positive = past due)
-  if (dueDays > grace) return "late";
+  if (dueDays >= grace) return "late";
   if (dueDays >= 0) return "due";
   return "upcoming";
 }
@@ -113,10 +114,15 @@ export function buildActionCenter(state, base = todayISO()) {
     .map((m) => ({ id: `maint-${m.id}`, kind: "maintenance", ticket: m, suite: suiteById(suites, m.suiteId), priority: 60 + (m.priority === "high" ? 30 : m.priority === "normal" ? 10 : 0) }))
     .sort((a, b) => b.priority - a.priority);
 
-  // 5. Applicant follow-ups (still "new" — touring/applying clears the task so
-  // recording progress removes it instead of re-surfacing it).
+  // 5. Applicant follow-ups: "new" leads past their initial window, and "contacted"
+  // leads who haven't toured yet — so tapping Text/Copy moves them to "contacted"
+  // but they re-surface if they go quiet for APPLICANT_REFOLLOW_DAYS more days.
   const leads = applicants
-    .filter((a) => a.status === "new" && daysAgo(a.added, base) >= APPLICANT_FOLLOWUP_DAYS)
+    .filter(
+      (a) =>
+        (a.status === "new" && daysAgo(a.added, base) >= APPLICANT_FOLLOWUP_DAYS) ||
+        (a.status === "contacted" && daysAgo(a.contacted || a.added, base) >= APPLICANT_REFOLLOW_DAYS)
+    )
     .map((a) => ({ id: `lead-${a.id}`, kind: "applicant", applicant: a, waitingDays: daysAgo(a.added, base), priority: 50 }));
 
   // 6. Rent not yet billed for the current month (so a new month doesn't slip

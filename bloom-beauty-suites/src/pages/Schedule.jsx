@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useBloom } from "../store";
 import { C } from "../theme";
 import { Icon, Icons } from "../icons";
-import { fmt, todayISO, addDays, dayName } from "../format";
+import { fmt, todayISO, addDays, dayName, monthName } from "../format";
 import { StatusBadge, EmptyState } from "../ui";
 import BookAppointmentModal from "./BookAppointmentModal";
 
@@ -50,21 +50,30 @@ export default function Schedule() {
       </div>
 
       <div style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16, paddingBottom: 4 }}>
-        {dates.map((d) => {
+        {dates.map((d, i) => {
           const active = d === scheduleDate;
           const isToday = d === todayISO();
           const dt = new Date(d + "T12:00:00");
           const count = data.appointments.filter((a) => a.date === d).length;
+          // Show a month label chip whenever the month changes within the strip.
+          const prevD = i > 0 ? dates[i - 1] : null;
+          const monthChanged = prevD && d.substring(0, 7) !== prevD.substring(0, 7);
           return (
-            <button
-              key={d}
-              onClick={() => setScheduleDate(d)}
-              style={{ minWidth: 52, padding: "8px 6px", borderRadius: 12, border: active ? `2px solid ${C.rose}` : `1px solid ${isToday ? C.gold : C.grayBorder}`, background: active ? C.roseLight : C.white, cursor: "pointer", textAlign: "center", flexShrink: 0 }}
-            >
-              <div style={{ fontSize: 10, color: C.grayLight }}>{dayName(d)}</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: active ? C.rose : C.charcoal }}>{dt.getDate()}</div>
-              <div style={{ fontSize: 10, color: active ? C.rose : C.gray, minHeight: 13 }}>{count > 0 ? count : ""}</div>
-            </button>
+            <div key={d} style={{ display: "flex", flexShrink: 0, alignItems: "flex-start", gap: 0 }}>
+              {monthChanged && (
+                <div style={{ alignSelf: "center", fontSize: 9, fontWeight: 700, color: C.rose, textTransform: "uppercase", letterSpacing: 0.5, marginRight: 4, whiteSpace: "nowrap", writingMode: "vertical-rl", transform: "rotate(180deg)" }}>
+                  {monthName(dt.getMonth())}
+                </div>
+              )}
+              <button
+                onClick={() => setScheduleDate(d)}
+                style={{ minWidth: 52, padding: "8px 6px", borderRadius: 12, border: active ? `2px solid ${C.rose}` : `1px solid ${isToday ? C.gold : C.grayBorder}`, background: active ? C.roseLight : C.white, cursor: "pointer", textAlign: "center" }}
+              >
+                <div style={{ fontSize: 10, color: C.grayLight }}>{dayName(d)}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: active ? C.rose : C.charcoal }}>{dt.getDate()}</div>
+                <div style={{ fontSize: 10, color: active ? C.rose : C.gray, minHeight: 13 }}>{count > 0 ? count : ""}</div>
+              </button>
+            </div>
           );
         })}
       </div>

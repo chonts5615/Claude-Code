@@ -24,8 +24,8 @@ const ActionBtn = ({ children, onClick, primary }) => (
 );
 
 // An <a> styled like ActionBtn that opens the phone's Messages app (sms:).
-const TextBtn = ({ phone, body }) => (
-  <a href={smsHref(phone, body)} style={{ padding: "7px 12px", borderRadius: 9, border: "none", background: C.rose, color: C.white, fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 5 }}>
+const TextBtn = ({ phone, body, onClick }) => (
+  <a href={smsHref(phone, body)} onClick={onClick} style={{ padding: "7px 12px", borderRadius: 9, border: "none", background: C.rose, color: C.white, fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 5 }}>
     <Icon d={Icons.phone} size={13} color={C.white} /> Text
   </a>
 );
@@ -126,13 +126,17 @@ export default function ActionCenter({ onOpenTenant, goTo }) {
 
           {groups.leads.map((t) => (
             <Row key={t.id} meta={META.applicant}
-              title={`Follow up — ${t.applicant.name}`}
-              subtitle={`Waiting ${t.waitingDays} days · ${t.applicant.profession} · ${t.applicant.interest}`}>
-              <ActionBtn primary onClick={() => actions.setApplicantStatus(t.applicant.id, t.applicant.status === "new" ? "toured" : "applied")}>
-                {t.applicant.status === "new" ? "Mark toured" : "Mark applied"}
+              title={t.applicant.status === "contacted" ? `Re-follow up — ${t.applicant.name}` : `Follow up — ${t.applicant.name}`}
+              subtitle={`${t.waitingDays} days since added · ${t.applicant.profession} · ${t.applicant.interest}`}>
+              <ActionBtn primary onClick={() => actions.setApplicantStatus(t.applicant.id, t.applicant.status === "contacted" ? "toured" : "contacted")}>
+                {t.applicant.status === "contacted" ? "Mark toured" : "Mark contacted"}
               </ActionBtn>
-              <TextBtn phone={t.applicant.phone} body={applicantMessage(t.applicant, data.settings)} />
-              <ActionBtn onClick={() => copy(applicantMessage(t.applicant, data.settings))}>Copy</ActionBtn>
+              <TextBtn
+                phone={t.applicant.phone}
+                body={applicantMessage(t.applicant, data.settings)}
+                onClick={() => { if (t.applicant.status === "new") actions.setApplicantStatus(t.applicant.id, "contacted"); }}
+              />
+              <ActionBtn onClick={() => { copy(applicantMessage(t.applicant, data.settings)); if (t.applicant.status === "new") actions.setApplicantStatus(t.applicant.id, "contacted"); }}>Copy</ActionBtn>
             </Row>
           ))}
         </div>
