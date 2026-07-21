@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "bloom-beauty-ops",
+  "displayName": "Bloom Beauty Ops",
+  "description": "Operations skills for Bloom Beauty Suites & Lash Bar (Maple Grove, MN): marketing & content, booking & retention, pricing & suite-rental financials, and hiring & staffing.",
+  "version": "0.1.0",
+  "author": {
+    "name": "chonts5615",
+    "email": "vt67gzt6mc@privaterelay.appleid.com"
+  },
+  "homepage": "https://github.com/chonts5615/Claude-Code/tree/main/plugins/bloom-beauty-ops",
+  "keywords": ["salon", "lash", "beauty", "small-business", "marketing", "scheduling", "pricing", "hiring", "suite-rental", "maple-grove"]
+}

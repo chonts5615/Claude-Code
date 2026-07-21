@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "cargill-io-psych",
+  "displayName": "Cargill IO-Psych Toolkit",
+  "description": "IO-psychology skills for talent assessment, job analysis, assessment-center design, career architecture, and adverse-impact analysis — grounded in SIOP Principles, the Uniform Guidelines, and Sackett et al. (2022).",
+  "version": "0.1.0",
+  "author": {
+    "name": "chonts5615",
+    "email": "vt67gzt6mc@privaterelay.appleid.com"
+  },
+  "homepage": "https://github.com/chonts5615/Claude-Code/tree/main/plugins/cargill-io-psych",
+  "keywords": ["hr", "io-psychology", "talent-assessment", "selection", "job-analysis", "assessment-center", "career-architecture", "adverse-impact", "psychometrics", "validation"]
+}

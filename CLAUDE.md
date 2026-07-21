@@ -16,6 +16,8 @@ Claude-Code/
 ├── coverage-audit/                 # Claude Skill — artifact-to-artifact coverage audit (Excel + Word)
 ├── sme-validation-package/         # Claude Skill — SME focus-group validation packages (Word)
 ├── structured-interview-generator/ # Claude Skill — BEI guides, BARS, scorecards (Excel + Word)
+├── plugins/                        # Claude Code plugin marketplace — cargill-io-psych + bloom-beauty-ops
+├── .claude-plugin/marketplace.json # Marketplace manifest (registers the two plugins above)
 └── .github/workflows/build-linux.yml  # CI (lints + tests tech-competency-agent ONLY)
 ```
 
@@ -88,6 +90,33 @@ skill selection) and preserve the documented deliverable contracts (e.g.
 coverage-audit produces a paired Excel matrix + Word summary). Several skills
 declare **mandatory co-skills** (`xlsx`, `docx`, `cargill-branding`,
 `multi-lens-review`) — honor those dependencies.
+
+### 4. Plugin marketplace (`plugins/` + `.claude-plugin/marketplace.json`)
+
+A Claude Code **plugin marketplace** (`cargill-bloom-suite`) that bundles the
+custom skills for the repo owner's two worlds into two installable plugins:
+
+- **`plugins/cargill-io-psych/`** — five I-O-psychology skills that *complement*
+  the TCB app and the three skills above (they do not re-author competency models
+  or interview guides): `job-analysis-facilitator`, `selection-method-advisor`,
+  `assessment-center-designer`, `career-architecture-builder`,
+  `adverse-impact-analyzer`. Grounded in the SIOP Principles (5th ed.), the
+  Uniform Guidelines (29 CFR 1607), and Sackett et al. (2022) validities. Uses
+  Cargill branding.
+- **`plugins/bloom-beauty-ops/`** — four salon-operations skills for **Bloom
+  Beauty Suites & Lash Bar** that read the Bloom React apps' real data shapes and
+  numbers: `bloom-content-studio`, `bloom-booking-ops`, `bloom-pricing-financials`,
+  `bloom-hiring-staff`. Uses the Bloom palette in
+  `plugins/bloom-beauty-ops/references/brand.md`; every artifact carries a
+  not-legal-advice / verify-MN-licensing disclaimer.
+
+Same skill conventions as section 3 (SKILL.md `name` + `description`, `references/`,
+optional `scripts/`). Two skills ship tested pure-Python calculators
+(`adverse-impact-analyzer/scripts/impact_ratio.py`,
+`bloom-pricing-financials/scripts/bloom_calc.py`). Validate with
+`claude plugin validate ./plugins/<name> --strict`. Not covered by CI. Keep the
+two brand systems strictly separate — never use Cargill green for Bloom or vice
+versa.
 
 ## Development workflows
 
