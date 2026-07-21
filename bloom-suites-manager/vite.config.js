@@ -5,6 +5,17 @@ import { VitePWA } from "vite-plugin-pwa";
 // Relative base so the build works from a domain root or a sub-folder.
 export default defineConfig({
   base: "./",
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          recharts: ["recharts"],
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({

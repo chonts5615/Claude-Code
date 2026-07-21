@@ -6,6 +6,17 @@ import { VitePWA } from "vite-plugin-pwa";
 // (Netlify/Vercel) or a sub-folder (GitHub Pages, a USB stick, etc.).
 export default defineConfig({
   base: "./",
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          recharts: ["recharts"],
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
