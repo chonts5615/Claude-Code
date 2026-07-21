@@ -5,6 +5,7 @@ from pathlib import Path
 import anthropic
 
 from src.agents.base import BaseAgent
+from src.schemas.ranking import RankingOutput
 from src.schemas.run_state import RunState
 
 
@@ -19,23 +20,44 @@ class TemplatePopulatorAgent(BaseAgent):
         """
         Populate output template.
 
-        Args:
-            state: Current workflow state
-
-        Returns:
-            Updated state with populated template
+        Writes a minimal workbook with run, job, competency, rank, score, and
+        covered-responsibility metadata so end-to-end smoke runs generate a real
+        artifact instead of a dangling workbook path.
         """
         state.current_step = self.agent_id
 
-        # TODO: Load ranked competencies and populate template
-        # This is a placeholder implementation
-
-        # Save artifact
         output_path = Path(f"data/output/{state.run_id}_s8_populated_template.xlsx")
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        state.artifacts.populated_template = output_path
+        try:
+            from openpyxl import Workbook
+        except ImportError as exc:  # pragma: no cover - dependency is installed in project env
+            raise RuntimeError("openpyxl is required to populate template workbooks") from exc
 
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Ranked Competencies"
+        ws.append([
+            "run_id", "family", "job_id", "rank", "competency_id",
+            "criticality_score", "responsibilities_covered",
+        ])
+
+        if state.artifacts.ranked_top8_v5 and Path(state.artifacts.ranked_top8_v5).exists():
+            ranking = RankingOutput.model_validate_json(Path(state.artifacts.ranked_top8_v5).read_text())
+            for job in ranking.jobs:
+                for competency in job.ranked_competencies:
+                    ws.append([
+                        state.run_id,
+                        state.config.family,
+                        job.job_id,
+                        competency.rank,
+                        competency.competency_id,
+                        competency.criticality_score,
+                        ",".join(competency.responsibility_ids_covered),
+                    ])
+
+        wb.save(output_path)
+        state.artifacts.populated_template = output_path
         return state
 
     def get_system_prompt(self) -> str:
@@ -51,11 +73,5 @@ Population process:
 4. Apply formatting rules (word wrapping, styles, etc.)
 5. Populate metadata (timestamps, version, flags)
 6. Validate populated template
-
-Quality standards:
-- All required fields populated
-- Formatting consistent and professional
-- No data truncation or loss
-- Template validation passes
 
 Output: Populated Excel template file."""

@@ -45,9 +45,10 @@ class NormalizerAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s3_normalized_v2.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
         state.artifacts.normalized_v2 = output_path
+        state.artifacts.normalized_competencies_v2 = output_path
 
         return state
 

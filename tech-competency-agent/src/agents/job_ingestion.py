@@ -50,7 +50,7 @@ class JobIngestionAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s1_jobs_extracted.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
         state.artifacts.jobs_extracted = output_path
 

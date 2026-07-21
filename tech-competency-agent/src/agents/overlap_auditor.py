@@ -45,7 +45,7 @@ class OverlapAuditorAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s4_overlap_audit_v1.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
         state.artifacts.overlap_audit_v1 = output_path
 

@@ -1,5 +1,6 @@
 """Step 5: Overlap Remediator Agent - Fixes overlap issues."""
 
+import shutil
 from pathlib import Path
 
 import anthropic
@@ -45,10 +46,22 @@ class OverlapRemediatorAgent(BaseAgent):
         output_path = Path(f"data/output/{state.run_id}_s5_remediation_log.json")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            f.write(output.json(indent=2))
+            f.write(output.model_dump_json(indent=2))
 
-        # Save cleaned competencies (v3)
+        # Save cleaned competencies (v3). With no remediation actions, preserve
+        # the normalized artifact so later stages never receive a dangling path.
         clean_output_path = Path(f"data/output/{state.run_id}_s5_clean_v3.json")
+        source_path = state.artifacts.normalized_v2 or state.artifacts.normalized_competencies_v2
+        if source_path and Path(source_path).exists():
+            shutil.copyfile(source_path, clean_output_path)
+        else:
+            clean_output_path.write_text(
+                '{\n'
+                '  "jobs": [],\n'
+                '  "processing_version": "v3",\n'
+                '  "total_competencies": 0\n'
+                '}\n'
+            )
         state.artifacts.clean_v3 = clean_output_path
 
         return state

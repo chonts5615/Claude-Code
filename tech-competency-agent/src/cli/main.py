@@ -98,7 +98,7 @@ def run(stage, family, jobs_file, tech_sources, leadership_file, template_file, 
 
     state_file = output_path / f"{run_id}_final_state.json"
     with open(state_file, "w") as f:
-        f.write(final_state.json(indent=2))
+        f.write(final_state.model_dump_json(indent=2))
 
     click.echo("\n=== v3.1 Workflow Summary ===")
     click.echo(f"Run ID:  {run_id}")
@@ -155,14 +155,14 @@ def map_skills(library, catalog, family, out, config, min_confidence, llm_tiebre
 @click.argument("state_file", type=click.Path(exists=True))
 def inspect(state_file):
     """Inspect a completed workflow run state."""
-    state = RunState.parse_file(state_file)
+    state = RunState.model_validate_json(Path(state_file).read_text())
     click.echo(f"\n=== Run State: {state.run_id} ===")
     click.echo(f"Timestamp: {state.run_timestamp_utc}")
     click.echo(f"Stage:     {state.config.stage}")
     click.echo(f"Family:    {state.config.family}")
     click.echo(f"Step:      {state.current_step}")
     click.echo("\nArtifacts generated:")
-    for key, value in state.artifacts.dict().items():
+    for key, value in state.artifacts.model_dump().items():
         if value:
             click.echo(f"  {key}: {value}")
     click.echo(f"\nFlags: {len(state.flags)}")
