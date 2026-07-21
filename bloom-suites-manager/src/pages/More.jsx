@@ -18,8 +18,22 @@ const APPLICANT_NEXT = { new: "toured", toured: "applied", applied: "approved" }
 function Applicants({ onBack }) {
   const { data, actions, notify } = useBloom();
   const [adding, setAdding] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("active");
   const [form, setForm] = useState({ name: "", profession: "Lash Artist", phone: "", email: "", interest: "", notes: "" });
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const ACTIVE_STATUSES = ["new", "toured", "applied"];
+  const visible = data.applicants.filter((a) => {
+    if (statusFilter === "active") return ACTIVE_STATUSES.includes(a.status);
+    if (statusFilter === "approved") return a.status === "approved";
+    return true;
+  });
+
+  const counts = {
+    active: data.applicants.filter((a) => ACTIVE_STATUSES.includes(a.status)).length,
+    approved: data.applicants.filter((a) => a.status === "approved").length,
+    all: data.applicants.length,
+  };
 
   return (
     <div style={{ padding: "16px 16px 100px" }}>
@@ -28,9 +42,17 @@ function Applicants({ onBack }) {
         <button onClick={() => setAdding(true)} style={addBtn}><Icon d={Icons.plus} size={16} color={C.white} /> Add</button>
       }>Applicants</PageTitle>
 
-      {data.applicants.length === 0 && <EmptyState icon={Icons.users} text="No applicants yet" />}
+      <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
+        {[["Active", "active", counts.active], ["Approved", "approved", counts.approved], ["All", "all", counts.all]].map(([label, val, count]) => (
+          <button key={val} onClick={() => setStatusFilter(val)} style={{ padding: "6px 12px", borderRadius: 20, border: `1px solid ${statusFilter === val ? C.rose : C.grayBorder}`, background: statusFilter === val ? C.roseLight : C.white, color: statusFilter === val ? C.rose : C.charcoal, fontSize: 12, fontWeight: statusFilter === val ? 600 : 400, cursor: "pointer" }}>
+            {label} ({count})
+          </button>
+        ))}
+      </div>
 
-      {data.applicants.map((a) => (
+      {visible.length === 0 && <EmptyState icon={Icons.users} text={data.applicants.length === 0 ? "No applicants yet" : "None in this group"} />}
+
+      {visible.map((a) => (
         <Card key={a.id} style={{ padding: "14px 16px", marginBottom: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
@@ -111,8 +133,11 @@ function Maintenance({ onBack }) {
       )}
 
       <Modal open={adding} onClose={() => setAdding(false)} title="Log Maintenance Request">
-        <Field label="Suite">
-          <Select value={form.suiteId} onChange={set("suiteId")}>{data.suites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</Select>
+        <Field label="Location">
+          <Select value={form.suiteId} onChange={set("suiteId")}>
+            <option value="">Common area</option>
+            {data.suites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </Select>
         </Field>
         <Field label="Issue"><Input value={form.title} onChange={set("title")} placeholder="e.g. Leaky faucet" /></Field>
         <Field label="Priority">

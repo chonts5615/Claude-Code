@@ -255,6 +255,7 @@ function Settings({ onBack }) {
   const setField = (k) => (e) => actions.updateSettings({ [k]: e.target.value });
   const setExpense = (k) => (e) =>
     actions.updateSettings({ monthlyExpenses: { ...settings.monthlyExpenses, [k]: Math.max(0, Number(e.target.value) || 0) } });
+  const setRate = (k) => (e) => actions.updateSettings({ [k]: Math.min(1, Math.max(0, (Number(e.target.value) || 0) / 100)) });
 
   const backup = () => actions.backupData();
   const restore = (e) => {
@@ -299,6 +300,21 @@ function Settings({ onBack }) {
           ))}
         </div>
         <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Used to estimate monthly profit on the Finances tab.</p>
+      </Card>
+
+      <Card style={{ marginBottom: 16 }}>
+        <SectionHeader title="Finance Rates" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <Field label="Tax reserve (% of profit)">
+            <Input type="number" inputMode="decimal" min={0} max={100} step={1}
+              value={Math.round(settings.taxReserveRate * 100)} onChange={setRate("taxReserveRate")} />
+          </Field>
+          <Field label="Product cost (% of revenue)">
+            <Input type="number" inputMode="decimal" min={0} max={100} step={0.5}
+              value={Math.round(settings.cogsRate * 1000) / 10} onChange={setRate("cogsRate")} />
+          </Field>
+        </div>
+        <p style={{ fontSize: 11, color: C.grayLight, margin: 0 }}>Used on the Finances tab for the tax reserve and profit estimate.</p>
       </Card>
 
       <Card style={{ marginBottom: 16 }}>
@@ -378,7 +394,7 @@ export default function More() {
       <Card style={{ marginTop: 16 }}>
         <SectionHeader title="Business Snapshot" />
         {[
-          ["Active Clients", `${data.clients.length}`],
+          ["Total Clients", `${data.clients.length}`],
           ["Services Offered", `${data.services.length}`],
           ["Monthly Rent", fmt(data.settings.monthlyExpenses.rent)],
           ["Location", data.settings.location],
